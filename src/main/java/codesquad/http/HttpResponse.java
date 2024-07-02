@@ -60,7 +60,7 @@ public class HttpResponse<T> {
                 response.append((String) body);
             } else if (body instanceof File) {
                 try (InputStream inputStream = new FileInputStream((File) body)) {
-                    byte[] buffer = new byte[1024];
+                    byte[] buffer = new byte[(int) ((File) body).length()];
                     int bytesRead;
                     while ((bytesRead = inputStream.read(buffer)) != -1) {
                         response.append(new String(buffer, 0, bytesRead));

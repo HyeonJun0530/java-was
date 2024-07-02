@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class HttpProcessor implements Runnable {
 
@@ -60,7 +61,7 @@ public class HttpProcessor implements Runnable {
     }
 
     private void write(HttpResponse httpResponse, OutputStream out) throws IOException {
-        out.write(httpResponse.toString().getBytes());
+        out.write(httpResponse.toString().getBytes(StandardCharsets.UTF_8));
         out.flush();
     }
 
