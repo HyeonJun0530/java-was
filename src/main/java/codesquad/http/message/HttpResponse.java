@@ -1,4 +1,6 @@
-package codesquad.http;
+package codesquad.http.message;
+
+import codesquad.http.message.constant.HttpStatus;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,10 +15,10 @@ public class HttpResponse<T> {
 
     private final String httpVersion;
     private final HttpStatus httpStatus;
-    private final HttpHeader header;
+    private final HttpHeaders header;
     private final T body;
 
-    public HttpResponse(final String httpVersion, final HttpStatus httpStatus, final HttpHeader header, final T body) {
+    public HttpResponse(final String httpVersion, final HttpStatus httpStatus, final HttpHeaders header, final T body) {
         if (httpVersion != null) this.httpVersion = httpVersion;
         else this.httpVersion = DEFAULT_HTTP_VERSION;
         this.httpStatus = httpStatus;
@@ -26,17 +28,17 @@ public class HttpResponse<T> {
 
     public static <T> HttpResponse<T> of(final HttpStatus httpStatus, final T body) {
         if (httpStatus.is4xxClientError() || httpStatus.is5xxServerError())
-            return new HttpResponse<>(DEFAULT_HTTP_VERSION, httpStatus, HttpHeader.error(), body);
+            return new HttpResponse<>(DEFAULT_HTTP_VERSION, httpStatus, HttpHeaders.error(), body);
 
         if (httpStatus.is2xxSuccessful()) {
             return ok(body);
         }
 
-        return new HttpResponse<>(DEFAULT_HTTP_VERSION, httpStatus, HttpHeader.of(httpStatus, body), body);
+        return new HttpResponse<>(DEFAULT_HTTP_VERSION, httpStatus, HttpHeaders.of(httpStatus, body), body);
     }
 
     public static <T> HttpResponse<T> ok(final T body) {
-        return new HttpResponse<>(DEFAULT_HTTP_VERSION, HttpStatus.OK, HttpHeader.of(HttpStatus.OK, body), body);
+        return new HttpResponse<>(DEFAULT_HTTP_VERSION, HttpStatus.OK, HttpHeaders.of(HttpStatus.OK, body), body);
     }
 
     @Override

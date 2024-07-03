@@ -1,5 +1,6 @@
 package codesquad.http;
 
+import codesquad.http.message.constant.HttpStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

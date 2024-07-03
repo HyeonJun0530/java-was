@@ -1,5 +1,7 @@
 package codesquad.http;
 
+import codesquad.http.message.HttpHeaders;
+import codesquad.http.message.constant.HttpStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -14,18 +16,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class HttpHeaderTest {
+class HttpHeadersTest {
 
-    private static final Logger log = LoggerFactory.getLogger(HttpHeaderTest.class);
+    private static final Logger log = LoggerFactory.getLogger(HttpHeadersTest.class);
 
     @Test
     @DisplayName("HttpHeader 객체를 생성한다. - error")
     void error() {
-        HttpHeader httpHeader = HttpHeader.error();
-        log.debug(httpHeader.toString());
+        HttpHeaders httpHeaders = HttpHeaders.error();
+        log.debug(httpHeaders.toString());
 
-        assertNotNull(httpHeader);
-        assertTrue(httpHeader.toString().contains("application/json"));
+        assertNotNull(httpHeaders);
+        assertTrue(httpHeaders.toString().contains("application/json"));
     }
 
     @Test
@@ -36,12 +38,12 @@ class HttpHeaderTest {
                 "\r\n";
 
         try (BufferedReader reader = new BufferedReader(new StringReader(input))) {
-            HttpHeader httpHeader = HttpHeader.from(reader);
-            log.debug(httpHeader.toString());
+            HttpHeaders httpHeaders = HttpHeaders.from(reader);
+            log.debug(httpHeaders.toString());
 
-            assertNotNull(httpHeader);
-            assertTrue(httpHeader.toString().contains("text/html"));
-            assertThat(httpHeader.toString()).contains("host:www.example.com");
+            assertNotNull(httpHeaders);
+            assertTrue(httpHeaders.toString().contains("text/html"));
+            assertThat(httpHeaders.toString()).contains("host:www.example.com");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -52,11 +54,11 @@ class HttpHeaderTest {
     void of() {
         HttpStatus httpStatus = HttpStatus.OK;
         File file = new File("src/main/resources/static/index.html");
-        HttpHeader httpHeader = HttpHeader.of(httpStatus, file);
-        log.debug(httpHeader.toString());
+        HttpHeaders httpHeaders = HttpHeaders.of(httpStatus, file);
+        log.debug(httpHeaders.toString());
 
-        assertNotNull(httpHeader);
-        assertTrue(httpHeader.toString().contains("text/html"));
+        assertNotNull(httpHeaders);
+        assertTrue(httpHeaders.toString().contains("text/html"));
     }
 
     @Test
@@ -65,7 +67,7 @@ class HttpHeaderTest {
         HttpStatus httpStatus = HttpStatus.OK;
         int body = 1;
 
-        assertThatThrownBy(() -> HttpHeader.of(httpStatus, body))
+        assertThatThrownBy(() -> HttpHeaders.of(httpStatus, body))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

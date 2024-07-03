@@ -1,4 +1,7 @@
-package codesquad.http;
+package codesquad.http.message;
+
+import codesquad.http.message.constant.ContentType;
+import codesquad.http.message.constant.HttpStatus;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,30 +11,30 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
-public class HttpHeader {
+public class HttpHeaders {
 
     private static final String NEW_LINE_LETTER = "\r\n";
     private static final String COLON_LETTER = ":";
 
     private final Map<String, String> headers;
 
-    public HttpHeader(final Map<String, String> headers) {
+    public HttpHeaders(final Map<String, String> headers) {
         this.headers = headers;
     }
 
-    public static HttpHeader error() {
+    public static HttpHeaders error() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", ContentType.APPLICATION_JSON.getType());
         headers.put("Content-Length", "0");
 
-        return new HttpHeader(headers);
+        return new HttpHeaders(headers);
     }
 
-    public static HttpHeader from(final BufferedReader reader) throws IOException {
-        return new HttpHeader(parseHeaders(reader));
+    public static HttpHeaders from(final BufferedReader reader) throws IOException {
+        return new HttpHeaders(parseHeaders(reader));
     }
 
-    public static <T> HttpHeader of(final HttpStatus status, final T body) {
+    public static <T> HttpHeaders of(final HttpStatus status, final T body) {
         Map<String, String> headers = new HashMap<>();
         if (body instanceof String) {
             String bodyStr = (String) body;
@@ -45,7 +48,7 @@ public class HttpHeader {
             throw new IllegalArgumentException("Unsupported body type");
         }
 
-        return new HttpHeader(headers);
+        return new HttpHeaders(headers);
     }
 
     private static Map<String, String> parseHeaders(final BufferedReader reader) throws IOException {

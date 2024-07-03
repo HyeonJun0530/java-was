@@ -1,4 +1,4 @@
-package codesquad.http;
+package codesquad.http.message.constant;
 
 import java.util.Arrays;
 

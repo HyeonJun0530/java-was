@@ -1,4 +1,4 @@
-package codesquad.http;
+package codesquad.http.message;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,21 +8,22 @@ public class HttpRequest {
     private final String method;
     private final String path;
     private final String version;
-    private final HttpHeader httpHeader;
+    private final HttpHeaders httpHeaders;
 
-    private HttpRequest(final String method, final String path, final String version, final HttpHeader httpHeader) {
+
+    private HttpRequest(final String method, final String path, final String version, final HttpHeaders httpHeaders) {
         this.method = method;
         this.path = path;
         this.version = version;
-        this.httpHeader = httpHeader;
+        this.httpHeaders = httpHeaders;
     }
 
     public static HttpRequest from(final BufferedReader reader) throws IOException {
         String requestLine = readRequestLine(reader);
         String[] requestParts = parseRequestLine(requestLine);
-        HttpHeader httpHeader = HttpHeader.from(reader);
+        HttpHeaders httpHeaders = HttpHeaders.from(reader);
 
-        return new HttpRequest(requestParts[0], requestParts[1], requestParts[2], httpHeader);
+        return new HttpRequest(requestParts[0], requestParts[1], requestParts[2], httpHeaders);
     }
 
     private static String readRequestLine(final BufferedReader reader) throws IOException {
@@ -53,7 +54,7 @@ public class HttpRequest {
         return version;
     }
 
-    public HttpHeader getHttpHeader() {
-        return httpHeader;
+    public HttpHeaders getHttpHeader() {
+        return httpHeaders;
     }
 }
