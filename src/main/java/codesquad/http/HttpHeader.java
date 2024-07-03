@@ -63,13 +63,13 @@ public class HttpHeader {
         return headers;
     }
 
-    private static String formatHeaders(Map<String, String> headers) {
+    private static String formatHeaders(final Map<String, String> headers) {
         return headers.entrySet().stream()
                 .map(entry -> entry.getKey() + COLON_LETTER + entry.getValue())
                 .collect(Collectors.joining(NEW_LINE_LETTER));
     }
 
-    private static String getContentType(String fileName) {
+    private static String getContentType(final String fileName) {
         String ext = fileName.substring(fileName.lastIndexOf('.')).toLowerCase();
 
         return ContentType.of(ext).getType();
