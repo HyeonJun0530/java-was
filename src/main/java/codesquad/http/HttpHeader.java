@@ -53,10 +53,10 @@ public class HttpHeader {
         Map<String, String> headers = new HashMap<>();
 
         String headerLine;
-        while (!(headerLine = reader.readLine()).isEmpty()) {
+        while ((headerLine = reader.readLine()) != null && !headerLine.isEmpty()) {
             String[] headerParts = headerLine.split(COLON_LETTER, 2);
             if (headerParts.length == 2) {
-                headers.put(headerParts[0], headerParts[1]);
+                headers.put(headerParts[0].toLowerCase(), headerParts[1].trim());
             }
         }
 
