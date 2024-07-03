@@ -12,7 +12,6 @@ public enum HttpStatus {
     MOVED_PERMANENTLY(301, HttpStatus.Series.REDIRECTION, "Moved Permanently"),
     FOUND(302, HttpStatus.Series.REDIRECTION, "Found"),
 
-    MOVED_TEMPORARILY(302, HttpStatus.Series.REDIRECTION, "Moved Temporarily"),
 
     BAD_REQUEST(400, HttpStatus.Series.CLIENT_ERROR, "Bad Request"),
     UNAUTHORIZED(401, HttpStatus.Series.CLIENT_ERROR, "Unauthorized"),
