@@ -44,7 +44,6 @@ public class HttpHeader {
         } else {
             throw new IllegalArgumentException("Unsupported body type");
         }
-        headers.put("Status", status.toString());
 
         return new HttpHeader(headers);
     }
