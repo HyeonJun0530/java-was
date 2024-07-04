@@ -1,80 +1,82 @@
 package codesquad.http.message;
 
-import codesquad.http.message.constant.ContentType;
-import codesquad.http.message.constant.HttpStatus;
+import codesquad.http.message.constant.HttpHeader;
+import codesquad.http.message.response.ResponseBody;
+import codesquad.utils.HttpMessageUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import static codesquad.utils.StringUtils.COLON;
+import static codesquad.utils.StringUtils.NEW_LINE;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 
 
 public class HttpHeaders {
 
-    private static final String NEW_LINE_LETTER = "\r\n";
-    private static final String COLON_LETTER = ":";
+    private static final String DEFAULT_SERVER_NAME = "Hyn_053 Server";
 
     private final Map<String, String> headers;
 
-    public HttpHeaders(final Map<String, String> headers) {
+    private HttpHeaders(final Map<String, String> headers) {
         this.headers = headers;
     }
 
-    public static HttpHeaders error() {
+    public static HttpHeaders newInstance() {
         Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", ContentType.APPLICATION_JSON.getType());
-        headers.put("Content-Length", "0");
+        addResponseDefaultHeaders(headers);
+        headers.put(HttpHeader.CONTENT_LENGTH.getHeaderName(), "0");
 
         return new HttpHeaders(headers);
     }
 
-    public static HttpHeaders from(final BufferedReader reader) throws IOException {
-        return new HttpHeaders(parseHeaders(reader));
+    public static HttpHeaders from(final String headerMessage) {
+        Map<String, String> headers = parseHeaders(headerMessage);
+        addResponseDefaultHeaders(headers);
+        return new HttpHeaders(headers);
     }
 
-    public static <T> HttpHeaders of(final HttpStatus status, final T body) {
+    public static HttpHeaders of(final ResponseBody body) {
         Map<String, String> headers = new HashMap<>();
-        if (body instanceof String) {
-            String bodyStr = (String) body;
-            headers.put("Content-Type", ContentType.APPLICATION_JSON.getType());
-            headers.put("Content-Length", String.valueOf(bodyStr.getBytes().length));
-        } else if (body instanceof File) {
-            File bodyFile = (File) body;
-            headers.put("Content-Type", getContentType(bodyFile.getName()));
-            headers.put("Content-Length", String.valueOf(bodyFile.length()));
-        } else {
-            throw new IllegalArgumentException("Unsupported body type");
-        }
+        addResponseDefaultHeaders(headers);
+
+        headers.put(HttpHeader.CONTENT_TYPE.getHeaderName(), body.getContentType().getType());
+        headers.put(HttpHeader.CONTENT_LENGTH.getHeaderName(), String.valueOf(body.getBytes().length));
 
         return new HttpHeaders(headers);
     }
 
-    private static Map<String, String> parseHeaders(final BufferedReader reader) throws IOException {
-        Map<String, String> headers = new HashMap<>();
+    public static HttpHeaders of(final String location) {
+        HttpHeaders httpHeaders = newInstance();
+        httpHeaders.headers.put(HttpHeader.LOCATION.getHeaderName(), location);
 
-        String headerLine;
-        while ((headerLine = reader.readLine()) != null && !headerLine.isEmpty()) {
-            String[] headerParts = headerLine.split(COLON_LETTER, 2);
-            if (headerParts.length == 2) {
-                headers.put(headerParts[0].toLowerCase(), headerParts[1].trim());
-            }
-        }
+        return httpHeaders;
+    }
 
-        return headers;
+    private static void addResponseDefaultHeaders(final Map<String, String> headers) {
+        headers.put(HttpHeader.SERVER.getHeaderName(), DEFAULT_SERVER_NAME);
+        headers.put(HttpHeader.DATE.getHeaderName(), HttpMessageUtils.getCurrentTime());
+    }
+
+    private static Map<String, String> parseHeaders(final String headers) {
+        return Arrays.stream(headers.split(NEW_LINE))
+                .map(header -> header.split(COLON, 2))
+                .collect(toMap(
+                        headerKeyValue -> headerKeyValue[0].trim(),
+                        headerKeyValue -> headerKeyValue[1].trim()
+                ));
     }
 
     private static String formatHeaders(final Map<String, String> headers) {
         return headers.entrySet().stream()
-                .map(entry -> entry.getKey() + COLON_LETTER + entry.getValue())
-                .collect(Collectors.joining(NEW_LINE_LETTER));
+                .map(entry -> entry.getKey() + COLON + entry.getValue())
+                .collect(joining(NEW_LINE));
     }
 
-    private static String getContentType(final String fileName) {
-        String ext = fileName.substring(fileName.lastIndexOf('.')).toLowerCase();
-
-        return ContentType.of(ext).getType();
+    public byte[] getBytes() {
+        return formatHeaders(headers).getBytes();
     }
 
     @Override

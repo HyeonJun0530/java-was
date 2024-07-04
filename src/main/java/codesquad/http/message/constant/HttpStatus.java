@@ -80,6 +80,7 @@ public enum HttpStatus {
         return this.is4xxClientError() || this.is5xxServerError();
     }
 
+    @Override
     public String toString() {
         int var10000 = this.value;
         return "" + var10000 + " " + this.name();
