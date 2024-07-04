@@ -60,7 +60,7 @@ public class HttpProcessor implements Runnable {
         return new File(BASE_DIRECTORY + path);
     }
 
-    private void write(HttpResponse httpResponse, OutputStream out) throws IOException {
+    private void write(final HttpResponse httpResponse, final OutputStream out) throws IOException {
         out.write(httpResponse.toString().getBytes(StandardCharsets.UTF_8));
         out.flush();
     }

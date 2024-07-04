@@ -19,12 +19,12 @@ public enum ContentType {
     private final String type;
     private final String ext;
 
-    ContentType(String type, final String ext) {
+    ContentType(final String type, final String ext) {
         this.type = type;
         this.ext = ext;
     }
 
-    public static ContentType of(String ext) {
+    public static ContentType of(final String ext) {
         return Arrays.stream(ContentType.values())
                 .filter(contentType -> contentType.ext.equals(ext))
                 .findFirst()

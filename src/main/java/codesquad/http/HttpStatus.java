@@ -12,7 +12,6 @@ public enum HttpStatus {
     MOVED_PERMANENTLY(301, HttpStatus.Series.REDIRECTION, "Moved Permanently"),
     FOUND(302, HttpStatus.Series.REDIRECTION, "Found"),
 
-    MOVED_TEMPORARILY(302, HttpStatus.Series.REDIRECTION, "Moved Temporarily"),
 
     BAD_REQUEST(400, HttpStatus.Series.CLIENT_ERROR, "Bad Request"),
     UNAUTHORIZED(401, HttpStatus.Series.CLIENT_ERROR, "Unauthorized"),
@@ -32,13 +31,13 @@ public enum HttpStatus {
     private final Series series;
     private final String reasonPhrase;
 
-    private HttpStatus(int value, Series series, String reasonPhrase) {
+    private HttpStatus(final int value, final Series series, final String reasonPhrase) {
         this.value = value;
         this.series = series;
         this.reasonPhrase = reasonPhrase;
     }
 
-    public static HttpStatus valueOf(int statusCode) {
+    public static HttpStatus valueOf(final int statusCode) {
         return Arrays.stream(HttpStatus.values())
                 .filter(status -> status.value == statusCode)
                 .findFirst()
@@ -95,11 +94,11 @@ public enum HttpStatus {
 
         private final int value;
 
-        private Series(int value) {
+        private Series(final int value) {
             this.value = value;
         }
 
-        public static Series resolve(int statusCode) {
+        public static Series resolve(final int statusCode) {
             int seriesCode = statusCode / 100;
             Series[] var2 = values();
             int var3 = var2.length;

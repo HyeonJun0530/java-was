@@ -24,7 +24,7 @@ public class HttpResponse<T> {
         this.body = body;
     }
 
-    public static <T> HttpResponse<T> of(HttpStatus httpStatus, T body) {
+    public static <T> HttpResponse<T> of(final HttpStatus httpStatus, final T body) {
         if (httpStatus.is4xxClientError() || httpStatus.is5xxServerError())
             return new HttpResponse<>(DEFAULT_HTTP_VERSION, httpStatus, HttpHeader.error(), body);
 
@@ -35,7 +35,7 @@ public class HttpResponse<T> {
         return new HttpResponse<>(DEFAULT_HTTP_VERSION, httpStatus, HttpHeader.of(httpStatus, body), body);
     }
 
-    public static <T> HttpResponse<T> ok(T body) {
+    public static <T> HttpResponse<T> ok(final T body) {
         return new HttpResponse<>(DEFAULT_HTTP_VERSION, HttpStatus.OK, HttpHeader.of(HttpStatus.OK, body), body);
     }
 

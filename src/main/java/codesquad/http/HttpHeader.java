@@ -44,7 +44,6 @@ public class HttpHeader {
         } else {
             throw new IllegalArgumentException("Unsupported body type");
         }
-        headers.put("Status", status.toString());
 
         return new HttpHeader(headers);
     }
@@ -53,23 +52,23 @@ public class HttpHeader {
         Map<String, String> headers = new HashMap<>();
 
         String headerLine;
-        while (!(headerLine = reader.readLine()).isEmpty()) {
+        while ((headerLine = reader.readLine()) != null && !headerLine.isEmpty()) {
             String[] headerParts = headerLine.split(COLON_LETTER, 2);
             if (headerParts.length == 2) {
-                headers.put(headerParts[0], headerParts[1]);
+                headers.put(headerParts[0].toLowerCase(), headerParts[1].trim());
             }
         }
 
         return headers;
     }
 
-    private static String formatHeaders(Map<String, String> headers) {
+    private static String formatHeaders(final Map<String, String> headers) {
         return headers.entrySet().stream()
                 .map(entry -> entry.getKey() + COLON_LETTER + entry.getValue())
                 .collect(Collectors.joining(NEW_LINE_LETTER));
     }
 
-    private static String getContentType(String fileName) {
+    private static String getContentType(final String fileName) {
         String ext = fileName.substring(fileName.lastIndexOf('.')).toLowerCase();
 
         return ContentType.of(ext).getType();
