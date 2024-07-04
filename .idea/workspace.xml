@@ -1,0 +1,599 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="00e50db5-86bc-40ae-bcf5-ef19e391d6fd" name="Changes" comment="refactor: rename, package 이동&#10;&#10;- message로 HttpRequest, Response, Headers 이동&#10;- HttpHeader -&gt; HttpHeaders로 rename">
+      <change afterPath="$PROJECT_DIR$/src/main/java/codesquad/http/message/constant/HttpMethod.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/codesquad/http/HttpResponseTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/codesquad/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/codesquad/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/codesquad/http/HttpProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/codesquad/http/HttpProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/codesquad/http/message/HttpHeaders.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/codesquad/http/message/HttpHeaders.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/codesquad/http/message/HttpRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/codesquad/http/message/request/HttpRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/codesquad/http/message/HttpResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/codesquad/http/message/response/HttpResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/codesquad/http/message/constant/ContentType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/codesquad/http/message/constant/ContentType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/codesquad/http/message/constant/HttpStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/codesquad/http/message/constant/HttpStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/registration/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/registration/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/codesquad/http/ContentTypeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/codesquad/http/ContentTypeTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/codesquad/http/HttpHeadersTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/codesquad/http/HttpHeadersTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/codesquad/http/HttpRequestTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/codesquad/http/HttpRequestTest.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="java-was" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="java-was" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="java-was" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="build" type="c8890929:TasksNode$1" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JUnit5 Test Class" />
+        <option value="Enum" />
+        <option value="AnnotationType" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="step-2" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="MIXED" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;HyeonJun0530&quot;
+  }
+}</component>
+  <component name="GitRewordedCommitMessages">
+    <option name="commitMessagesMapping">
+      <RewordedCommitMessageMapping>
+        <option name="originalMessage" value="refactor: rename, package 이동&#10;&#10;- message로 HttpRequest, Response, Headers 이동&#10;- HttpHeader -&gt; HttpHeaders로 rename" />
+        <option name="rewordedMessage" value="refactor: rename, package 이동&#10;&#10;- message로 HttpRequest, Response, Headers 이동&#10;- HttpHeader -&gt; HttpHeaders로 rename" />
+      </RewordedCommitMessageMapping>
+    </option>
+    <option name="currentCommit" value="1" />
+    <option name="onto" value="c398757669a57f68e53b8f13122a08976c386e58" />
+  </component>
+  <component name="GitToolBoxStore">
+    <option name="recentBranches">
+      <RecentBranches>
+        <option name="branchesForRepo">
+          <list>
+            <RecentBranchesForRepo>
+              <option name="branches">
+                <list>
+                  <RecentBranch>
+                    <option name="branchName" value="step-3" />
+                    <option name="lastUsedInstant" value="1720002651" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="step-2" />
+                    <option name="lastUsedInstant" value="1719922599" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="main" />
+                    <option name="lastUsedInstant" value="1719813954" />
+                  </RecentBranch>
+                </list>
+              </option>
+              <option name="repositoryRootUrl" value="file://$PROJECT_DIR$" />
+            </RecentBranchesForRepo>
+          </list>
+        </option>
+      </RecentBranches>
+    </option>
+  </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/HyeonJun0530/java-was.git&quot;,
+    &quot;accountId&quot;: &quot;53891952-711f-4d4b-9b0b-30d1af9e01e5&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2idHeDFEl30hPw7hWZnHHoiupV8" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Main.executor": "Run",
+    "Gradle.Download Sources.executor": "Run",
+    "Gradle.HttpHeaderTest.of.executor": "Run",
+    "Gradle.java-was [:Main.main()].executor": "Run",
+    "Gradle.java-was [clean].executor": "Run",
+    "Gradle.java-was [jar].executor": "Run",
+    "JUnit.All in java-was.test (1).executor": "Run",
+    "JUnit.All in java-was.test (2).executor": "Run",
+    "JUnit.All in java-was.test.executor": "Run",
+    "JUnit.ContentTypeTest.executor": "Debug",
+    "JUnit.ContentTypeTest.from.executor": "Run",
+    "JUnit.ContentTypeTest.of.executor": "Run",
+    "JUnit.ExecutorServiceConfigurationTest.threadPool.executor": "Run",
+    "JUnit.HttpHeaderTest.error.executor": "Run",
+    "JUnit.HttpHeaderTest.from.executor": "Run",
+    "JUnit.HttpHeaderTest.of.executor": "Run",
+    "JUnit.HttpHeaderTest.of_fail.executor": "Run",
+    "JUnit.HttpRequestTest.from.executor": "Run",
+    "JUnit.HttpResponseTest.of.executor": "Run",
+    "JUnit.HttpResponseTest.ok.executor": "Run",
+    "JUnit.HttpStatusTest.series_resolve.executor": "Run",
+    "JUnit.HttpStatusTest.valueOf.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
+    "git-widget-placeholder": "step-3",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.sourceCode.Java",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="codesquad.utils" />
+      <recent name="codesquad.http.message.request" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="codesquad.http" />
+      <recent name="codesquad.config" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.Main">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="codesquad.Main" />
+      <module name="java-was.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="codesquad.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="java-was [jar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="jar" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="ContentTypeTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="java-was.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="codesquad.http.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="codesquad.http" />
+      <option name="MAIN_CLASS_NAME" value="codesquad.http.ContentTypeTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ContentTypeTest.from" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="java-was.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="codesquad.http.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="codesquad.http" />
+      <option name="MAIN_CLASS_NAME" value="codesquad.http.ContentTypeTest" />
+      <option name="METHOD_NAME" value="from(java.lang.String,java.lang.String)" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="HttpResponseTest.ok" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="java-was.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="codesquad.http.message.constant.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="codesquad.http" />
+      <option name="MAIN_CLASS_NAME" value="codesquad.http.HttpResponseTest" />
+      <option name="METHOD_NAME" value="ok" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+        <item itemvalue="Gradle.java-was [jar]" />
+        <item itemvalue="JUnit.ContentTypeTest" />
+        <item itemvalue="JUnit.ContentTypeTest.from" />
+        <item itemvalue="JUnit.HttpResponseTest.ok" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.18034.62" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.18034.62" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="00e50db5-86bc-40ae-bcf5-ef19e391d6fd" name="Changes" comment="" />
+      <created>1719813627629</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1719813627629</updated>
+      <workItem from="1719813629858" duration="4398000" />
+      <workItem from="1719819784702" duration="1295000" />
+      <workItem from="1719821377354" duration="2115000" />
+      <workItem from="1719880835866" duration="11208000" />
+      <workItem from="1719899636760" duration="17937000" />
+      <workItem from="1719922959777" duration="2429000" />
+      <workItem from="1719969596688" duration="3255000" />
+      <workItem from="1719977344203" duration="35000" />
+      <workItem from="1719977412600" duration="27148000" />
+      <workItem from="1720057021437" duration="4682000" />
+      <workItem from="1720064378166" duration="19255000" />
+    </task>
+    <task id="LOCAL-00001" summary="config: 프로젝트 환경설정&#10;- .gitignore 추가&#10;- build.gradle 의존성 추가(로깅, 테스트)">
+      <option name="closed" value="true" />
+      <created>1719893729369</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1719893729369</updated>
+    </task>
+    <task id="LOCAL-00002" summary="config: 프로젝트 환경설정&#10;- .gitignore 추가&#10;- build.gradle 의존성 추가(로깅, 테스트)">
+      <option name="closed" value="true" />
+      <created>1719894313308</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1719894313308</updated>
+    </task>
+    <task id="LOCAL-00003" summary="feat: HttpHeader 구현&#10;&#10;- 헤더 생성 메서드&#10;- BufferedReader 에서 들어온 값 파싱">
+      <option name="closed" value="true" />
+      <created>1719917361711</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1719917361711</updated>
+    </task>
+    <task id="LOCAL-00004" summary="feat">
+      <option name="closed" value="true" />
+      <created>1719917438037</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1719917438037</updated>
+    </task>
+    <task id="LOCAL-00005" summary="feat: HttpRequest 구현&#10;&#10;- BufferedReader로 들어온 입력 값 파싱&#10;- HttpRequest 생성 메서드 구현">
+      <option name="closed" value="true" />
+      <created>1719917650876</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1719917650876</updated>
+    </task>
+    <task id="LOCAL-00006" summary="feat: HttpResponse, HttpStatus 구현&#10;&#10;- HttpResponse를 생성하는 객체 구현&#10;- HttpStatus Enum 객체 구현">
+      <option name="closed" value="true" />
+      <created>1719917715046</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1719917715046</updated>
+    </task>
+    <task id="LOCAL-00007" summary="feat: Http 요청과 응답에 대한 작업을 진행하는 Processor 구현&#10;&#10;- 한 개의 쓰레드 단위로 구현&#10;- 작업 진행 메서드 구현">
+      <option name="closed" value="true" />
+      <created>1719917810652</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1719917810652</updated>
+    </task>
+    <task id="LOCAL-00008" summary="feat: Thread Pool 구현 및 Main 수정&#10;&#10;- Thread Pool 생성해서 반환하는 config 구현&#10;- Main에서 Thread를 사용하도록 수정">
+      <option name="closed" value="true" />
+      <created>1719917866620</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1719917866620</updated>
+    </task>
+    <task id="LOCAL-00009" summary="fix: byte 배열 크기에 따른 문자열 깨짐 현상 해결">
+      <option name="closed" value="true" />
+      <created>1719921255684</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1719921255684</updated>
+    </task>
+    <task id="LOCAL-00010" summary="fix: byte 배열 크기에 따른 문자열 깨짐 현상 해결&#10;&#10;- 1024 Byte가 아닌 동적으로 바이트 배열 생성하도록 코드 변경">
+      <option name="closed" value="true" />
+      <created>1719921320330</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1719921320330</updated>
+    </task>
+    <task id="LOCAL-00011" summary="config: gitignore 변경 및 필요없는 파일 추적 관리">
+      <option name="closed" value="true" />
+      <created>1719921406191</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1719921406191</updated>
+    </task>
+    <task id="LOCAL-00012" summary=".">
+      <option name="closed" value="true" />
+      <created>1719922574337</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1719922574337</updated>
+    </task>
+    <task id="LOCAL-00013" summary="refactor: 누락된 매개 변수 final 추가">
+      <option name="closed" value="true" />
+      <created>1719967866318</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1719967866318</updated>
+    </task>
+    <task id="LOCAL-00014" summary="test: ContentTypeTest 작성&#10;&#10;- 올바른 확장자를 바꾸고 있는지&#10;- 모르는 확장자는 에러를 반환하는지">
+      <option name="closed" value="true" />
+      <created>1719972794199</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1719972794199</updated>
+    </task>
+    <task id="LOCAL-00015" summary="test: HttpHeader 테스트&#10;&#10;- HttpHeader 생성 테스트 작성&#10;- HttpHeader parseHeader에서 헤더 첫 줄을 읽지 못하는 버그 수정">
+      <option name="closed" value="true" />
+      <created>1719972879818</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1719972879818</updated>
+    </task>
+    <task id="LOCAL-00016" summary="test: HttpStatus 테스트 작성&#10;&#10;- 중복된 HttpStatus 값 삭제&#10;- 올바른 Series 반환 확인&#10;- 상태 코드에 따른 상태 코드 반환 및 메시지 반환 확인">
+      <option name="closed" value="true" />
+      <created>1719973587277</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1719973587277</updated>
+    </task>
+    <task id="LOCAL-00017" summary="test: ThreadPool 생성 확인 테스트&#10;&#10;- corePoolSize, workQueue, MaximumSize&#10;- 위 세가지가 정상적으로 생성되는지 확인">
+      <option name="closed" value="true" />
+      <created>1719978149439</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1719978149439</updated>
+    </task>
+    <task id="LOCAL-00018" summary="test: HttpRequestTest 작성&#10;&#10;- HttpRequest 생성 테스트 작성">
+      <option name="closed" value="true" />
+      <created>1719978512464</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1719978512464</updated>
+    </task>
+    <task id="LOCAL-00019" summary="fix: HTTP header에 status 추가하는 부분 삭제">
+      <option name="closed" value="true" />
+      <created>1720002619022</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1720002619022</updated>
+    </task>
+    <task id="LOCAL-00020" summary="refactor: rename, package 이동&#10;&#10;- message로 HttpRequest, Response, Headers 이동&#10;- HttpHeader -&gt; HttpHeaders로 rename">
+      <option name="closed" value="true" />
+      <created>1720010356345</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1720010356345</updated>
+    </task>
+    <task id="LOCAL-00021" summary="refactor: rename, package 이동&#10;&#10;- message로 HttpRequest, Response, Headers 이동&#10;- HttpHeader -&gt; HttpHeaders로 rename">
+      <option name="closed" value="true" />
+      <created>1720010377466</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1720010377466</updated>
+    </task>
+    <task id="LOCAL-00022" summary="refactor: rename, package 이동&#10;&#10;- message로 HttpRequest, Response, Headers 이동&#10;- HttpHeader -&gt; HttpHeaders로 rename">
+      <option name="closed" value="true" />
+      <created>1720010818746</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1720010818746</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="config: 프로젝트 환경설정&#10;- .gitignore 추가&#10;- build.gradle 의존성 추가(로깅, 테스트)" />
+    <MESSAGE value="feat: HttpHeader 구현&#10;&#10;- 헤더 생성 메서드&#10;- BufferedReader 에서 들어온 값 파싱" />
+    <MESSAGE value="feat" />
+    <MESSAGE value="feat: HttpHeader 구현&#10;&#10;- 헤더 생성 메서드&#10;- BufferedReader 에서 들어온 값 파싱&#10;- ContentType Enum 구현" />
+    <MESSAGE value="feat: HttpRequest 구현&#10;&#10;- BufferedReader로 들어온 입력 값 파싱&#10;- HttpRequest 생성 메서드 구현" />
+    <MESSAGE value="feat: HttpResponse, HttpStatus 구현&#10;&#10;- HttpResponse를 생성하는 객체 구현&#10;- HttpStatus Enum 객체 구현" />
+    <MESSAGE value="feat: Http 요청과 응답에 대한 작업을 진행하는 Processor 구현&#10;&#10;- 한 개의 쓰레드 단위로 구현&#10;- 작업 진행 메서드 구현" />
+    <MESSAGE value="feat: Thread Pool 구현 및 Main 수정&#10;&#10;- Thread Pool 생성해서 반환하는 config 구현&#10;- Main에서 Thread를 사용하도록 수정" />
+    <MESSAGE value="fix: byte 배열 크기에 따른 문자열 깨짐 현상 해결" />
+    <MESSAGE value="config: gitignore 변경 및 필요없는 파일 추적 관리" />
+    <MESSAGE value="." />
+    <MESSAGE value="fix: byte 배열 크기에 따른 문자열 깨짐 현상 해결&#10;&#10;- 1024 Byte가 아닌 동적으로 바이트 배열 생성하도록 코드 변경" />
+    <MESSAGE value="refactor: 누락된 매개 변수 final 추가" />
+    <MESSAGE value="test: ContentTypeTest 작성&#10;&#10;- 올바른 확장자를 바꾸고 있는지&#10;- 모르는 확장자는 에러를 반환하는지" />
+    <MESSAGE value="test: HttpHeader 테스트&#10;&#10;- HttpHeader 생성 테스트 작성&#10;- HttpHeader parseHeader에서 헤더 첫 줄을 읽지 못하는 버그 수정" />
+    <MESSAGE value="test: HttpStatus 테스트 작성&#10;&#10;- 중복된 HttpStatus 값 삭제&#10;- 올바른 Series 반환 확인&#10;- 상태 코드에 따른 상태 코드 반환 및 메시지 반환 확인" />
+    <MESSAGE value="test: ThreadPool 생성 확인 테스트&#10;&#10;- corePoolSize, workQueue, MaximumSize&#10;- 위 세가지가 정상적으로 생성되는지 확인" />
+    <MESSAGE value="test: HttpRequestTest 작성&#10;&#10;- HttpRequest 생성 테스트 작성" />
+    <MESSAGE value="fix: HTTP header에 status 추가하는 부분 삭제" />
+    <MESSAGE value="refactor: rename, package 이동&#10;&#10;- message로 HttpRequest, Response, Headers 이동&#10;- HttpHeader -&gt; HttpHeaders로 rename" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: rename, package 이동&#10;&#10;- message로 HttpRequest, Response, Headers 이동&#10;- HttpHeader -&gt; HttpHeaders로 rename" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/codesquad/http/message/request/HttpRequest.java</url>
+          <line>55</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/codesquad/http/message/request/HttpRequest.java</url>
+          <line>30</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/codesquad/http/message/request/HttpRequest.java</url>
+          <line>23</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/codesquad/http/message/request/HttpRequest.java</url>
+          <line>24</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/codesquad/http/message/request/RequestStartLine.java</url>
+          <line>23</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/codesquad/http/message/request/RequestStartLine.java</url>
+          <line>25</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/codesquad/http/message/request/RequestStartLine.java</url>
+          <line>24</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/codesquad/http/message/request/QueryString.java</url>
+          <line>24</line>
+          <option name="timeStamp" value="25" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/codesquad/http/message/request/QueryString.java</url>
+          <line>32</line>
+          <option name="timeStamp" value="26" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/codesquad/http/handler/StaticHandler.java</url>
+          <line>46</line>
+          <option name="timeStamp" value="53" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

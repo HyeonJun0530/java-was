@@ -1,0 +1,323 @@
+Index: src/main/java/codesquad/http/HttpHeader.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package codesquad.http;\n\nimport java.io.BufferedReader;\nimport java.io.File;\nimport java.io.IOException;\nimport java.util.HashMap;\nimport java.util.Map;\nimport java.util.stream.Collectors;\n\n\npublic class HttpHeader {\n\n    private static final String NEW_LINE_LETTER = \"\\r\\n\";\n    private static final String COLON_LETTER = \":\";\n\n    private final Map<String, String> headers;\n\n    public HttpHeader(final Map<String, String> headers) {\n        this.headers = headers;\n    }\n\n    public static HttpHeader error() {\n        Map<String, String> headers = new HashMap<>();\n        headers.put(\"Content-Type\", ContentType.APPLICATION_JSON.getType());\n        headers.put(\"Content-Length\", \"0\");\n\n        return new HttpHeader(headers);\n    }\n\n    public static HttpHeader from(final BufferedReader reader) throws IOException {\n        return new HttpHeader(parseHeaders(reader));\n    }\n\n    public static <T> HttpHeader of(final HttpStatus status, final T body) {\n        Map<String, String> headers = new HashMap<>();\n        if (body instanceof String) {\n            String bodyStr = (String) body;\n            headers.put(\"Content-Type\", ContentType.APPLICATION_JSON.getType());\n            headers.put(\"Content-Length\", String.valueOf(bodyStr.getBytes().length));\n        } else if (body instanceof File) {\n            File bodyFile = (File) body;\n            headers.put(\"Content-Type\", getContentType(bodyFile.getName()));\n            headers.put(\"Content-Length\", String.valueOf(bodyFile.length()));\n        } else {\n            throw new IllegalArgumentException(\"Unsupported body type\");\n        }\n        headers.put(\"Status\", status.toString());\n\n        return new HttpHeader(headers);\n    }\n\n    private static Map<String, String> parseHeaders(final BufferedReader reader) throws IOException {\n        Map<String, String> headers = new HashMap<>();\n\n        String headerLine;\n        while (!(headerLine = reader.readLine()).isEmpty()) {\n            String[] headerParts = headerLine.split(COLON_LETTER, 2);\n            if (headerParts.length == 2) {\n                headers.put(headerParts[0], headerParts[1]);\n            }\n        }\n\n        return headers;\n    }\n\n    private static String formatHeaders(Map<String, String> headers) {\n        return headers.entrySet().stream()\n                .map(entry -> entry.getKey() + COLON_LETTER + entry.getValue())\n                .collect(Collectors.joining(NEW_LINE_LETTER));\n    }\n\n    private static String getContentType(String fileName) {\n        String ext = fileName.substring(fileName.lastIndexOf('.')).toLowerCase();\n\n        return ContentType.of(ext).getType();\n    }\n\n    @Override\n    public String toString() {\n        return formatHeaders(headers);\n    }\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/codesquad/http/HttpHeader.java b/src/main/java/codesquad/http/HttpHeader.java
+--- a/src/main/java/codesquad/http/HttpHeader.java	(revision 8f4e16e20e8c629481c7cc53b2fb579763cf7b17)
++++ b/src/main/java/codesquad/http/HttpHeader.java	(date 1719923117933)
+@@ -63,13 +63,13 @@
+         return headers;
+     }
+ 
+-    private static String formatHeaders(Map<String, String> headers) {
++    private static String formatHeaders(final Map<String, String> headers) {
+         return headers.entrySet().stream()
+                 .map(entry -> entry.getKey() + COLON_LETTER + entry.getValue())
+                 .collect(Collectors.joining(NEW_LINE_LETTER));
+     }
+ 
+-    private static String getContentType(String fileName) {
++    private static String getContentType(final String fileName) {
+         String ext = fileName.substring(fileName.lastIndexOf('.')).toLowerCase();
+ 
+         return ContentType.of(ext).getType();
+Index: src/main/java/codesquad/http/HttpStatus.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package codesquad.http;\n\nimport java.util.Arrays;\n\npublic enum HttpStatus {\n    CONTINUE(100, HttpStatus.Series.INFORMATIONAL, \"Continue\"),\n\n    CHECKPOINT(103, HttpStatus.Series.INFORMATIONAL, \"Checkpoint\"),\n    OK(200, HttpStatus.Series.SUCCESSFUL, \"OK\"),\n    CREATED(201, HttpStatus.Series.SUCCESSFUL, \"Created\"),\n    ACCEPTED(202, HttpStatus.Series.SUCCESSFUL, \"Accepted\"),\n    MOVED_PERMANENTLY(301, HttpStatus.Series.REDIRECTION, \"Moved Permanently\"),\n    FOUND(302, HttpStatus.Series.REDIRECTION, \"Found\"),\n\n    MOVED_TEMPORARILY(302, HttpStatus.Series.REDIRECTION, \"Moved Temporarily\"),\n\n    BAD_REQUEST(400, HttpStatus.Series.CLIENT_ERROR, \"Bad Request\"),\n    UNAUTHORIZED(401, HttpStatus.Series.CLIENT_ERROR, \"Unauthorized\"),\n    FORBIDDEN(403, HttpStatus.Series.CLIENT_ERROR, \"Forbidden\"),\n    NOT_FOUND(404, HttpStatus.Series.CLIENT_ERROR, \"Not Found\"),\n    METHOD_NOT_ALLOWED(405, HttpStatus.Series.CLIENT_ERROR, \"Method Not Allowed\"),\n\n\n    INTERNAL_SERVER_ERROR(500, HttpStatus.Series.SERVER_ERROR, \"Internal Server Error\"),\n    NOT_IMPLEMENTED(501, HttpStatus.Series.SERVER_ERROR, \"Not Implemented\"),\n    BAD_GATEWAY(502, HttpStatus.Series.SERVER_ERROR, \"Bad Gateway\"),\n    SERVICE_UNAVAILABLE(503, HttpStatus.Series.SERVER_ERROR, \"Service Unavailable\"),\n    GATEWAY_TIMEOUT(504, HttpStatus.Series.SERVER_ERROR, \"Gateway Timeout\");\n\n\n    private final int value;\n    private final Series series;\n    private final String reasonPhrase;\n\n    private HttpStatus(int value, Series series, String reasonPhrase) {\n        this.value = value;\n        this.series = series;\n        this.reasonPhrase = reasonPhrase;\n    }\n\n    public static HttpStatus valueOf(int statusCode) {\n        return Arrays.stream(HttpStatus.values())\n                .filter(status -> status.value == statusCode)\n                .findFirst()\n                .orElseThrow(() -> new IllegalArgumentException(\"No matching constant for [\" + statusCode + \"]\"));\n    }\n\n    public int value() {\n        return this.value;\n    }\n\n    public Series series() {\n        return this.series;\n    }\n\n    public String getReasonPhrase() {\n        return this.reasonPhrase;\n    }\n\n    public boolean is1xxInformational() {\n        return this.series() == HttpStatus.Series.INFORMATIONAL;\n    }\n\n    public boolean is2xxSuccessful() {\n        return this.series() == HttpStatus.Series.SUCCESSFUL;\n    }\n\n    public boolean is3xxRedirection() {\n        return this.series() == HttpStatus.Series.REDIRECTION;\n    }\n\n    public boolean is4xxClientError() {\n        return this.series() == HttpStatus.Series.CLIENT_ERROR;\n    }\n\n    public boolean is5xxServerError() {\n        return this.series() == HttpStatus.Series.SERVER_ERROR;\n    }\n\n    public boolean isError() {\n        return this.is4xxClientError() || this.is5xxServerError();\n    }\n\n    public String toString() {\n        int var10000 = this.value;\n        return \"\" + var10000 + \" \" + this.name();\n    }\n\n    public static enum Series {\n        INFORMATIONAL(1),\n        SUCCESSFUL(2),\n        REDIRECTION(3),\n        CLIENT_ERROR(4),\n        SERVER_ERROR(5);\n\n        private final int value;\n\n        private Series(int value) {\n            this.value = value;\n        }\n\n        public static Series resolve(int statusCode) {\n            int seriesCode = statusCode / 100;\n            Series[] var2 = values();\n            int var3 = var2.length;\n\n            for (int var4 = 0; var4 < var3; ++var4) {\n                Series series = var2[var4];\n                if (series.value == seriesCode) {\n                    return series;\n                }\n            }\n\n            return null;\n        }\n\n        public int value() {\n            return this.value;\n        }\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/codesquad/http/HttpStatus.java b/src/main/java/codesquad/http/HttpStatus.java
+--- a/src/main/java/codesquad/http/HttpStatus.java	(revision 8f4e16e20e8c629481c7cc53b2fb579763cf7b17)
++++ b/src/main/java/codesquad/http/HttpStatus.java	(date 1719923240983)
+@@ -32,13 +32,13 @@
+     private final Series series;
+     private final String reasonPhrase;
+ 
+-    private HttpStatus(int value, Series series, String reasonPhrase) {
++    private HttpStatus(final int value, final Series series, final String reasonPhrase) {
+         this.value = value;
+         this.series = series;
+         this.reasonPhrase = reasonPhrase;
+     }
+ 
+-    public static HttpStatus valueOf(int statusCode) {
++    public static HttpStatus valueOf(final int statusCode) {
+         return Arrays.stream(HttpStatus.values())
+                 .filter(status -> status.value == statusCode)
+                 .findFirst()
+@@ -95,11 +95,11 @@
+ 
+         private final int value;
+ 
+-        private Series(int value) {
++        private Series(final int value) {
+             this.value = value;
+         }
+ 
+-        public static Series resolve(int statusCode) {
++        public static Series resolve(final int statusCode) {
+             int seriesCode = statusCode / 100;
+             Series[] var2 = values();
+             int var3 = var2.length;
+Index: src/main/java/codesquad/http/HttpResponse.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package codesquad.http;\n\nimport java.io.File;\nimport java.io.FileInputStream;\nimport java.io.IOException;\nimport java.io.InputStream;\n\npublic class HttpResponse<T> {\n\n    private static final String NEW_LINE_LETTER = \"\\r\\n\";\n    private static final String BLANK_LETTER = \" \";\n    private static final String DEFAULT_HTTP_VERSION = \"HTTP/1.1\";\n\n    private final String httpVersion;\n    private final HttpStatus httpStatus;\n    private final HttpHeader header;\n    private final T body;\n\n    public HttpResponse(final String httpVersion, final HttpStatus httpStatus, final HttpHeader header, final T body) {\n        if (httpVersion != null) this.httpVersion = httpVersion;\n        else this.httpVersion = DEFAULT_HTTP_VERSION;\n        this.httpStatus = httpStatus;\n        this.header = header;\n        this.body = body;\n    }\n\n    public static <T> HttpResponse<T> of(HttpStatus httpStatus, T body) {\n        if (httpStatus.is4xxClientError() || httpStatus.is5xxServerError())\n            return new HttpResponse<>(DEFAULT_HTTP_VERSION, httpStatus, HttpHeader.error(), body);\n\n        if (httpStatus.is2xxSuccessful()) {\n            return ok(body);\n        }\n\n        return new HttpResponse<>(DEFAULT_HTTP_VERSION, httpStatus, HttpHeader.of(httpStatus, body), body);\n    }\n\n    public static <T> HttpResponse<T> ok(T body) {\n        return new HttpResponse<>(DEFAULT_HTTP_VERSION, HttpStatus.OK, HttpHeader.of(HttpStatus.OK, body), body);\n    }\n\n    @Override\n    public String toString() {\n        StringBuilder response = new StringBuilder();\n\n        // 상태 라인 추가\n        response.append(httpVersion).append(BLANK_LETTER)\n                .append(httpStatus.value()).append(BLANK_LETTER)\n                .append(httpStatus.getReasonPhrase()).append(NEW_LINE_LETTER);\n\n        // 헤더 추가\n        response.append(header.toString()).append(NEW_LINE_LETTER);\n\n        // 빈 줄 추가 (헤더와 본문을 구분)\n        response.append(NEW_LINE_LETTER);\n\n        // 본문 추가\n        if (body != null) {\n            if (body instanceof String) {\n                response.append((String) body);\n            } else if (body instanceof File) {\n                try (InputStream inputStream = new FileInputStream((File) body)) {\n                    byte[] buffer = new byte[(int) ((File) body).length()];\n                    int bytesRead;\n                    while ((bytesRead = inputStream.read(buffer)) != -1) {\n                        response.append(new String(buffer, 0, bytesRead));\n                    }\n                } catch (IOException e) {\n                    throw new RuntimeException(\"Failed to read file body\", e);\n                }\n            }\n        }\n\n        return response.toString();\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/codesquad/http/HttpResponse.java b/src/main/java/codesquad/http/HttpResponse.java
+--- a/src/main/java/codesquad/http/HttpResponse.java	(revision 8f4e16e20e8c629481c7cc53b2fb579763cf7b17)
++++ b/src/main/java/codesquad/http/HttpResponse.java	(date 1719923117917)
+@@ -24,7 +24,7 @@
+         this.body = body;
+     }
+ 
+-    public static <T> HttpResponse<T> of(HttpStatus httpStatus, T body) {
++    public static <T> HttpResponse<T> of(final HttpStatus httpStatus, final T body) {
+         if (httpStatus.is4xxClientError() || httpStatus.is5xxServerError())
+             return new HttpResponse<>(DEFAULT_HTTP_VERSION, httpStatus, HttpHeader.error(), body);
+ 
+@@ -35,7 +35,7 @@
+         return new HttpResponse<>(DEFAULT_HTTP_VERSION, httpStatus, HttpHeader.of(httpStatus, body), body);
+     }
+ 
+-    public static <T> HttpResponse<T> ok(T body) {
++    public static <T> HttpResponse<T> ok(final T body) {
+         return new HttpResponse<>(DEFAULT_HTTP_VERSION, HttpStatus.OK, HttpHeader.of(HttpStatus.OK, body), body);
+     }
+ 
+Index: src/main/java/codesquad/http/ContentType.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package codesquad.http;\n\nimport java.util.Arrays;\n\npublic enum ContentType {\n    TEXT_HTML(\"text/html\", \".html\"),\n    TEXT_CSS(\"text/css\", \".css\"),\n    TEXT_JAVASCRIPT(\"text/javascript\", \".js\"),\n    IMAGE_JPEG(\"image/jpeg\", \".jpg\"),\n    IMAGE_PNG(\"image/png\", \".png\"),\n    IMAGE_GIF(\"image/gif\", \".gif\"),\n    IMAGE_SVG(\"image/svg+xml\", \".svg\"),\n    IMAGE_ICO(\"image/x-icon\", \".ico\"),\n    APPLICATION_JSON(\"application/json\", \".json\"),\n    APPLICATION_XML(\"application/xml\", \".xml\"),\n    APPLICATION_XHTML(\"application/xhtml+xml\", \".xhtml\"),\n    APPLICATION_OCTET_STREAM(\"application/octet-stream\", \".bin\");\n\n    private final String type;\n    private final String ext;\n\n    ContentType(String type, final String ext) {\n        this.type = type;\n        this.ext = ext;\n    }\n\n    public static ContentType of(String ext) {\n        return Arrays.stream(ContentType.values())\n                .filter(contentType -> contentType.ext.equals(ext))\n                .findFirst()\n                .orElseThrow(() -> new IllegalArgumentException(\"지원하지 않는 확장자입니다.\"));\n    }\n\n    public String getType() {\n        return type;\n    }\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/codesquad/http/ContentType.java b/src/main/java/codesquad/http/ContentType.java
+--- a/src/main/java/codesquad/http/ContentType.java	(revision 8f4e16e20e8c629481c7cc53b2fb579763cf7b17)
++++ b/src/main/java/codesquad/http/ContentType.java	(date 1719923117930)
+@@ -19,12 +19,12 @@
+     private final String type;
+     private final String ext;
+ 
+-    ContentType(String type, final String ext) {
++    ContentType(final String type, final String ext) {
+         this.type = type;
+         this.ext = ext;
+     }
+ 
+-    public static ContentType of(String ext) {
++    public static ContentType of(final String ext) {
+         return Arrays.stream(ContentType.values())
+                 .filter(contentType -> contentType.ext.equals(ext))
+                 .findFirst()
+Index: src/main/java/codesquad/http/HttpProcessor.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package codesquad.http;\n\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n\nimport java.io.*;\nimport java.net.Socket;\nimport java.nio.charset.StandardCharsets;\n\npublic class HttpProcessor implements Runnable {\n\n    private static final Logger log = LoggerFactory.getLogger(HttpProcessor.class);\n    private static final String BASE_DIRECTORY = \"src/main/resources/static\";\n    private final Socket connection;\n\n    public HttpProcessor(final Socket connection) {\n        this.connection = connection;\n    }\n\n    @Override\n    public void run() {\n        try {\n            log.debug(\"Client connected\");\n\n            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));\n                 OutputStream client = connection.getOutputStream()) {\n\n                HttpRequest request = HttpRequest.from(in);\n                log.debug(\"Request: {}\", request.getHttpHeader());\n\n                File file = getFile(request);\n\n                HttpResponse httpResponse;\n                if (file.exists()) {\n                    httpResponse = HttpResponse.of(HttpStatus.OK, file);\n                } else {\n                    HttpStatus httpStatus = HttpStatus.NOT_FOUND;\n                    httpResponse = HttpResponse.of(httpStatus, httpStatus.getReasonPhrase());\n                }\n\n                log.debug(\"Response: {}\", httpResponse);\n                write(httpResponse, client);\n            }\n        } catch (IOException e) {\n            log.error(\"Error handling client connection\", e);\n        } catch (IllegalArgumentException e) {\n            log.error(\"Error parsing request = {}\", e.getMessage());\n        } finally {\n            try {\n                connection.close();\n            } catch (IOException e) {\n                log.error(\"Error closing client socket\", e);\n            }\n        }\n\n    }\n\n    private File getFile(final HttpRequest request) {\n        String path = request.getPath();\n        return new File(BASE_DIRECTORY + path);\n    }\n\n    private void write(HttpResponse httpResponse, OutputStream out) throws IOException {\n        out.write(httpResponse.toString().getBytes(StandardCharsets.UTF_8));\n        out.flush();\n    }\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/codesquad/http/HttpProcessor.java b/src/main/java/codesquad/http/HttpProcessor.java
+--- a/src/main/java/codesquad/http/HttpProcessor.java	(revision 8f4e16e20e8c629481c7cc53b2fb579763cf7b17)
++++ b/src/main/java/codesquad/http/HttpProcessor.java	(date 1719923117920)
+@@ -60,7 +60,7 @@
+         return new File(BASE_DIRECTORY + path);
+     }
+ 
+-    private void write(HttpResponse httpResponse, OutputStream out) throws IOException {
++    private void write(final HttpResponse httpResponse, final OutputStream out) throws IOException {
+         out.write(httpResponse.toString().getBytes(StandardCharsets.UTF_8));
+         out.flush();
+     }
+Index: src/test/java/codesquad/config/ExecutorServiceConfigurationTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/codesquad/config/ExecutorServiceConfigurationTest.java b/src/test/java/codesquad/config/ExecutorServiceConfigurationTest.java
+new file mode 100644
+--- /dev/null	(date 1719922585654)
++++ b/src/test/java/codesquad/config/ExecutorServiceConfigurationTest.java	(date 1719922585654)
+@@ -0,0 +1,7 @@
++package codesquad.config;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++class ExecutorServiceConfigurationTest {
++
++}
+Index: src/test/java/codesquad/http/HttpResponseTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/codesquad/http/HttpResponseTest.java b/src/test/java/codesquad/http/HttpResponseTest.java
+new file mode 100644
+--- /dev/null	(date 1719922585647)
++++ b/src/test/java/codesquad/http/HttpResponseTest.java	(date 1719922585647)
+@@ -0,0 +1,16 @@
++package codesquad.http;
++
++import org.junit.jupiter.api.Test;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++class HttpResponseTest {
++
++    @Test
++    void of() {
++    }
++
++    @Test
++    void ok() {
++    }
++}
+Index: src/main/java/codesquad/http/HttpMethod.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/codesquad/http/HttpMethod.java b/src/main/java/codesquad/http/HttpMethod.java
+new file mode 100644
+--- /dev/null	(date 1719923117927)
++++ b/src/main/java/codesquad/http/HttpMethod.java	(date 1719923117927)
+@@ -0,0 +1,14 @@
++package codesquad.http;
++
++import java.util.Arrays;
++
++public enum HttpMethod {
++    GET, POST, PUT, PATCH, DELETE;
++
++    public static HttpMethod of(final String method) {
++        return Arrays.stream(HttpMethod.values())
++                .filter(httpMethod -> httpMethod.name().equals(method))
++                .findFirst()
++                .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 HTTP 메소드입니다."));
++    }
++}
+Index: src/test/java/codesquad/http/HttpStatusTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/codesquad/http/HttpStatusTest.java b/src/test/java/codesquad/http/HttpStatusTest.java
+new file mode 100644
+--- /dev/null	(date 1719922585640)
++++ b/src/test/java/codesquad/http/HttpStatusTest.java	(date 1719922585640)
+@@ -0,0 +1,7 @@
++package codesquad.http;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++class HttpStatusTest {
++
++}
+Index: src/test/java/codesquad/http/HttpHeaderTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/codesquad/http/HttpHeaderTest.java b/src/test/java/codesquad/http/HttpHeaderTest.java
+new file mode 100644
+--- /dev/null	(date 1719922585644)
++++ b/src/test/java/codesquad/http/HttpHeaderTest.java	(date 1719922585644)
+@@ -0,0 +1,20 @@
++package codesquad.http;
++
++import org.junit.jupiter.api.Test;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++class HttpHeaderTest {
++
++    @Test
++    void error() {
++    }
++
++    @Test
++    void from() {
++    }
++
++    @Test
++    void of() {
++    }
++}
+Index: src/test/java/codesquad/http/ContentTypeTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/codesquad/http/ContentTypeTest.java b/src/test/java/codesquad/http/ContentTypeTest.java
+new file mode 100644
+--- /dev/null	(date 1719922585634)
++++ b/src/test/java/codesquad/http/ContentTypeTest.java	(date 1719922585634)
+@@ -0,0 +1,39 @@
++package codesquad.http;
++
++import org.junit.jupiter.api.DisplayName;
++import org.junit.jupiter.params.ParameterizedTest;
++import org.junit.jupiter.params.provider.Arguments;
++import org.junit.jupiter.params.provider.MethodSource;
++
++import java.util.stream.Stream;
++
++import static org.assertj.core.api.Assertions.assertThat;
++
++class ContentTypeTest {
++
++    @ParameterizedTest
++    @MethodSource("param")
++    @DisplayName("확장자에 해당하는 ContentType을 반환한다.")
++    void of(String ext, String expectedType) {
++        ContentType contentType = ContentType.of(ext);
++        System.out.println(contentType);
++
++        assertThat(contentType.getType()).isEqualTo(expectedType);
++    }
++
++    private static Stream<Arguments> param() {
++        return Stream.of(
++                Arguments.of(".html", "text/html"),
++                Arguments.of(".css", "text/css"),
++                Arguments.of(".js", "text/javascript"),
++                Arguments.of(".png", "image/png"),
++                Arguments.of(".gif", "image/gif"),
++                Arguments.of(".svg", "image/svg+xml"),
++                Arguments.of(".ico", "image/x-icon"),
++                Arguments.of(".json", "application/json"),
++                Arguments.of(".xml", "application/xml"),
++                Arguments.of(".xhtml", "application/xhtml+xml"),
++                Arguments.of(".bin", "application/octet-stream")
++        );
++    }
++}
+Index: src/test/java/codesquad/http/HttpRequestTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/codesquad/http/HttpRequestTest.java b/src/test/java/codesquad/http/HttpRequestTest.java
+new file mode 100644
+--- /dev/null	(date 1719922585637)
++++ b/src/test/java/codesquad/http/HttpRequestTest.java	(date 1719922585637)
+@@ -0,0 +1,12 @@
++package codesquad.http;
++
++import org.junit.jupiter.api.Test;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++class HttpRequestTest {
++
++    @Test
++    void from() {
++    }
++}

@@ -1,0 +1,98 @@
+Index: src/main/java/codesquad/Main.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package codesquad;\n\nimport java.io.IOException;\nimport java.io.OutputStream;\nimport java.net.ServerSocket;\nimport java.net.Socket;\n\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        ServerSocket serverSocket = new ServerSocket(8080); // 8080 포트에서 서버를 엽니다.\n        System.out.println(\"Listening for connection on port 8080 ....\");\n\n        while (true) { // 무한 루프를 돌며 클라이언트의 연결을 기다립니다.\n            try (Socket clientSocket = serverSocket.accept()) { // 클라이언트 연결을 수락합니다.\n                System.out.println(\"Client connected\");\n\n                // HTTP 응답을 생성합니다.\n                OutputStream clientOutput = clientSocket.getOutputStream();\n                clientOutput.write(\"HTTP/1.1 200 OK\\r\\n\".getBytes());\n                clientOutput.write(\"Content-Type: text/html\\r\\n\".getBytes());\n                clientOutput.write(\"\\r\\n\".getBytes());\n                clientOutput.write(\"<h1>Hello</h1>\\r\\n\".getBytes()); // 응답 본문으로 \"Hello\"를 보냅니다.\n                clientOutput.flush();\n            }\n        }\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/codesquad/Main.java b/src/main/java/codesquad/Main.java
+--- a/src/main/java/codesquad/Main.java	(revision b84efd500e9e2d0e1bcfc80a728e17321b5a26bf)
++++ b/src/main/java/codesquad/Main.java	(date 1719894858014)
+@@ -1,28 +1,29 @@
+ package codesquad;
+ 
++import codesquad.config.ExecutorServiceConfiguration;
++import codesquad.http.HttpProcessor;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++
+ import java.io.IOException;
+-import java.io.OutputStream;
+ import java.net.ServerSocket;
+ import java.net.Socket;
+-
++import java.util.concurrent.ExecutorService;
+ 
+ public class Main {
++
++    private static final Logger logger = LoggerFactory.getLogger(Main.class);
++
+     public static void main(String[] args) throws IOException {
+         ServerSocket serverSocket = new ServerSocket(8080); // 8080 포트에서 서버를 엽니다.
+-        System.out.println("Listening for connection on port 8080 ....");
++        logger.info("Listening for connection on port 8080 ....");
++
++        ExecutorService executorService = ExecutorServiceConfiguration.getExecutorService();
+ 
+         while (true) { // 무한 루프를 돌며 클라이언트의 연결을 기다립니다.
+-            try (Socket clientSocket = serverSocket.accept()) { // 클라이언트 연결을 수락합니다.
+-                System.out.println("Client connected");
+-
+-                // HTTP 응답을 생성합니다.
+-                OutputStream clientOutput = clientSocket.getOutputStream();
+-                clientOutput.write("HTTP/1.1 200 OK\r\n".getBytes());
+-                clientOutput.write("Content-Type: text/html\r\n".getBytes());
+-                clientOutput.write("\r\n".getBytes());
+-                clientOutput.write("<h1>Hello</h1>\r\n".getBytes()); // 응답 본문으로 "Hello"를 보냅니다.
+-                clientOutput.flush();
+-            }
++            Socket clientSocket = serverSocket.accept(); // 클라이언트 연결을 수락합니다.
++            executorService.submit(new HttpProcessor(clientSocket)); // 클라이언트 요청을 병렬로 처리합니다.
+         }
+     }
+ }
++
+Index: .idea/gradle.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"GradleSettings\">\n    <option name=\"linkedExternalProjectsSettings\">\n      <GradleProjectSettings>\n        <option name=\"externalProjectPath\" value=\"$PROJECT_DIR$\" />\n        <option name=\"gradleHome\" value=\"\" />\n        <option name=\"modules\">\n          <set>\n            <option value=\"$PROJECT_DIR$\" />\n          </set>\n        </option>\n      </GradleProjectSettings>\n    </option>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/gradle.xml b/.idea/gradle.xml
+--- a/.idea/gradle.xml	(revision b84efd500e9e2d0e1bcfc80a728e17321b5a26bf)
++++ b/.idea/gradle.xml	(date 1719899692232)
+@@ -1,10 +1,12 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
++  <component name="GradleMigrationSettings" migrationVersion="1" />
+   <component name="GradleSettings">
+     <option name="linkedExternalProjectsSettings">
+       <GradleProjectSettings>
++        <option name="delegatedBuild" value="false" />
++        <option name="testRunner" value="PLATFORM" />
+         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+-        <option name="gradleHome" value="" />
+         <option name="modules">
+           <set>
+             <option value="$PROJECT_DIR$" />
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\n  <component name=\"FrameworkDetectionExcludesConfiguration\">\n    <file type=\"web\" url=\"file://$PROJECT_DIR$\" />\n  </component>\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_17\" default=\"true\" project-jdk-name=\"corretto-17\" project-jdk-type=\"JavaSDK\">\n    <output url=\"file://$PROJECT_DIR$/out\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision b84efd500e9e2d0e1bcfc80a728e17321b5a26bf)
++++ b/.idea/misc.xml	(date 1719894866319)
+@@ -4,7 +4,7 @@
+   <component name="FrameworkDetectionExcludesConfiguration">
+     <file type="web" url="file://$PROJECT_DIR$" />
+   </component>
+-  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="corretto-17" project-jdk-type="JavaSDK">
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="17" project-jdk-type="JavaSDK">
+     <output url="file://$PROJECT_DIR$/out" />
+   </component>
+ </project>
+\ No newline at end of file
