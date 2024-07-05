@@ -24,22 +24,6 @@ public class HttpProcessor implements Runnable {
         this.connection = connection;
     }
 
-    private static String parseBufferedReaderToString(final BufferedReader reader) {
-        StringBuilder requestMessage = new StringBuilder();
-        String line;
-        try {
-            while ((line = reader.readLine()) != null) {
-                requestMessage.append(line).append(NEW_LINE);
-                if (line.isEmpty()) {
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            log.error("Error reading request", e);
-        }
-        return requestMessage.toString();
-    }
-
     @Override
     public void run() {
         try {
@@ -89,6 +73,22 @@ public class HttpProcessor implements Runnable {
         out.write(httpResponse.getHeaderBytes());
         writeNewLine(out);
         out.flush();
+    }
+
+    private String parseBufferedReaderToString(final BufferedReader reader) {
+        StringBuilder requestMessage = new StringBuilder();
+        String line;
+        try {
+            while ((line = reader.readLine()) != null) {
+                requestMessage.append(line).append(NEW_LINE);
+                if (line.isEmpty()) {
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            log.error("Error reading request", e);
+        }
+        return requestMessage.toString();
     }
 
     private void writeNewLine(final OutputStream out) throws IOException {
