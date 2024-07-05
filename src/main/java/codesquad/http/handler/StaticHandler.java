@@ -1,70 +1,56 @@
 package codesquad.http.handler;
 
+import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 public class StaticHandler {
 
     private static final Logger log = LoggerFactory.getLogger(StaticHandler.class);
-    private static final String BASE_DIRECTORY = "src/main/resources/static";
+
+    private static final Map<String, String> pathMap = Map.of("/registration", "/registration/index.html",
+            "/login", "/login/index.html",
+            "/main", "/main/index.html",
+            "/", "/index.html");
+
 
     private StaticHandler() {
     }
 
     public static HttpResponse handle(final HttpRequest httpRequest) {
         try {
-            return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(),
+            String path = httpRequest.getRequestStartLine().getPath();
+
+            if (pathMap.containsKey(path)) {
+                path = pathMap.get(path);
+            }
+
+            return HttpResponse.of(ContentType.from(path),
+                    httpRequest.getRequestStartLine().getProtocol(),
                     HttpStatus.OK,
-                    getFile(httpRequest.getRequestStartLine().getPath()));
+                    getStaticFiles(path));
         } catch (IllegalArgumentException e) {
             log.error("Static file not found", e);
             return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.NOT_FOUND);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private static File getFile(final String path) {
-        String staticPath = BASE_DIRECTORY + path;
+    public static byte[] getStaticFiles(final String path) throws IOException {
+        ClassLoader classLoader = StaticHandler.class.getClassLoader();
+        String resourcePath = "static" + path;
 
-        File file = new File(staticPath);
+        InputStream resourceAsStream = classLoader.getResourceAsStream(resourcePath);
 
-        if (file.isDirectory()) {
-            file = new File(staticPath + "/index.html");
-        }
-
-        if (!file.exists()) {
-            throw new IllegalArgumentException("Not found static file");
-        }
-
-        return file;
+        return resourceAsStream.readAllBytes();
     }
 
-    //TODO: 동적으로 받을 수 있지 않을까?
-//    private Map<String, String> getStaticFiles() {
-//        Map<String, String> filesMap = new HashMap<>();
-//        URL directoryUrl = getClass().getClassLoader().getResource(BASE_DIRECTORY);
-//        File directory = new File(requireNonNull(directoryUrl).getPath());
-//        if (directory.exists() && directory.isDirectory()) {
-//            addFilesRecursively(directory, filesMap, BASE_DIRECTORY);
-//        }
-//        return Collections.unmodifiableMap(filesMap);
-//    }
-//
-//    private void addFilesRecursively(File directory, Map<String, String> filesMap, String basePath) {
-//        File[] files = directory.listFiles();
-//        if (files != null) {
-//            for (File file : files) {
-//                if (file.isDirectory()) {
-//                    addFilesRecursively(file, filesMap, "/" + file.getName());
-//                } else {
-//                    String relativePath = basePath + "/" + file.getName();
-//                    filesMap.put(relativePath, relativePath);
-//                }
-//            }
-//        }
-//    }
 }

@@ -1,5 +1,6 @@
 package codesquad.http.message;
 
+import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.constant.HttpHeader;
 import codesquad.http.message.response.ResponseBody;
 import codesquad.utils.HttpMessageUtils;
@@ -38,11 +39,11 @@ public class HttpHeaders {
         return new HttpHeaders(headers);
     }
 
-    public static HttpHeaders of(final ResponseBody body) {
+    public static HttpHeaders of(final ContentType contentType, final ResponseBody body) {
         Map<String, String> headers = new HashMap<>();
         addResponseDefaultHeaders(headers);
 
-        headers.put(HttpHeader.CONTENT_TYPE.getHeaderName(), body.getContentType().getType());
+        headers.put(HttpHeader.CONTENT_TYPE.getHeaderName(), contentType.getType());
         headers.put(HttpHeader.CONTENT_LENGTH.getHeaderName(), String.valueOf(body.getBytes().length));
 
         return new HttpHeaders(headers);

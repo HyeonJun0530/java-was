@@ -1,6 +1,7 @@
 package codesquad.http.message.response;
 
 import codesquad.http.message.HttpHeaders;
+import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.constant.HttpStatus;
 
 public class HttpResponse {
@@ -15,9 +16,9 @@ public class HttpResponse {
         this.body = body;
     }
 
-    public static <T> HttpResponse of(final String httpVersion, final HttpStatus httpStatus, final T body) {
+    public static <T> HttpResponse of(final ContentType contentType, final String httpVersion, final HttpStatus httpStatus, final T body) {
         ResponseBody responseBody = ResponseBody.from(body);
-        return new HttpResponse(ResponseLine.of(httpVersion, httpStatus), HttpHeaders.of(responseBody), responseBody);
+        return new HttpResponse(ResponseLine.of(httpVersion, httpStatus), HttpHeaders.of(contentType, responseBody), responseBody);
     }
 
     public static HttpResponse redirect(final String httpVersion, final HttpStatus httpStatus, final String location) {

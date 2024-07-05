@@ -1,5 +1,6 @@
 package codesquad.http.message;
 
+import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.response.ResponseBody;
 import org.junit.jupiter.api.DisplayName;
@@ -8,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,12 +51,28 @@ class HttpHeadersTest {
     void of() {
         HttpStatus httpStatus = HttpStatus.OK;
         File file = new File("src/main/resources/static/index.html");
-        ResponseBody responseBody = ResponseBody.from(file);
-        HttpHeaders httpHeaders = HttpHeaders.of(responseBody);
+
+        byte[] bytes = fileTobyte(file);
+        ResponseBody responseBody = ResponseBody.from(bytes);
+        HttpHeaders httpHeaders = HttpHeaders.of(ContentType.TEXT_HTML, responseBody);
         log.debug(httpHeaders.toString());
 
         assertNotNull(httpHeaders);
         assertAll(() -> assertTrue(httpHeaders.toString().contains("text/html")),
                 () -> assertTrue(httpHeaders.toString().contains("Content-Length:" + responseBody.getBytes().length)));
+    }
+
+    private byte[] fileTobyte(final File file) {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] fileBytes = new byte[(int) file.length()];
+            int bytesRead = fis.read(fileBytes);
+            if (bytesRead != fileBytes.length) {
+                throw new IOException("Could not read the entire file");
+            }
+
+            return fileBytes;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
