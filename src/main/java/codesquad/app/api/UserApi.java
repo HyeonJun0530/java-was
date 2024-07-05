@@ -29,7 +29,7 @@ public class UserApi {
                 .userId(userId)
                 .build();
 
-        return HttpResponse.of(request.getRequestStartLine().getProtocol(),
+        return HttpResponse.redirect(request.getRequestStartLine().getProtocol(),
                 HttpStatus.MOVED_PERMANENTLY, "/index.html");
     }
 }

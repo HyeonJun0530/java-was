@@ -20,7 +20,7 @@ public class HttpResponse {
         return new HttpResponse(ResponseLine.of(httpVersion, httpStatus), HttpHeaders.of(responseBody), responseBody);
     }
 
-    public static <T> HttpResponse of(final String httpVersion, final HttpStatus httpStatus, final String location) {
+    public static HttpResponse redirect(final String httpVersion, final HttpStatus httpStatus, final String location) {
         return new HttpResponse(ResponseLine.of(httpVersion, httpStatus), HttpHeaders.of(location), null);
     }
 
