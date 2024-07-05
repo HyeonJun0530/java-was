@@ -2,8 +2,6 @@ package codesquad.http.message.request;
 
 import codesquad.http.message.HttpHeaders;
 
-import java.io.IOException;
-
 import static codesquad.utils.StringUtils.NEW_LINE;
 
 public class HttpRequest {
@@ -19,7 +17,7 @@ public class HttpRequest {
         this.requestBody = requestBody;
     }
 
-    public static HttpRequest from(final String requestMessage) throws IOException {
+    public static HttpRequest from(final String requestMessage) {
         String[] requestLine = parseRequest(requestMessage);
         RequestStartLine requestStartLine = RequestStartLine.from(requestLine[0]);
         HttpHeaders httpHeaders = HttpHeaders.from(requestLine[1]);
