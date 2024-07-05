@@ -1,0 +1,185 @@
+Index: src/test/java/codesquad/http/ContentTypeTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/codesquad/http/ContentTypeTest.java b/src/test/java/codesquad/http/ContentTypeTest.java
+new file mode 100644
+--- /dev/null	(date 1719922392414)
++++ b/src/test/java/codesquad/http/ContentTypeTest.java	(date 1719922392414)
+@@ -0,0 +1,39 @@
++package codesquad.http;
++
++import org.junit.jupiter.api.DisplayName;
++import org.junit.jupiter.params.ParameterizedTest;
++import org.junit.jupiter.params.provider.Arguments;
++import org.junit.jupiter.params.provider.MethodSource;
++
++import java.util.stream.Stream;
++
++import static org.assertj.core.api.Assertions.assertThat;
++
++class ContentTypeTest {
++
++    @ParameterizedTest
++    @MethodSource("param")
++    @DisplayName("확장자에 해당하는 ContentType을 반환한다.")
++    void of(String ext, String expectedType) {
++        ContentType contentType = ContentType.of(ext);
++        System.out.println(contentType);
++
++        assertThat(contentType.getType()).isEqualTo(expectedType);
++    }
++
++    private static Stream<Arguments> param() {
++        return Stream.of(
++                Arguments.of(".html", "text/html"),
++                Arguments.of(".css", "text/css"),
++                Arguments.of(".js", "text/javascript"),
++                Arguments.of(".png", "image/png"),
++                Arguments.of(".gif", "image/gif"),
++                Arguments.of(".svg", "image/svg+xml"),
++                Arguments.of(".ico", "image/x-icon"),
++                Arguments.of(".json", "application/json"),
++                Arguments.of(".xml", "application/xml"),
++                Arguments.of(".xhtml", "application/xhtml+xml"),
++                Arguments.of(".bin", "application/octet-stream")
++        );
++    }
++}
+Index: src/test/java/codesquad/http/HttpRequestTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/codesquad/http/HttpRequestTest.java b/src/test/java/codesquad/http/HttpRequestTest.java
+new file mode 100644
+--- /dev/null	(date 1719918040675)
++++ b/src/test/java/codesquad/http/HttpRequestTest.java	(date 1719918040675)
+@@ -0,0 +1,12 @@
++package codesquad.http;
++
++import org.junit.jupiter.api.Test;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++class HttpRequestTest {
++
++    @Test
++    void from() {
++    }
++}
+Index: src/test/java/codesquad/http/HttpStatusTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/codesquad/http/HttpStatusTest.java b/src/test/java/codesquad/http/HttpStatusTest.java
+new file mode 100644
+--- /dev/null	(date 1719918040682)
++++ b/src/test/java/codesquad/http/HttpStatusTest.java	(date 1719918040682)
+@@ -0,0 +1,7 @@
++package codesquad.http;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++class HttpStatusTest {
++
++}
+Index: src/test/java/codesquad/http/HttpHeaderTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/codesquad/http/HttpHeaderTest.java b/src/test/java/codesquad/http/HttpHeaderTest.java
+new file mode 100644
+--- /dev/null	(date 1719918040678)
++++ b/src/test/java/codesquad/http/HttpHeaderTest.java	(date 1719918040678)
+@@ -0,0 +1,20 @@
++package codesquad.http;
++
++import org.junit.jupiter.api.Test;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++class HttpHeaderTest {
++
++    @Test
++    void error() {
++    }
++
++    @Test
++    void from() {
++    }
++
++    @Test
++    void of() {
++    }
++}
+Index: src/test/java/codesquad/http/HttpResponseTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/codesquad/http/HttpResponseTest.java b/src/test/java/codesquad/http/HttpResponseTest.java
+new file mode 100644
+--- /dev/null	(date 1719918040672)
++++ b/src/test/java/codesquad/http/HttpResponseTest.java	(date 1719918040672)
+@@ -0,0 +1,16 @@
++package codesquad.http;
++
++import org.junit.jupiter.api.Test;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++class HttpResponseTest {
++
++    @Test
++    void of() {
++    }
++
++    @Test
++    void ok() {
++    }
++}
+Index: src/main/java/codesquad/http/HttpMethod.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/codesquad/http/HttpMethod.java b/src/main/java/codesquad/http/HttpMethod.java
+new file mode 100644
+--- /dev/null	(date 1719903642631)
++++ b/src/main/java/codesquad/http/HttpMethod.java	(date 1719903642631)
+@@ -0,0 +1,14 @@
++package codesquad.http;
++
++import java.util.Arrays;
++
++public enum HttpMethod {
++    GET, POST, PUT, PATCH, DELETE;
++
++    public static HttpMethod of(String method) {
++        return Arrays.stream(HttpMethod.values())
++                .filter(httpMethod -> httpMethod.name().equals(method))
++                .findFirst()
++                .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 HTTP 메소드입니다."));
++    }
++}
+Index: src/test/java/codesquad/config/ExecutorServiceConfigurationTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/test/java/codesquad/config/ExecutorServiceConfigurationTest.java b/src/test/java/codesquad/config/ExecutorServiceConfigurationTest.java
+new file mode 100644
+--- /dev/null	(date 1719918040664)
++++ b/src/test/java/codesquad/config/ExecutorServiceConfigurationTest.java	(date 1719918040664)
+@@ -0,0 +1,7 @@
++package codesquad.config;
++
++import static org.junit.jupiter.api.Assertions.*;
++
++class ExecutorServiceConfigurationTest {
++
++}

@@ -1,4 +1,4 @@
-package codesquad.http;
+package codesquad.http.message.constant;
 
 import java.util.Arrays;
 
@@ -24,11 +24,20 @@ public enum ContentType {
         this.ext = ext;
     }
 
-    public static ContentType of(final String ext) {
+    public static ContentType from(final String fileName) {
+        String ext = fileName.substring(fileName.lastIndexOf("."));
+
         return Arrays.stream(ContentType.values())
                 .filter(contentType -> contentType.ext.equals(ext))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 확장자입니다."));
+    }
+
+    public boolean isStatic() {
+        return this == TEXT_HTML || this == TEXT_CSS
+                || this == TEXT_JAVASCRIPT || this == IMAGE_JPEG
+                || this == IMAGE_PNG || this == IMAGE_GIF
+                || this == IMAGE_SVG || this == IMAGE_ICO;
     }
 
     public String getType() {

@@ -1,5 +1,6 @@
-package codesquad.http;
+package codesquad.http.message;
 
+import codesquad.http.message.constant.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -30,8 +31,8 @@ class ContentTypeTest {
     @ParameterizedTest
     @MethodSource("param")
     @DisplayName("확장자에 해당하는 ContentType을 반환한다.")
-    void of(String ext, String expectedType) {
-        ContentType contentType = ContentType.of(ext);
+    void from(String ext, String expectedType) {
+        ContentType contentType = ContentType.from(ext);
         System.out.println(contentType);
 
         assertThat(contentType.getType()).isEqualTo(expectedType);
