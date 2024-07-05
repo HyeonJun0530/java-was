@@ -30,6 +30,6 @@ public class UserApi {
                 .build();
 
         return HttpResponse.redirect(request.getRequestStartLine().getProtocol(),
-                HttpStatus.MOVED_PERMANENTLY, "/index.html");
+                HttpStatus.MOVED_PERMANENTLY, "/main/index.html");
     }
 }
