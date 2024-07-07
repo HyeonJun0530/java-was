@@ -44,13 +44,17 @@ public class StaticHandler {
         }
     }
 
-    public static byte[] getStaticFiles(final String path) throws IOException {
+    private static byte[] getStaticFiles(final String path) throws IOException {
         ClassLoader classLoader = StaticHandler.class.getClassLoader();
         String resourcePath = "static" + path;
 
-        InputStream resourceAsStream = classLoader.getResourceAsStream(resourcePath);
+        try (InputStream resourceAsStream = classLoader.getResourceAsStream(resourcePath)) {
+            if (resourceAsStream == null) {
+                throw new IllegalArgumentException("Static file not found");
+            }
 
-        return resourceAsStream.readAllBytes();
+            return resourceAsStream.readAllBytes();
+        }
     }
 
 }
