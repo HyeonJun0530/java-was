@@ -7,8 +7,6 @@ public enum ContentType {
     TEXT_CSS("text/css", ".css"),
     TEXT_JAVASCRIPT("text/javascript", ".js"),
     TEXT_PLAIN("text/plain", ".txt"),
-    TEXT_XML("text/xml", ".xml"),
-    TEXT_XHTML("text/xhtml", ".xhtml"),
     IMAGE_JPEG("image/jpeg", ".jpg"),
     IMAGE_PNG("image/png", ".png"),
     IMAGE_GIF("image/gif", ".gif"),

@@ -2,6 +2,7 @@ package codesquad.http.message;
 
 import codesquad.http.message.constant.ContentType;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -9,6 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ContentTypeTest {
 
@@ -36,5 +38,13 @@ class ContentTypeTest {
         System.out.println(contentType);
 
         assertThat(contentType.getType()).isEqualTo(expectedType);
+    }
+
+    @Test
+    @DisplayName("확장자에 해당하는 ContentType이 없는 경우 예외를 발생한다.")
+    void from_exception() {
+        assertThatThrownBy(() -> ContentType.from(".hyn"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("지원하지 않는 확장자입니다.");
     }
 }
