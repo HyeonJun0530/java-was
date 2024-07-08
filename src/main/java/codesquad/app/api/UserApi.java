@@ -36,6 +36,6 @@ public class UserApi {
         log.debug("User: {}", user.toString());
 
         return HttpResponse.redirect(request.getRequestStartLine().getProtocol(),
-                HttpStatus.MOVED_PERMANENTLY, "/main/index.html");
+                HttpStatus.FOUND, "/main/index.html");
     }
 }
