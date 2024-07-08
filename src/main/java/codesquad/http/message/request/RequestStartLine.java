@@ -23,7 +23,7 @@ public class RequestStartLine {
     }
 
     public static RequestStartLine from(final BufferedReader reader) throws IOException {
-        String[] startLineTokens = URLDecoder.decode(reader.readLine(), StandardCharsets.UTF_8).split(SPACE);
+        String[] startLineTokens = getStartLineTokens(reader);
 
         HttpMethod method = HttpMethod.from(startLineTokens[0]);
         Path path = Path.from(startLineTokens[1]);
@@ -55,6 +55,16 @@ public class RequestStartLine {
                 ", path=" + path +
                 ", protocol=" + protocol +
                 '}';
+    }
+
+    private static String[] getStartLineTokens(final BufferedReader reader) throws IOException {
+        String[] startLineTokens = URLDecoder.decode(reader.readLine(), StandardCharsets.UTF_8).split(SPACE);
+
+        if (startLineTokens.length != 3) {
+            throw new IllegalArgumentException("Invalid Request Start Line");
+        }
+
+        return startLineTokens;
     }
 
 }

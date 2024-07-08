@@ -2,6 +2,7 @@ package codesquad.http.message;
 
 import codesquad.http.message.constant.HttpMethod;
 import codesquad.http.message.request.HttpRequest;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +36,18 @@ class HttpRequestTest {
                 () -> assertThat(from.getHttpHeaders()).isNotNull(),
                 () -> assertThat(from.getRequestBody()).isNull(),
                 () -> assertThat(from.getHttpHeaders().getHeader("Host")).isEqualTo("www.example.com"));
+    }
+
+    @Test
+    @DisplayName("HttpRequest 객체 생성 테스트 - body가 없는 경우")
+    void from_fail() throws IOException {
+        String input = "GET HTTP/1.1\r\n" +
+                "Host: www.example.com\r\n" +
+                "Content-Type: text/html\r\n" +
+                "Content-Length: 0\r\n";
+
+        Assertions.assertThatThrownBy(() -> getHttpRequest(input))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
