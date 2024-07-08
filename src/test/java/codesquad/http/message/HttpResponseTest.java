@@ -16,7 +16,7 @@ class HttpResponseTest {
         HttpResponse httpResponse = HttpResponse.redirect("HTTP/1.1", HttpStatus.FOUND, "/index.html");
 
         assertAll(() -> assertFalse(httpResponse.hasBody()),
-                () -> assertTrue(httpResponse.toString().contains("302 FOUND")),
+                () -> assertTrue(httpResponse.toString().contains("302 Found")),
                 () -> assertTrue(httpResponse.toString().contains("Location:/index.html")));
     }
 
