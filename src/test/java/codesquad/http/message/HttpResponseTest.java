@@ -13,9 +13,10 @@ class HttpResponseTest {
     @Test
     @DisplayName("HttpResponse.of() 메서드를 통해 HttpResponse 객체를 생성할 수 있다. - redirect인 경우")
     void of_redirect() {
-        HttpResponse httpResponse = HttpResponse.redirect("HTTP/1.1", HttpStatus.MOVED_PERMANENTLY, "/index.html");
+        HttpResponse httpResponse = HttpResponse.redirect("HTTP/1.1", HttpStatus.FOUND, "/index.html");
 
         assertAll(() -> assertFalse(httpResponse.hasBody()),
+                () -> assertTrue(httpResponse.toString().contains("302 FOUND")),
                 () -> assertTrue(httpResponse.toString().contains("Location:/index.html")));
     }
 
@@ -25,16 +26,19 @@ class HttpResponseTest {
         HttpResponse httpResponse = HttpResponse.of("HTTP/1.1", HttpStatus.OK);
 
         assertAll(() -> assertFalse(httpResponse.hasBody()),
+                () -> assertTrue(httpResponse.toString().contains("Content-Length:0")),
                 () -> assertTrue(httpResponse.toString().contains("200 OK")));
     }
 
     @Test
     @DisplayName("HttpResponse.of() 메서드를 통해 HttpResponse 객체를 생성할 수 있다. - body가 있는 경우")
     void of_ok_with_body() {
-        HttpResponse httpResponse = HttpResponse.of(ContentType.APPLICATION_JSON, "HTTP/1.1", HttpStatus.OK,
+        HttpResponse httpResponse = HttpResponse.of(ContentType.TEXT_PLAIN, "HTTP/1.1", HttpStatus.OK,
                 "Hello, World!");
 
         assertAll(() -> assertTrue(httpResponse.hasBody()),
+                () -> assertTrue(httpResponse.toString().contains("Content-Type:text/plain")),
+                () -> assertTrue(httpResponse.toString().contains("Content-Length:13")),
                 () -> assertTrue(httpResponse.toString().contains("200 OK")),
                 () -> assertTrue(httpResponse.toString().contains("Hello, World!")));
     }
