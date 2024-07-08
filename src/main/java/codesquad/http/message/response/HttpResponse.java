@@ -4,6 +4,8 @@ import codesquad.http.message.HttpHeaders;
 import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.constant.HttpStatus;
 
+import static codesquad.utils.StringUtils.NEW_LINE;
+
 public class HttpResponse {
 
     private final ResponseLine responseLine;
@@ -47,10 +49,13 @@ public class HttpResponse {
 
     @Override
     public String toString() {
-        return "HttpResponse{" +
-                "responseLine=" + responseLine +
-                ", header=" + header +
-                ", body=" + body +
-                '}';
+        if (hasBody()) {
+            return responseLine.toString() + NEW_LINE +
+                    header.toString() + NEW_LINE + NEW_LINE +
+                    body.toString();
+        }
+
+        return responseLine.toString() + NEW_LINE +
+                header.toString() + NEW_LINE + NEW_LINE;
     }
 }

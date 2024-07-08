@@ -2,6 +2,9 @@ package codesquad.http.message.constant;
 
 import java.util.Arrays;
 
+import static codesquad.utils.StringUtils.EMPTY;
+import static codesquad.utils.StringUtils.SPACE;
+
 public enum HttpStatus {
     CONTINUE(100, HttpStatus.Series.INFORMATIONAL, "Continue"),
 
@@ -83,7 +86,7 @@ public enum HttpStatus {
     @Override
     public String toString() {
         int var10000 = this.value;
-        return "" + var10000 + " " + this.name();
+        return EMPTY + var10000 + SPACE + this.getReasonPhrase();
     }
 
     public static enum Series {
