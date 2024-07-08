@@ -8,9 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,14 +31,14 @@ class HttpHeadersTest {
     }
 
     @Test
-    void from() {
+    void from() throws IOException {
         String input = "Host: www.example.com\r\n" +
                 "Content-Type: text/html\r\n" +
                 "Content-Length: 1024\r\n" +
                 "\r\n";
 
 
-        HttpHeaders httpHeaders = HttpHeaders.from(input);
+        HttpHeaders httpHeaders = HttpHeaders.from(new BufferedReader(new StringReader(input)));
         log.debug(httpHeaders.toString());
 
         assertNotNull(httpHeaders);
@@ -48,11 +49,12 @@ class HttpHeadersTest {
 
     @Test
     @DisplayName("body를 받아 HttpHeader를 생성한다.")
-    void of() {
+    void of() throws IOException {
         HttpStatus httpStatus = HttpStatus.OK;
-        File file = new File("src/main/resources/static/index.html");
+        ClassLoader cl = getClass().getClassLoader();
+        InputStream resourceAsStream = cl.getResourceAsStream("static/index.html");
 
-        byte[] bytes = fileTobyte(file);
+        byte[] bytes = resourceAsStream.readAllBytes();
         ResponseBody responseBody = ResponseBody.from(bytes);
         HttpHeaders httpHeaders = HttpHeaders.of(ContentType.TEXT_HTML, responseBody);
         log.debug(httpHeaders.toString());
@@ -60,19 +62,5 @@ class HttpHeadersTest {
         assertNotNull(httpHeaders);
         assertAll(() -> assertTrue(httpHeaders.toString().contains("text/html")),
                 () -> assertTrue(httpHeaders.toString().contains("Content-Length:" + responseBody.getBytes().length)));
-    }
-
-    private byte[] fileTobyte(final File file) {
-        try (FileInputStream fis = new FileInputStream(file)) {
-            byte[] fileBytes = new byte[(int) file.length()];
-            int bytesRead = fis.read(fileBytes);
-            if (bytesRead != fileBytes.length) {
-                throw new IOException("Could not read the entire file");
-            }
-
-            return fileBytes;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }
