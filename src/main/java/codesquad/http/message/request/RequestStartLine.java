@@ -50,11 +50,7 @@ public class RequestStartLine {
 
     @Override
     public String toString() {
-        return "RequestStartLine{" +
-                "method=" + method +
-                ", path=" + path +
-                ", protocol=" + protocol +
-                '}';
+        return method.name() + SPACE + path.toString() + SPACE + protocol.toString();
     }
 
     private static String[] getStartLineTokens(final BufferedReader reader) throws IOException {

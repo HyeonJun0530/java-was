@@ -35,9 +35,7 @@ public class RequestBody {
 
     @Override
     public String toString() {
-        return "RequestBody{" +
-                "body='" + body + '\'' +
-                '}';
+        return body;
     }
 
     public Map<String, String> parseFormUrlEncoded() {
@@ -46,4 +44,5 @@ public class RequestBody {
                 .collect(toMap(kv -> kv[0], kv -> kv.length > 1 ? kv[1] : EMPTY));
 
     }
+
 }

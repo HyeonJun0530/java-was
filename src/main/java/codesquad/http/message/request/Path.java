@@ -38,4 +38,9 @@ public class Path {
         return queryString;
     }
 
+    @Override
+    public String toString() {
+        return path + queryString.toString();
+    }
+
 }

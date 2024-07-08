@@ -26,4 +26,9 @@ public class Protocol {
         return version;
     }
 
+    @Override
+    public String toString() {
+        return this.version;
+    }
+
 }

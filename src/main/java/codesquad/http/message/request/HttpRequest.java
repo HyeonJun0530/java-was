@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static codesquad.http.message.constant.HttpHeader.CONTENT_LENGTH;
+import static codesquad.utils.StringUtils.NEW_LINE;
 
 public class HttpRequest {
 
@@ -50,10 +51,14 @@ public class HttpRequest {
 
     @Override
     public String toString() {
-        return "HttpRequest{" +
-                "requestStartLine=" + requestStartLine +
-                ", httpHeaders=" + httpHeaders +
-                ", requestBody=" + requestBody +
-                '}';
+        if (requestBody == null) {
+            return requestStartLine.toString() + NEW_LINE
+                    + httpHeaders.toString() + NEW_LINE;
+        }
+
+        return requestStartLine.toString() + NEW_LINE
+                + httpHeaders.toString() + NEW_LINE + NEW_LINE
+                + requestBody;
     }
+
 }
