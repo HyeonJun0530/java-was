@@ -7,7 +7,7 @@ public enum HttpMethod {
 
     public static HttpMethod from(final String method) {
         return Arrays.stream(HttpMethod.values())
-                .filter(httpMethod -> httpMethod.name().equals(method))
+                .filter(httpMethod -> httpMethod.name().equalsIgnoreCase(method))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("올바르지 않은 HTTP 메소드입니다."));
     }

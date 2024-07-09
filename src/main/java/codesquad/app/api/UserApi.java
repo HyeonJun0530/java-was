@@ -7,20 +7,23 @@ import codesquad.http.message.constant.HttpMethod;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class UserApi {
 
+    private static final Logger log = LoggerFactory.getLogger(UserApi.class);
     private UserRepository userRepository = new UserRepository();
 
-    @ApiMapping(method = HttpMethod.GET, path = "/create")
+    @ApiMapping(method = HttpMethod.POST, path = "/create")
     public HttpResponse create(HttpRequest request) {
-        Map<String, String> queryString = request.getRequestStartLine().getQueryString();
-        String name = queryString.get("name");
-        String email = queryString.get("email");
-        String password = queryString.get("password");
-        String userId = queryString.get("userId");
+        Map<String, String> body = request.getRequestBody().parseFormUrlEncoded();
+        String name = body.get("name");
+        String email = body.get("email");
+        String password = body.get("password");
+        String userId = body.get("userId");
 
         User user = new User.Builder()
                 .name(name)
@@ -29,7 +32,10 @@ public class UserApi {
                 .userId(userId)
                 .build();
 
+        userRepository.save(user);
+        log.debug("User: {}", user.toString());
+
         return HttpResponse.redirect(request.getRequestStartLine().getProtocol(),
-                HttpStatus.MOVED_PERMANENTLY, "/main/index.html");
+                HttpStatus.FOUND, "/main/index.html");
     }
 }

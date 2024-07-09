@@ -29,12 +29,10 @@ public class HttpProcessor implements Runnable {
         try {
             log.debug("Client connected");
 
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                  OutputStream client = connection.getOutputStream()) {
 
-                String requestMessage = parseBufferedReaderToString(in);
-
-                HttpRequest request = HttpRequest.from(requestMessage);
+                HttpRequest request = HttpRequest.from(reader);
                 log.debug("Request: {}", request);
 
                 HttpResponse httpResponse = HttpRequestHandler.handle(request);
@@ -73,22 +71,6 @@ public class HttpProcessor implements Runnable {
         out.write(httpResponse.getHeaderBytes());
         writeNewLine(out);
         out.flush();
-    }
-
-    private String parseBufferedReaderToString(final BufferedReader reader) {
-        StringBuilder requestMessage = new StringBuilder();
-        String line;
-        try {
-            while ((line = reader.readLine()) != null) {
-                requestMessage.append(line).append(NEW_LINE);
-                if (line.isEmpty()) {
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            log.error("Error reading request", e);
-        }
-        return requestMessage.toString();
     }
 
     private void writeNewLine(final OutputStream out) throws IOException {

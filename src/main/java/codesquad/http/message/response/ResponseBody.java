@@ -25,8 +25,6 @@ public class ResponseBody {
 
     @Override
     public String toString() {
-        return "ResponseBody{" +
-                "body=" + new String(body) +
-                '}';
+        return new String(body);
     }
 }

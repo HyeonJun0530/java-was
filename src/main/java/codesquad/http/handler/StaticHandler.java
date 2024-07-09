@@ -32,10 +32,12 @@ public class StaticHandler {
                 path = pathMap.get(path);
             }
 
+            byte[] staticFiles = getStaticFiles(path);
+
             return HttpResponse.of(ContentType.from(path),
                     httpRequest.getRequestStartLine().getProtocol(),
                     HttpStatus.OK,
-                    getStaticFiles(path));
+                    staticFiles);
         } catch (IllegalArgumentException e) {
             log.error("Static file not found", e);
             return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.NOT_FOUND);

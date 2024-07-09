@@ -37,7 +37,10 @@ public class ApiHandler {
             for (Method method : apiClass.getMethods()) {
                 if (method.isAnnotationPresent(ApiMapping.class)) {
                     ApiMapping apiMapping = method.getAnnotation(ApiMapping.class);
-                    if (apiMapping.path().equals(path) && apiMapping.method().equals(httpRequest.getRequestStartLine().getMethod())) {
+                    if (apiMapping.path().equals(path)) {
+                        if (!apiMapping.method().equals(httpRequest.getRequestStartLine().getMethod())) {
+                            return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.METHOD_NOT_ALLOWED);
+                        }
                         HttpResponse response = (HttpResponse) method.invoke(apiInstance, httpRequest);
                         return response;
                     }

@@ -35,4 +35,16 @@ public class QueryString {
         return parameters;
     }
 
+    @Override
+    public String toString() {
+        if (parameters.isEmpty()) {
+            return "";
+        }
+
+        return "?" + parameters.entrySet().stream()
+                .map(entry -> entry.getKey() + EQUAL + entry.getValue())
+                .reduce((a, b) -> a + "&" + b)
+                .orElse(EMPTY);
+    }
+
 }

@@ -6,6 +6,7 @@ public enum ContentType {
     TEXT_HTML("text/html", ".html"),
     TEXT_CSS("text/css", ".css"),
     TEXT_JAVASCRIPT("text/javascript", ".js"),
+    TEXT_PLAIN("text/plain", ".txt"),
     IMAGE_JPEG("image/jpeg", ".jpg"),
     IMAGE_PNG("image/png", ".png"),
     IMAGE_GIF("image/gif", ".gif"),
@@ -14,7 +15,9 @@ public enum ContentType {
     APPLICATION_JSON("application/json", ".json"),
     APPLICATION_XML("application/xml", ".xml"),
     APPLICATION_XHTML("application/xhtml+xml", ".xhtml"),
-    APPLICATION_OCTET_STREAM("application/octet-stream", ".bin");
+    APPLICATION_OCTET_STREAM("application/octet-stream", ".bin"),
+    APPLICATION_PDF("application/pdf", ".pdf"),
+    APPLICATION_JAVASCRIPT("application/javascript", ".js");
 
     private final String type;
     private final String ext;

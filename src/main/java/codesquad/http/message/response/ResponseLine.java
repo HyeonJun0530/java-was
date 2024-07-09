@@ -32,8 +32,6 @@ public class ResponseLine {
 
     @Override
     public String toString() {
-        return "ResponseLine{" +
-                httpVersion + SPACE + httpStatus +
-                '}';
+        return this.httpVersion + SPACE + this.httpStatus.toString();
     }
 }
