@@ -29,13 +29,20 @@ public class Cookie {
         this.attributes = attributes;
     }
 
+    public Cookie(final String name, final String value) {
+        Map<String, String> attributes = new HashMap<>();
+        setDefaultAttributes(attributes);
+        this.name = name;
+        this.value = value;
+        this.attributes = attributes;
+    }
+
     public static List<Cookie> of(final String headerValue) {
         return Arrays.stream(headerValue.split(SEMICOLON))
                 .map(cookieValue -> {
                     String[] cookiePair = cookieValue.split("=");
                     Cookie cookie = new Cookie(cookiePair[0].trim(), cookiePair[1].trim(), new HashMap<>());
-                    cookie.setDomain(DEFAULT_DOMAIN);
-                    cookie.setPath(DEFAULT_PATH);
+                    setDefaultAttributes(cookie.attributes);
                     return cookie;
                 }).toList();
     }
@@ -74,5 +81,11 @@ public class Cookie {
     public String toString() {
         return format();
     }
+
+    private static void setDefaultAttributes(final Map<String, String> attributes) {
+        attributes.put(DOMAIN, DEFAULT_DOMAIN);
+        attributes.put(PATH, DEFAULT_PATH);
+    }
+
 
 }

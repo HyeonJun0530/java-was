@@ -3,6 +3,7 @@ package codesquad.http.message.response;
 import codesquad.http.message.Cookie;
 import codesquad.http.message.HttpHeaders;
 import codesquad.http.message.constant.ContentType;
+import codesquad.http.message.constant.HttpHeader;
 import codesquad.http.message.constant.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import static codesquad.utils.StringUtils.NEW_LINE;
+import static codesquad.utils.StringUtils.*;
 
 public class HttpResponse {
 
@@ -90,7 +91,9 @@ public class HttpResponse {
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                httpResponse.append(cookie.toString()).append(NEW_LINE);
+                httpResponse.append(HttpHeader.SET_COOKIE.getHeaderName())
+                        .append(COLON).append(SPACE)
+                        .append(cookie.toString()).append(NEW_LINE);
             }
         }
 
