@@ -17,7 +17,7 @@ class HttpResponseTest {
 
         assertAll(() -> assertFalse(httpResponse.hasBody()),
                 () -> assertTrue(httpResponse.toString().contains("302 Found")),
-                () -> assertTrue(httpResponse.toString().contains("Location:/index.html")));
+                () -> assertTrue(httpResponse.toString().contains("Location: /index.html")));
     }
 
     @Test
@@ -26,7 +26,7 @@ class HttpResponseTest {
         HttpResponse httpResponse = HttpResponse.of("HTTP/1.1", HttpStatus.OK);
 
         assertAll(() -> assertFalse(httpResponse.hasBody()),
-                () -> assertTrue(httpResponse.toString().contains("Content-Length:0")),
+                () -> assertTrue(httpResponse.toString().contains("Content-Length: 0")),
                 () -> assertTrue(httpResponse.toString().contains("200 OK")));
     }
 
@@ -37,10 +37,20 @@ class HttpResponseTest {
                 "Hello, World!");
 
         assertAll(() -> assertTrue(httpResponse.hasBody()),
-                () -> assertTrue(httpResponse.toString().contains("Content-Type:text/plain")),
-                () -> assertTrue(httpResponse.toString().contains("Content-Length:13")),
+                () -> assertTrue(httpResponse.toString().contains("Content-Type: text/plain")),
+                () -> assertTrue(httpResponse.toString().contains("Content-Length: 13")),
                 () -> assertTrue(httpResponse.toString().contains("200 OK")),
                 () -> assertTrue(httpResponse.toString().contains("Hello, World!")));
+    }
+
+    @Test
+    @DisplayName("HttpResponse.setCookie() 메서드를 통해 Cookie를 추가할 수 있다.")
+    void setCookie() {
+        HttpResponse httpResponse = HttpResponse.of("HTTP/1.1", HttpStatus.OK);
+        httpResponse.setCookie(new Cookie("name", "value"));
+
+        assertAll(() -> assertTrue(httpResponse.toString().contains("Set-Cookie: name=value")),
+                () -> assertTrue(httpResponse.toString().contains("200 OK")));
     }
 
 }
