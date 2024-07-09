@@ -1,9 +1,11 @@
 package codesquad.http.message.request;
 
+import codesquad.http.message.Cookie;
 import codesquad.http.message.HttpHeaders;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import static codesquad.http.message.constant.HttpHeader.CONTENT_LENGTH;
@@ -49,16 +51,29 @@ public class HttpRequest {
         return requestBody;
     }
 
-    @Override
-    public String toString() {
-        if (requestBody == null) {
-            return requestStartLine.toString() + NEW_LINE
-                    + httpHeaders.toString() + NEW_LINE;
+    public List<Cookie> getCookies() {
+        String header = httpHeaders.getHeader("Cookie");
+
+        if (header == null) {
+            return null;
         }
 
-        return requestStartLine.toString() + NEW_LINE
-                + httpHeaders.toString() + NEW_LINE + NEW_LINE
-                + requestBody;
+        return Cookie.of(header);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder request = new StringBuilder();
+
+        request.append(requestStartLine).append(NEW_LINE)
+                .append(httpHeaders).append(NEW_LINE)
+                .append(NEW_LINE);
+
+        if (requestBody != null) {
+            request.append(requestBody);
+        }
+
+        return request.toString();
     }
 
 }
