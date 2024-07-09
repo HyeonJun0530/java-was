@@ -1,5 +1,7 @@
 package codesquad.http.message.response;
 
+import java.nio.charset.StandardCharsets;
+
 public class ResponseBody {
 
     private final byte[] body;
@@ -10,7 +12,7 @@ public class ResponseBody {
 
     public static <T> ResponseBody from(final T body) {
         if (body instanceof String) {
-            return new ResponseBody(body.toString().getBytes());
+            return new ResponseBody(body.toString().getBytes(StandardCharsets.UTF_8));
         } else if (body instanceof byte[]) {
             return new ResponseBody((byte[]) body);
         }
