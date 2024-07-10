@@ -31,7 +31,7 @@ class HttpRequestHandlerTest {
     @Test
     @DisplayName("HttpRequestHandlerTest 테스트 - static 파일 요청이 성공적으로 처리되는 경우")
     void static_handle_success() throws IOException {
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET / HTTP/1.1"))), null, null);
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /favicon.ico HTTP/1.1"))), null, null);
         HttpResponse httpResponse = StaticHandler.handle(httpRequest);
 
         assertAll(() -> assertThat(httpResponse.hasBody()).isTrue(),
@@ -54,7 +54,7 @@ class HttpRequestHandlerTest {
     @Test
     @DisplayName("HttpRequestHandlerTest 테스트 - api 핸들러에 api가 없어서 static 핸들러로 처리되는 경우")
     void handle_static() throws IOException {
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET / HTTP/1.1"))), null, null);
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /favicon.ico HTTP/1.1"))), null, null);
         HttpResponse httpResponse = HttpRequestHandler.handle(httpRequest);
 
         assertAll(() -> assertThat(httpResponse.hasBody()).isTrue(),
