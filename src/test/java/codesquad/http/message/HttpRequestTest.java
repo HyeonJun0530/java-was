@@ -12,6 +12,7 @@ import java.io.StringReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HttpRequestTest {
 
@@ -123,7 +124,7 @@ class HttpRequestTest {
     }
 
     @Test
-    @DisplayName("HttpRequest 쿠키가 없으면 null을 반환한다.")
+    @DisplayName("HttpRequest 쿠키가 없으면 빈 배열을 반환한다.")
     void getCookies_null() throws IOException {
         String input = "GET /index.html HTTP/1.1\r\n" +
                 "Host: www.example.com\r\n" +
@@ -132,7 +133,7 @@ class HttpRequestTest {
 
         HttpRequest from = getHttpRequest(input);
 
-        assertThat(from.getCookies()).isNull();
+        assertTrue(from.getCookies().isEmpty());
     }
 
 }

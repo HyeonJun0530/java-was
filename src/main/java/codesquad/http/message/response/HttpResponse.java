@@ -5,6 +5,7 @@ import codesquad.http.message.HttpHeaders;
 import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.constant.HttpHeader;
 import codesquad.http.message.constant.HttpStatus;
+import codesquad.http.message.request.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,15 +21,19 @@ public class HttpResponse {
 
     private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
 
-    private final ResponseLine responseLine;
-    private final HttpHeaders headers;
-    private final ResponseBody body;
+    private ResponseLine responseLine;
+    private HttpHeaders headers;
+    private ResponseBody body;
     private List<Cookie> cookies;
 
     private HttpResponse(final ResponseLine responseLine, final HttpHeaders headers, final ResponseBody body) {
         this.responseLine = responseLine;
         this.headers = headers;
         this.body = body;
+    }
+
+    public static HttpResponse empty() {
+        return new HttpResponse(null, null, null);
     }
 
     public static <T> HttpResponse of(final ContentType contentType, final String httpVersion, final HttpStatus httpStatus, final T body) {
@@ -44,6 +49,12 @@ public class HttpResponse {
         return new HttpResponse(ResponseLine.of(httpVersion, httpStatus), HttpHeaders.newInstance(), null);
     }
 
+    public void sendRedirect(final HttpRequest httpRequest, final String path) {
+        this.responseLine = ResponseLine.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.FOUND);
+        this.headers = HttpHeaders.of(path);
+        this.body = null;
+    }
+
     public void setCookie(final Cookie cookie) {
         if (cookies == null) {
             cookies = new ArrayList<>();
@@ -52,6 +63,10 @@ public class HttpResponse {
         }
 
         cookies.add(cookie);
+    }
+
+    public boolean hasMessage() {
+        return responseLine != null && headers != null;
     }
 
     public boolean hasBody() {

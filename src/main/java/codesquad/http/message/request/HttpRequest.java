@@ -2,6 +2,7 @@ package codesquad.http.message.request;
 
 import codesquad.http.message.Cookie;
 import codesquad.http.message.HttpHeaders;
+import codesquad.http.message.constant.HttpHeader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -52,13 +53,26 @@ public class HttpRequest {
     }
 
     public List<Cookie> getCookies() {
-        String header = httpHeaders.getHeader("Cookie");
+        String header = httpHeaders.getHeader(HttpHeader.COOKIE.getHeaderName());
 
         if (header == null) {
-            return null;
+            return List.of();
         }
 
         return Cookie.of(header);
+    }
+
+    public String getSessionId() {
+        List<Cookie> cookies = getCookies();
+
+        if (cookies == null) {
+            return null;
+        }
+
+        return cookies.stream()
+                .filter(cookie -> cookie.getName().equals("SID"))
+                .map(Cookie::getValue)
+                .findFirst().orElse(null);
     }
 
     @Override

@@ -59,6 +59,12 @@ public class HttpHeaders {
     private static void addResponseDefaultHeaders(final Map<String, String> headers) {
         headers.put(HttpHeader.SERVER.getHeaderName(), DEFAULT_SERVER_NAME);
         headers.put(HttpHeader.DATE.getHeaderName(), HttpMessageUtils.getCurrentTime());
+
+        String type = headers.get(HttpHeader.CONTENT_TYPE.getHeaderName());
+        if (type != null) {
+            headers.put(HttpHeader.CONTENT_TYPE.getHeaderName(),
+                    ContentType.getContentType(type).getType() + "; charset=" + StandardCharsets.UTF_8);
+        }
     }
 
     private static Map<String, String> parseHeaders(final BufferedReader reader) throws IOException {

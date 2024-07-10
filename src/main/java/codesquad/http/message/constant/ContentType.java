@@ -13,6 +13,7 @@ public enum ContentType {
     IMAGE_SVG("image/svg+xml", ".svg"),
     IMAGE_ICO("image/x-icon", ".ico"),
     APPLICATION_JSON("application/json", ".json"),
+    APPLICATION_FORM("application/x-www-form-urlencoded", ".form"),
     APPLICATION_XML("application/xml", ".xml"),
     APPLICATION_XHTML("application/xhtml+xml", ".xhtml"),
     APPLICATION_OCTET_STREAM("application/octet-stream", ".bin"),
@@ -32,6 +33,13 @@ public enum ContentType {
 
         return Arrays.stream(ContentType.values())
                 .filter(contentType -> contentType.ext.equals(ext))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 확장자입니다."));
+    }
+
+    public static ContentType getContentType(final String type) {
+        return Arrays.stream(ContentType.values())
+                .filter(contentType -> contentType.type.equalsIgnoreCase(type))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 확장자입니다."));
     }
