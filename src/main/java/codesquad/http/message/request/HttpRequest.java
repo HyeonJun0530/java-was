@@ -66,13 +66,13 @@ public class HttpRequest {
         List<Cookie> cookies = getCookies();
 
         if (cookies == null) {
-            return null;
+            return "invalid";
         }
 
         return cookies.stream()
                 .filter(cookie -> cookie.getName().equals("SID"))
                 .map(Cookie::getValue)
-                .findFirst().orElse(null);
+                .findFirst().orElse("invalid");
     }
 
     @Override

@@ -52,9 +52,13 @@ class ApiHandlerTest {
 
     @Test
     @DisplayName("api 핸들러에서 처리 유무를 반환")
-    void is_api_request() {
-        assertAll(() -> assertThat(ApiHandler.isApiRequest("/create")).isTrue(),
-                () -> assertThat(ApiHandler.isApiRequest("/notfound")).isFalse());
+    void is_api_request() throws IOException {
+        HttpRequest success = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
+                RequestBody.from(new BufferedReader(new StringReader("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")), 113));
+        HttpRequest fail = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /global.css HTTP/1.1"))), null, null);
+
+        assertAll(() -> assertThat(ApiHandler.isApiRequest(success)).isTrue(),
+                () -> assertThat(ApiHandler.isApiRequest(fail)).isFalse());
     }
 }
 
