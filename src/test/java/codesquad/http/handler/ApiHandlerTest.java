@@ -1,10 +1,12 @@
 package codesquad.http.handler;
 
+import codesquad.app.repository.UserRepository;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.request.RequestBody;
 import codesquad.http.message.request.RequestStartLine;
 import codesquad.http.message.response.HttpResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +18,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ApiHandlerTest {
+
+    @BeforeEach
+    void setUp() {
+        UserRepository.save(new codesquad.app.domain.User.Builder()
+                .name("박재성")
+                .email("javajigi@slipp.net")
+                .userId("javajigi")
+                .password("password")
+                .build());
+    }
 
 
     @Test
@@ -48,6 +60,28 @@ class ApiHandlerTest {
 
         assertAll(() -> assertThat(response.hasBody()).isFalse(),
                 () -> assertThat(response.toString()).containsIgnoringCase(HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase()));
+    }
+
+    @Test
+    @DisplayName("api 핸들러 - 같은 url에 대해서 GET, POST 모두 처리 가능한 경우")
+    void api() throws IOException {
+        String getMessage = "GET /login HTTP/1.1\r\n" +
+                "Host: localhost:8080\r\n" +
+                "Connection: keep-alive\r\n";
+
+        String postMessage = "POST /login HTTP/1.1\r\n" +
+                "Host: localhost:8080\r\n" +
+                "Connection: keep-alive\r\n" +
+                "Content-Length: 33\r\n" +
+                "Content-Type: application/x-www-form-urlencoded\r\n" +
+                "\r\n" +
+                "userId=javajigi&password=password";
+
+        HttpRequest get = HttpRequest.from(new BufferedReader(new StringReader(getMessage)));
+        HttpRequest post = HttpRequest.from(new BufferedReader(new StringReader(postMessage)));
+
+        assertThat(ApiHandler.handle(get).toString()).contains(HttpStatus.OK.getReasonPhrase());
+        assertThat(ApiHandler.handle(post).toString()).contains(HttpStatus.FOUND.getReasonPhrase());
     }
 
     @Test

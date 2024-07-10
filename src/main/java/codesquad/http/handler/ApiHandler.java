@@ -13,6 +13,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ApiHandler {
@@ -23,30 +24,36 @@ public class ApiHandler {
     private ApiHandler() {
     }
 
+
+    //TODO : 같은 path에서 GET, POST 요청을 처리할 수 있도록 구현해야 합니다.
     public static HttpResponse handle(final HttpRequest httpRequest) {
         String path = httpRequest.getRequestStartLine().getPath();
         try {
-            for (Class apiClass : apiList) {
-                Object apiInstance = getNewInstance(apiClass);
-                for (Method method : apiClass.getMethods()) {
-                    if (method.isAnnotationPresent(ApiMapping.class)) {
-                        ApiMapping apiMapping = method.getAnnotation(ApiMapping.class);
-                        if (apiMapping.path().equals(path)) {
-                            if (!apiMapping.method().equals(httpRequest.getRequestStartLine().getMethod())) {
-                                return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.METHOD_NOT_ALLOWED);
-                            }
-                            return (HttpResponse) method.invoke(apiInstance, httpRequest);
-                        }
-                    }
-                }
+            List<Method> apiMethods = apiList.stream()
+                    .flatMap(apiClass -> Stream.of(apiClass.getMethods()))
+                    .filter(method -> method.isAnnotationPresent(ApiMapping.class))
+                    .filter(method -> method.getAnnotation(ApiMapping.class).path().equals(path))
+                    .toList();
+
+            if (apiMethods.isEmpty()) {
+                return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.NOT_FOUND);
             }
+
+            Optional<Method> findMethod = apiMethods.stream()
+                    .filter(method -> method.getAnnotation(ApiMapping.class).method()
+                            .equals(httpRequest.getRequestStartLine().getMethod()))
+                    .findFirst();
+
+            if (findMethod.isEmpty()) {
+                return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.METHOD_NOT_ALLOWED);
+            }
+
+            return (HttpResponse) findMethod.get().invoke(getNewInstance(findMethod.get().getDeclaringClass()), httpRequest);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
             log.error("API handler error", e);
             return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.NOT_FOUND);
     }
 
     @SuppressWarnings("unchecked")
