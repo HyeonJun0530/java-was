@@ -1,6 +1,6 @@
 package codesquad.http.handler;
 
-import codesquad.app.repository.UserRepository;
+import codesquad.app.infrastructure.UserDataBase;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.request.RequestBody;
@@ -21,7 +21,7 @@ class ApiHandlerTest {
 
     @BeforeEach
     void setUp() {
-        UserRepository.save(new codesquad.app.domain.User.Builder()
+        UserDataBase.save(new codesquad.app.domain.User.Builder()
                 .name("박재성")
                 .email("javajigi@slipp.net")
                 .userId("javajigi")

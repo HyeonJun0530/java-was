@@ -1,11 +1,11 @@
-package codesquad.app.repository;
+package codesquad.app.infrastructure;
 
 import codesquad.app.domain.User;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class UserRepository {
+public class UserDataBase {
 
     private static final Map<String, User> users = new ConcurrentHashMap<>();
 

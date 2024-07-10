@@ -2,7 +2,7 @@ package codesquad.app.api;
 
 import codesquad.app.api.annotation.ApiMapping;
 import codesquad.app.domain.User;
-import codesquad.app.repository.UserRepository;
+import codesquad.app.infrastructure.UserDataBase;
 import codesquad.http.handler.StaticHandler;
 import codesquad.http.message.Cookie;
 import codesquad.http.message.SessionManager;
@@ -35,7 +35,7 @@ public class UserApi {
                 .userId(userId)
                 .build();
 
-        UserRepository.save(user);
+        UserDataBase.save(user);
         log.debug("User: {}", user);
 
         HttpResponse response = HttpResponse.redirect(request.getRequestStartLine().getProtocol(),
@@ -58,7 +58,7 @@ public class UserApi {
         String userId = body.get("userId");
         String password = body.get("password");
 
-        User user = UserRepository.findByUserId(userId);
+        User user = UserDataBase.findByUserId(userId);
 
         if (user == null || !user.getPassword().equals(password)) {
             HttpResponse response = HttpResponse.redirect(request.getRequestStartLine().getProtocol(),

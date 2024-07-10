@@ -1,7 +1,7 @@
 package codesquad.http.message;
 
 import codesquad.app.domain.User;
-import codesquad.app.repository.UserRepository;
+import codesquad.app.infrastructure.UserDataBase;
 import codesquad.http.message.response.HttpResponse;
 
 import java.util.Map;
@@ -18,7 +18,7 @@ public class SessionManager {
 
     public static String createSession(final String userId, final HttpResponse response) {
         UUID sessionId = UUID.randomUUID();
-        User user = UserRepository.findByUserId(userId);
+        User user = UserDataBase.findByUserId(userId);
         sessions.put(sessionId.toString(), user);
 
         response.setCookie(new Cookie("SID", sessionId.toString()));

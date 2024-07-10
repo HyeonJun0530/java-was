@@ -1,7 +1,7 @@
 package codesquad.http.message;
 
 import codesquad.app.domain.User;
-import codesquad.app.repository.UserRepository;
+import codesquad.app.infrastructure.UserDataBase;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.response.HttpResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +20,7 @@ class SessionManagerTest {
                 .password("password")
                 .userId("userId")
                 .build();
-        UserRepository.save(user);
+        UserDataBase.save(user);
         return user;
     }
 

@@ -113,7 +113,7 @@ class HttpRequestTest {
                 "Host: www.example.com\r\n" +
                 "Content-Type: text/html\r\n" +
                 "Content-Length: 0\r\n" +
-                "Cookie: JSESSIONID=1234; remember=true\r\n";
+                "Cookie: SID=1234; remember=true\r\n";
 
         HttpRequest from = getHttpRequest(input);
 
