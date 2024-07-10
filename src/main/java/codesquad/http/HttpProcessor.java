@@ -42,6 +42,7 @@ public class HttpProcessor implements Runnable {
                 filterChain.doFilter(request, response);
 
                 if (response.hasMessage()) {
+                    log.debug("Response: {}", response);
                     write(response, client);
                     return;
                 }

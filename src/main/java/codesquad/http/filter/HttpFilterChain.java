@@ -9,8 +9,12 @@ import java.util.List;
 
 public class HttpFilterChain implements FilterChain {
 
-    private final List<Filter> filters = new ArrayList<>();
-    private final ThreadLocal<Integer> index = ThreadLocal.withInitial(() -> 0);
+    private static final List<Filter> filters = new ArrayList<>();
+    private ThreadLocal<Integer> index = ThreadLocal.withInitial(() -> 0);
+
+    public HttpFilterChain() {
+        filters.add(new LoginFilter(100));
+    }
 
     @Override
     public void doFilter(final HttpRequest request, final HttpResponse response) {
