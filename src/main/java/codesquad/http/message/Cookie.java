@@ -83,7 +83,6 @@ public class Cookie {
     }
 
     private static void setDefaultAttributes(final Map<String, String> attributes) {
-        attributes.put(DOMAIN, DEFAULT_DOMAIN);
         attributes.put(PATH, DEFAULT_PATH);
     }
 
