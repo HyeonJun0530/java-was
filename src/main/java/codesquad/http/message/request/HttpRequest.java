@@ -31,6 +31,10 @@ public class HttpRequest {
         String length = Optional.ofNullable(httpHeaders.getHeader(CONTENT_LENGTH.getHeaderName())).orElse("0");
         int contentLength = Integer.parseInt(length);
 
+        if (contentLength > 100000000) {
+            throw new IllegalArgumentException("Content-Length is too long");
+        }
+
         if (contentLength == 0) {
             return new HttpRequest(requestStartLine, httpHeaders, null);
         }
