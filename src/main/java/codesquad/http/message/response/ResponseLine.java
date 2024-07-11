@@ -2,8 +2,9 @@ package codesquad.http.message.response;
 
 import codesquad.http.message.constant.HttpStatus;
 
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 
+import static codesquad.utils.HttpMessageUtils.DECODING_CHARSET;
 import static codesquad.utils.StringUtils.SPACE;
 
 public class ResponseLine {
@@ -19,8 +20,8 @@ public class ResponseLine {
         return new ResponseLine(httpStatus);
     }
 
-    public byte[] getBytes() {
-        return (HTTP_PROTOCOL + SPACE + httpStatus.toString()).getBytes(StandardCharsets.UTF_8);
+    public byte[] getBytes() throws UnsupportedEncodingException {
+        return (HTTP_PROTOCOL + SPACE + httpStatus.toString()).getBytes(DECODING_CHARSET);
     }
 
     public HttpStatus getHttpStatus() {

@@ -3,10 +3,10 @@ package codesquad.http.message.request;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 
+import static codesquad.utils.HttpMessageUtils.DECODING_CHARSET;
 import static codesquad.utils.StringUtils.EMPTY;
 import static codesquad.utils.StringUtils.EQUAL;
 import static java.util.stream.Collectors.toMap;
@@ -24,7 +24,7 @@ public class RequestBody {
         reader.read(read);
 
         String body = new String(read);
-        String decode = URLDecoder.decode(body, StandardCharsets.UTF_8);
+        String decode = URLDecoder.decode(body, DECODING_CHARSET);
 
         return new RequestBody(decode);
     }

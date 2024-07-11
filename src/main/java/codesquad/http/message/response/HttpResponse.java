@@ -10,10 +10,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static codesquad.utils.HttpMessageUtils.DECODING_CHARSET;
 import static codesquad.utils.StringUtils.*;
 
 public class HttpResponse {
@@ -35,7 +36,7 @@ public class HttpResponse {
         return new HttpResponse(null, null, null);
     }
 
-    public static <T> HttpResponse of(final ContentType contentType, final HttpStatus httpStatus, final T body) {
+    public static HttpResponse of(final ContentType contentType, final HttpStatus httpStatus, final byte[] body) {
         ResponseBody responseBody = ResponseBody.from(body);
         return new HttpResponse(ResponseLine.of(httpStatus), HttpHeaders.of(contentType, responseBody), responseBody);
     }
@@ -88,18 +89,18 @@ public class HttpResponse {
         return body != null;
     }
 
-    public byte[] getResponseLineBytes() {
+    public byte[] getResponseLineBytes() throws UnsupportedEncodingException {
         return responseLine.getBytes();
     }
 
-    public byte[] getHeaderBytes() {
+    public byte[] getHeaderBytes() throws UnsupportedEncodingException {
         if (cookies == null) {
             return headers.getBytes();
         }
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             outputStream.write(headers.getBytes());
-            outputStream.write(NEW_LINE.getBytes(StandardCharsets.UTF_8));
+            outputStream.write(NEW_LINE.getBytes(DECODING_CHARSET));
             outputStream.write(Cookie.getCookiesBytes(this.cookies));
             return outputStream.toByteArray();
         } catch (IOException e) {

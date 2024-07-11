@@ -2,12 +2,13 @@ package codesquad.http.message;
 
 import codesquad.http.message.constant.HttpHeader;
 
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static codesquad.utils.HttpMessageUtils.DECODING_CHARSET;
 import static codesquad.utils.StringUtils.*;
 import static java.util.stream.Collectors.joining;
 
@@ -47,10 +48,10 @@ public class Cookie {
                 }).toList();
     }
 
-    public static byte[] getCookiesBytes(final List<Cookie> cookies) {
+    public static byte[] getCookiesBytes(final List<Cookie> cookies) throws UnsupportedEncodingException {
         return cookies.stream()
                 .map(cookie -> HttpHeader.SET_COOKIE.getHeaderName() + COLON + SPACE + cookie.format())
-                .collect(joining(NEW_LINE)).getBytes(StandardCharsets.UTF_8);
+                .collect(joining(NEW_LINE)).getBytes(DECODING_CHARSET);
     }
 
     public void setMaxAge(long maxAge) {

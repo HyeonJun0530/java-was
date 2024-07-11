@@ -5,7 +5,6 @@ import codesquad.http.message.constant.HttpMethod;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static codesquad.utils.StringUtils.SPACE;
@@ -54,7 +53,7 @@ public class RequestStartLine {
     }
 
     private static String[] getStartLineTokens(final BufferedReader reader) throws IOException {
-        String[] startLineTokens = URLDecoder.decode(reader.readLine(), StandardCharsets.UTF_8).split(SPACE);
+        String[] startLineTokens = URLDecoder.decode(reader.readLine(), "UTF-8").split(SPACE);
 
         if (startLineTokens.length != 3) {
             throw new IllegalArgumentException("Invalid Request Start Line");

@@ -6,6 +6,9 @@ import codesquad.http.message.response.HttpResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.UnsupportedEncodingException;
+
+import static codesquad.utils.HttpMessageUtils.DECODING_CHARSET;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HttpResponseTest {
@@ -32,9 +35,9 @@ class HttpResponseTest {
 
     @Test
     @DisplayName("HttpResponse.of() 메서드를 통해 HttpResponse 객체를 생성할 수 있다. - body가 있는 경우")
-    void of_ok_with_body() {
+    void of_ok_with_body() throws UnsupportedEncodingException {
         HttpResponse httpResponse = HttpResponse.of(ContentType.TEXT_PLAIN, HttpStatus.OK,
-                "Hello, World!");
+                "Hello, World!".getBytes(DECODING_CHARSET));
 
         assertAll(() -> assertTrue(httpResponse.hasBody()),
                 () -> assertTrue(httpResponse.toString().contains("Content-Type: text/plain")),
