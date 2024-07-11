@@ -2,7 +2,6 @@ package codesquad.http;
 
 import codesquad.config.FilterChainConfig;
 import codesquad.http.filter.FilterChain;
-import codesquad.http.handler.HttpRequestHandler;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
 import org.slf4j.Logger;
@@ -47,15 +46,13 @@ public class HttpProcessor implements Runnable {
                     return;
                 }
 
-                HttpResponse httpResponse = HttpRequestHandler.handle(request);
+                HttpResponse httpResponse = DispatcherServlet.service(request);
                 log.debug("Response: {}", httpResponse);
 
                 write(httpResponse, client);
             }
         } catch (IOException e) {
             log.error("Error handling client connection = {}", e);
-        } catch (Exception e) {
-            log.error("Error parsing request = {}", e);
         } finally {
             try {
                 connection.close();

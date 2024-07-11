@@ -29,7 +29,7 @@ class SessionManagerTest {
     void createSession() {
         User user = save();
 
-        HttpResponse httpResponse = HttpResponse.of("HTTP1.1", HttpStatus.OK);
+        HttpResponse httpResponse = HttpResponse.of(HttpStatus.OK);
         SessionManager.createSession(user.getUserId(), httpResponse);
 
         assertTrue(httpResponse.toString().contains("Set-Cookie: SID="));
@@ -40,7 +40,7 @@ class SessionManagerTest {
     void getUserId() {
         User user = save();
 
-        HttpResponse httpResponse = HttpResponse.of("HTTP1.1", HttpStatus.OK);
+        HttpResponse httpResponse = HttpResponse.of(HttpStatus.OK);
         String session = SessionManager.createSession(user.getUserId(), httpResponse);
 
         Optional<User> userId = SessionManager.getUserId(session);
@@ -55,7 +55,7 @@ class SessionManagerTest {
     void removeSession() {
         User user = save();
 
-        HttpResponse httpResponse = HttpResponse.of("HTTP1.1", HttpStatus.OK);
+        HttpResponse httpResponse = HttpResponse.of(HttpStatus.OK);
         String session = SessionManager.createSession(user.getUserId(), httpResponse);
 
         SessionManager.removeSession(session);
@@ -68,7 +68,7 @@ class SessionManagerTest {
     void isValidSession() {
         User user = save();
 
-        HttpResponse httpResponse = HttpResponse.of("HTTP1.1", HttpStatus.OK);
+        HttpResponse httpResponse = HttpResponse.of(HttpStatus.OK);
         String session = SessionManager.createSession(user.getUserId(), httpResponse);
 
         assertTrue(SessionManager.isValidSession(session));

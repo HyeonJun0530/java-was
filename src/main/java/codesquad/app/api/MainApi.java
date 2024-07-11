@@ -15,11 +15,9 @@ public class MainApi {
     @ApiMapping(method = HttpMethod.GET, path = "/")
     public HttpResponse main(HttpRequest request) {
         if (SessionManager.isValidSession(request.getSessionId())) {
-            return HttpResponse.of(ContentType.TEXT_HTML, request.getRequestStartLine().getProtocol(),
-                    HttpStatus.OK, getStaticFiles("/main/index.html"));
+            return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFiles("/main/index.html"));
         }
 
-        return HttpResponse.of(ContentType.TEXT_HTML, request.getRequestStartLine().getProtocol(),
-                HttpStatus.OK, getStaticFiles("/index.html"));
+        return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFiles("/index.html"));
     }
 }

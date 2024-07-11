@@ -33,7 +33,7 @@ public class LoginFilter implements Filter {
         if (validSession) {
             httpFilterChain.doFilter(request, response);
         } else {
-            response.sendRedirect(request, "/login");
+            response.sendRedirect("/login");
         }
     }
 

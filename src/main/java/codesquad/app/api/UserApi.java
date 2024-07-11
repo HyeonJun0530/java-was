@@ -39,8 +39,7 @@ public class UserApi {
         UserDataBase.save(user);
         log.debug("User: {}", user);
 
-        HttpResponse response = HttpResponse.redirect(request.getRequestStartLine().getProtocol(),
-                HttpStatus.FOUND, "/");
+        HttpResponse response = HttpResponse.redirect(HttpStatus.FOUND, "/");
 
         SessionManager.createSession(userId, response);
 
@@ -49,14 +48,12 @@ public class UserApi {
 
     @ApiMapping(method = HttpMethod.GET, path = "/registration")
     public HttpResponse registrationPage(final HttpRequest request) {
-        return HttpResponse.of(ContentType.TEXT_HTML, request.getRequestStartLine().getProtocol(),
-                HttpStatus.OK, getStaticFiles("/registration/index.html"));
+        return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFiles("/registration/index.html"));
     }
 
     @ApiMapping(method = HttpMethod.GET, path = "/login")
     public HttpResponse loginPage(final HttpRequest request) {
-        return HttpResponse.of(ContentType.TEXT_HTML, request.getRequestStartLine().getProtocol(),
-                HttpStatus.OK, getStaticFiles("/login/index.html"));
+        return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFiles("/login/index.html"));
     }
 
     @ApiMapping(method = HttpMethod.POST, path = "/login")
@@ -68,13 +65,11 @@ public class UserApi {
         User user = UserDataBase.findByUserId(userId);
 
         if (user == null || !user.getPassword().equals(password)) {
-            HttpResponse response = HttpResponse.redirect(request.getRequestStartLine().getProtocol(),
-                    HttpStatus.FOUND, "/login");
+            HttpResponse response = HttpResponse.redirect(HttpStatus.FOUND, "/login");
             return response;
         }
 
-        HttpResponse response = HttpResponse.redirect(request.getRequestStartLine().getProtocol(),
-                HttpStatus.FOUND, "/");
+        HttpResponse response = HttpResponse.redirect(HttpStatus.FOUND, "/");
 
         SessionManager.createSession(userId, response);
 
@@ -85,8 +80,7 @@ public class UserApi {
     public HttpResponse logout(final HttpRequest request) {
         SessionManager.removeSession(request.getSessionId());
 
-        HttpResponse response = HttpResponse.redirect(request.getRequestStartLine().getProtocol(),
-                HttpStatus.FOUND, "/");
+        HttpResponse response = HttpResponse.redirect(HttpStatus.FOUND, "/");
 
         Cookie cookie = new Cookie("SID", "null");
         cookie.setMaxAge(0);

@@ -32,7 +32,7 @@ public class ApiHandler implements HttpRequestHandler {
                     .toList();
 
             if (apiMethods.isEmpty()) {
-                return HttpResponse.of(request.getRequestStartLine().getProtocol(), HttpStatus.NOT_FOUND);
+                return HttpResponse.notFound();
             }
 
             Optional<Method> findMethod = apiMethods.stream()
@@ -41,14 +41,14 @@ public class ApiHandler implements HttpRequestHandler {
                     .findFirst();
 
             if (findMethod.isEmpty()) {
-                return HttpResponse.of(request.getRequestStartLine().getProtocol(), HttpStatus.METHOD_NOT_ALLOWED);
+                return HttpResponse.of(HttpStatus.METHOD_NOT_ALLOWED);
             }
 
             return findMethod.get().invoke(getNewInstance(findMethod.get().getDeclaringClass()), request);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
             log.error("API handler error", e);
-            return HttpResponse.of(request.getRequestStartLine().getProtocol(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return HttpResponse.internalServerError();
         }
     }
 

@@ -24,12 +24,11 @@ public class StaticHandler implements HttpRequestHandler {
             byte[] staticFiles = getStaticFiles(path);
 
             return HttpResponse.of(ContentType.from(path),
-                    httpRequest.getRequestStartLine().getProtocol(),
                     HttpStatus.OK,
                     staticFiles);
         } catch (IllegalArgumentException e) {
             log.error("Static file not found", e);
-            return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.NOT_FOUND);
+            return HttpResponse.notFound();
         }
     }
 
