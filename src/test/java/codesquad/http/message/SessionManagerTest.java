@@ -1,9 +1,10 @@
 package codesquad.http.message;
 
 import codesquad.app.domain.User;
-import codesquad.app.infrastructure.UserDataBase;
+import codesquad.app.infrastructure.UserDatabase;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.response.HttpResponse;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,8 +21,13 @@ class SessionManagerTest {
                 .password("password")
                 .userId("userId")
                 .build();
-        UserDataBase.save(user);
+        UserDatabase.save(user);
         return user;
+    }
+
+    @AfterEach
+    void tearDown() {
+        UserDatabase.remove("userId");
     }
 
     @Test

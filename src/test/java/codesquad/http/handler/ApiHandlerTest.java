@@ -1,11 +1,12 @@
 package codesquad.http.handler;
 
-import codesquad.app.infrastructure.UserDataBase;
+import codesquad.app.infrastructure.UserDatabase;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.request.RequestBody;
 import codesquad.http.message.request.RequestStartLine;
 import codesquad.http.message.response.HttpResponse;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,12 +25,17 @@ class ApiHandlerTest {
 
     @BeforeEach
     void setUp() {
-        UserDataBase.save(new codesquad.app.domain.User.Builder()
+        UserDatabase.save(new codesquad.app.domain.User.Builder()
                 .name("박재성")
                 .email("javajigi@slipp.net")
                 .userId("javajigi")
                 .password("password")
                 .build());
+    }
+
+    @AfterEach
+    void tearDown() {
+        UserDatabase.remove("javajigi");
     }
 
     private static HttpResponse convert(final Object response) {
@@ -41,6 +47,7 @@ class ApiHandlerTest {
     @Test
     @DisplayName("api 핸들러에 api가 있어서 성공적으로 처리되는 경우")
     public void api_handle_success() throws IOException {
+        UserDatabase.remove("javajigi");
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
                 RequestBody.from(new BufferedReader(new StringReader("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")), 113));
         Object response = apiHandler.handle(httpRequest);

@@ -1,5 +1,6 @@
 package codesquad.http.handler;
 
+import codesquad.app.infrastructure.UserDatabase;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.request.RequestBody;
@@ -26,19 +27,6 @@ class HttpRequestHandlerTest {
 
         HttpResponse httpResponse = (HttpResponse) response;
         return httpResponse;
-    }
-
-    @Test
-    @DisplayName("HttpRequestHandlerTest 테스트 - api 핸들러에 api가 있어서 성공적으로 HttpResponse 타입으로 처리되는 경우")
-    void api_handle_success() throws IOException {
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")), 113));
-        Object response = handlerList.get(0).handle(httpRequest);
-
-        HttpResponse httpResponse = getHttpResponse(response);
-
-        assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
-                () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.FOUND.getReasonPhrase()));
     }
 
     @Test
@@ -88,6 +76,21 @@ class HttpRequestHandlerTest {
     }
 
     @Test
+    @DisplayName("HttpRequestHandlerTest 테스트 - api 핸들러에 api가 있어서 성공적으로 HttpResponse 타입으로 처리되는 경우")
+    void api_handle_success() throws IOException {
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
+                RequestBody.from(new BufferedReader(new StringReader("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")), 113));
+        Object response = handlerList.get(0).handle(httpRequest);
+
+        HttpResponse httpResponse = getHttpResponse(response);
+
+        assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
+                () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.FOUND.getReasonPhrase()));
+
+        UserDatabase.remove("javajigi");
+    }
+
+    @Test
     @DisplayName("HttpRequestHandlerTest 테스트 - api 핸들러에 api가 있어서 api 핸들러로 처리되는 경우")
     void handle_api() throws IOException {
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
@@ -101,6 +104,8 @@ class HttpRequestHandlerTest {
         Object response = supportHandler.get().handle(httpRequest);
 
         HttpResponse httpResponse = getHttpResponse(response);
+
+        UserDatabase.remove("javajigi");
 
         assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
                 () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.FOUND.getReasonPhrase())
