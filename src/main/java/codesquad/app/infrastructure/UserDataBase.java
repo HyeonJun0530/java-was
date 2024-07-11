@@ -2,6 +2,7 @@ package codesquad.app.infrastructure;
 
 import codesquad.app.domain.User;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,5 +18,9 @@ public class UserDataBase {
 
     public static User findByUserId(String userId) {
         return users.get(userId);
+    }
+
+    public static List<User> findAll() {
+        return List.copyOf(users.values());
     }
 }

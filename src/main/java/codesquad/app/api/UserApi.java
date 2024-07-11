@@ -10,6 +10,7 @@ import codesquad.http.message.constant.HttpMethod;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
+import codesquad.http.model.ModelAndView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,10 @@ public class UserApi {
 
     @ApiMapping(method = HttpMethod.GET, path = "/login")
     public HttpResponse loginPage(final HttpRequest request) {
+        if (SessionManager.isValidSession(request.getSessionId())) {
+            return HttpResponse.redirect(HttpStatus.FOUND, "/");
+        }
+
         return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFile("/login/index.html"));
     }
 
@@ -88,5 +93,14 @@ public class UserApi {
         response.setCookie(cookie);
 
         return response;
+    }
+
+    @ApiMapping(method = HttpMethod.GET, path = "/user/list")
+    public ModelAndView getUserList(final HttpRequest request) {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/user/userList.html");
+        mav.addObject("users", UserDataBase.findAll());
+
+        return mav;
     }
 }

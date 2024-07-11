@@ -13,7 +13,16 @@ import static codesquad.utils.FileUtil.getStaticFile;
 public class MainApi {
 
     @ApiMapping(method = HttpMethod.GET, path = "/")
+    public HttpResponse root(HttpRequest request) {
+        return getMainPage(request);
+    }
+
+    @ApiMapping(method = HttpMethod.GET, path = "/main")
     public HttpResponse main(HttpRequest request) {
+        return getMainPage(request);
+    }
+
+    private HttpResponse getMainPage(final HttpRequest request) {
         if (SessionManager.isValidSession(request.getSessionId())) {
             return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFile("/main/index.html"));
         }
