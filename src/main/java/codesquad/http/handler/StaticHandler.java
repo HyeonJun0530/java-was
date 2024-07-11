@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static codesquad.utils.FileUtil.getStaticFiles;
+import static codesquad.utils.FileUtil.getStaticFile;
 
 public class StaticHandler implements HttpRequestHandler {
 
@@ -21,7 +21,7 @@ public class StaticHandler implements HttpRequestHandler {
         try {
             String path = httpRequest.getRequestStartLine().getPath();
 
-            byte[] staticFiles = getStaticFiles(path);
+            byte[] staticFiles = getStaticFile(path);
 
             return HttpResponse.of(ContentType.from(path),
                     HttpStatus.OK,

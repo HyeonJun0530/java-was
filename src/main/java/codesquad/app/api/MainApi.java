@@ -8,16 +8,16 @@ import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
 
-import static codesquad.utils.FileUtil.getStaticFiles;
+import static codesquad.utils.FileUtil.getStaticFile;
 
 public class MainApi {
 
     @ApiMapping(method = HttpMethod.GET, path = "/")
     public HttpResponse main(HttpRequest request) {
         if (SessionManager.isValidSession(request.getSessionId())) {
-            return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFiles("/main/index.html"));
+            return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFile("/main/index.html"));
         }
 
-        return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFiles("/index.html"));
+        return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFile("/index.html"));
     }
 }

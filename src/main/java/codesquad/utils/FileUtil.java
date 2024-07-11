@@ -7,7 +7,7 @@ import java.io.InputStream;
 
 public class FileUtil {
 
-    public static byte[] getStaticFiles(final String path) {
+    public static byte[] getStaticFile(final String path) {
         ClassLoader classLoader = StaticHandler.class.getClassLoader();
         String resourcePath = "static" + path;
 

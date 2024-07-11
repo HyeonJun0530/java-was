@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-import static codesquad.utils.FileUtil.getStaticFiles;
+import static codesquad.utils.FileUtil.getStaticFile;
 
 public class UserApi {
 
@@ -48,12 +48,12 @@ public class UserApi {
 
     @ApiMapping(method = HttpMethod.GET, path = "/registration")
     public HttpResponse registrationPage(final HttpRequest request) {
-        return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFiles("/registration/index.html"));
+        return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFile("/registration/index.html"));
     }
 
     @ApiMapping(method = HttpMethod.GET, path = "/login")
     public HttpResponse loginPage(final HttpRequest request) {
-        return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFiles("/login/index.html"));
+        return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFile("/login/index.html"));
     }
 
     @ApiMapping(method = HttpMethod.POST, path = "/login")
