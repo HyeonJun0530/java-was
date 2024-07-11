@@ -7,9 +7,9 @@ import codesquad.http.message.response.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
+
+import static codesquad.utils.FileUtil.getStaticFiles;
 
 public class StaticHandler implements HttpRequestHandler {
 
@@ -36,21 +36,6 @@ public class StaticHandler implements HttpRequestHandler {
     @Override
     public boolean isSupport(final HttpRequest request) {
         return staticExtension.stream().anyMatch(request.getRequestStartLine().getPath()::endsWith);
-    }
-
-    public static byte[] getStaticFiles(final String path) {
-        ClassLoader classLoader = StaticHandler.class.getClassLoader();
-        String resourcePath = "static" + path;
-
-        try (InputStream resourceAsStream = classLoader.getResourceAsStream(resourcePath)) {
-            if (resourceAsStream == null) {
-                throw new IllegalArgumentException("Static file not found");
-            }
-
-            return resourceAsStream.readAllBytes();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

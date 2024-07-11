@@ -3,7 +3,6 @@ package codesquad.app.api;
 import codesquad.app.api.annotation.ApiMapping;
 import codesquad.app.domain.User;
 import codesquad.app.infrastructure.UserDataBase;
-import codesquad.http.handler.StaticHandler;
 import codesquad.http.message.Cookie;
 import codesquad.http.message.SessionManager;
 import codesquad.http.message.constant.ContentType;
@@ -15,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+
+import static codesquad.utils.FileUtil.getStaticFiles;
 
 public class UserApi {
 
@@ -46,10 +47,16 @@ public class UserApi {
         return response;
     }
 
+    @ApiMapping(method = HttpMethod.GET, path = "/registration")
+    public HttpResponse registrationPage(final HttpRequest request) {
+        return HttpResponse.of(ContentType.TEXT_HTML, request.getRequestStartLine().getProtocol(),
+                HttpStatus.OK, getStaticFiles("/registration/index.html"));
+    }
+
     @ApiMapping(method = HttpMethod.GET, path = "/login")
     public HttpResponse loginPage(final HttpRequest request) {
         return HttpResponse.of(ContentType.TEXT_HTML, request.getRequestStartLine().getProtocol(),
-                HttpStatus.OK, StaticHandler.getStaticFiles("/login/index.html"));
+                HttpStatus.OK, getStaticFiles("/login/index.html"));
     }
 
     @ApiMapping(method = HttpMethod.POST, path = "/login")
