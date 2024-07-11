@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <link href="/reset.css" rel="stylesheet"/>
+    <link href="/global.css" rel="stylesheet"/>
+    <link href="/main.css" rel="stylesheet"/>
+    <link href="/table.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/"><img src="/img/signiture.svg"/></a>
+        <ul class="header__menu">
+            <li class="header__menu__item">
+                <a class="btn btn_contained btn_size_s" href="/article">글쓰기</a>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn_ghost btn_size_s" href="/logout">
+                    로그아웃
+                </a>
+            </li>
+        </ul>
+    </header>
+    <div class="wrapper">
+        <table class="tb_col">
+            <thead>
+            <tr>
+                <th>사용자 목록</th>
+                <th>아이디</th>
+                <th>이름</th>
+                <th>이메일</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                ${users}
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
