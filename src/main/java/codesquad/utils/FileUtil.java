@@ -22,4 +22,19 @@ public class FileUtil {
         }
     }
 
+    public static byte[] getTemplateFile(final String path) {
+        ClassLoader classLoader = StaticHandler.class.getClassLoader();
+        String resourcePath = "templates" + path;
+
+        try (InputStream resourceAsStream = classLoader.getResourceAsStream(resourcePath)) {
+            if (resourceAsStream == null) {
+                throw new IllegalArgumentException("Template file not found");
+            }
+
+            return resourceAsStream.readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
