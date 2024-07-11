@@ -1,7 +1,7 @@
 package codesquad.http.message;
 
 import codesquad.app.domain.User;
-import codesquad.app.infrastructure.UserDataBase;
+import codesquad.app.infrastructure.UserDatabase;
 import codesquad.http.message.response.HttpResponse;
 
 import java.util.Map;
@@ -16,9 +16,10 @@ public class SessionManager {
     private SessionManager() {
     }
 
+    //TODO: 재로그인시 기존 세션 제거
     public static String createSession(final String userId, final HttpResponse response) {
         UUID sessionId = UUID.randomUUID();
-        User user = UserDataBase.findByUserId(userId);
+        User user = UserDatabase.findByUserId(userId);
         sessions.put(sessionId.toString(), user);
 
         response.setCookie(new Cookie("SID", sessionId.toString()));

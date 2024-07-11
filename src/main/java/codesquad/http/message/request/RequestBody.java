@@ -42,7 +42,6 @@ public class RequestBody {
         return Arrays.stream(this.body.split("&"))
                 .map(kv -> kv.split(EQUAL))
                 .collect(toMap(kv -> kv[0], kv -> kv.length > 1 ? kv[1] : EMPTY));
-
     }
 
 }
