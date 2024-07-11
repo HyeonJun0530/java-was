@@ -46,7 +46,7 @@ public class HttpResponse {
     }
 
     public static HttpResponse ok() {
-        return HttpResponse.of(HttpStatus.NOT_FOUND);
+        return HttpResponse.of(HttpStatus.OK);
     }
 
     public static HttpResponse redirect(final HttpStatus httpStatus, final String location) {
