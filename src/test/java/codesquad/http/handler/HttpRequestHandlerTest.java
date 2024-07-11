@@ -78,8 +78,9 @@ class HttpRequestHandlerTest {
     @Test
     @DisplayName("HttpRequestHandlerTest 테스트 - api 핸들러에 api가 있어서 성공적으로 HttpResponse 타입으로 처리되는 경우")
     void api_handle_success() throws IOException {
+        String body = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")), 113));
+                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
         Object response = handlerList.get(0).handle(httpRequest);
 
         HttpResponse httpResponse = getHttpResponse(response);
@@ -93,8 +94,9 @@ class HttpRequestHandlerTest {
     @Test
     @DisplayName("HttpRequestHandlerTest 테스트 - api 핸들러에 api가 있어서 api 핸들러로 처리되는 경우")
     void handle_api() throws IOException {
+        String body = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")), 113));
+                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
         Optional<HttpRequestHandler> supportHandler = handlerList.stream()
                 .filter(handler -> handler.isSupport(httpRequest))
                 .findFirst();

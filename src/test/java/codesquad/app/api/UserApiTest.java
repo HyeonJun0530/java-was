@@ -64,8 +64,9 @@ class UserApiTest {
     @Test
     @DisplayName("유저 생성 테스트 - 중복 회원 가입은 막는다.")
     void createUser_duplicate() throws IOException {
+        String body = "userId=test&password=test&name=test&email=test@test.com";
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader("userId=test&password=test&name=test&email=test@test.com")), 113));
+                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
 
         assertThatThrownBy(() -> userApi.create(httpRequest))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -130,8 +131,9 @@ class UserApiTest {
     @Test
     @DisplayName("로그인 테스트 - 로그인 성공")
     void login() throws IOException {
+        String body = "userId=test&password=test";
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /login HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader("userId=test&password=test")), 33));
+                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
 
         HttpResponse response = userApi.login(httpRequest);
 
@@ -145,8 +147,9 @@ class UserApiTest {
     @Test
     @DisplayName("로그인 테스트 - 로그인 실패")
     void login_fail() throws IOException {
+        String body = "userId=test&password=wrong";
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /login HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader("userId=test&password=wrong")), 33));
+                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
 
         HttpResponse response = userApi.login(httpRequest);
 

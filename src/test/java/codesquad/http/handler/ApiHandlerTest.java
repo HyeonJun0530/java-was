@@ -48,8 +48,9 @@ class ApiHandlerTest {
     @DisplayName("api 핸들러에 api가 있어서 성공적으로 처리되는 경우")
     public void api_handle_success() throws IOException {
         UserDatabase.remove("javajigi");
+        String body = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")), 113));
+                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
         Object response = apiHandler.handle(httpRequest);
 
         HttpResponse httpResponse = convert(response);
@@ -90,10 +91,12 @@ class ApiHandlerTest {
                 "Host: localhost:8080\r\n" +
                 "Connection: keep-alive\r\n";
 
+        int length = "userId=javajigi&password=password".getBytes().length;
+
         String postMessage = "POST /login HTTP/1.1\r\n" +
                 "Host: localhost:8080\r\n" +
                 "Connection: keep-alive\r\n" +
-                "Content-Length: 33\r\n" +
+                "Content-Length: " + length + "\r\n" +
                 "Content-Type: application/x-www-form-urlencoded\r\n" +
                 "\r\n" +
                 "userId=javajigi&password=password";
@@ -108,8 +111,9 @@ class ApiHandlerTest {
     @Test
     @DisplayName("api 핸들러에서 처리 유무를 반환")
     void is_api_request() throws IOException {
+        String body = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
         HttpRequest success = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")), 113));
+                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
         HttpRequest fail = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /global.css HTTP/1.1"))), null, null);
 
         assertAll(() -> assertThat(apiHandler.isSupport(success)).isTrue(),

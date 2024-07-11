@@ -57,7 +57,7 @@ class HttpRequestTest {
         String input = "POST /index.html HTTP/1.1\r\n" +
                 "Host: www.example.com\r\n" +
                 "Content-Type: text/html\r\n" +
-                "Content-Length: 13\r\n" +
+                "Content-Length: " + "Hello, World!".getBytes().length + "\r\n" +
                 "\r\n" + "Hello, World!";
 
         HttpRequest from = getHttpRequest(input);
@@ -72,11 +72,13 @@ class HttpRequestTest {
     @Test
     @DisplayName("HttpRequest 객체 생성 테스트 - body가 있는 경우, body 디코딩 확인")
     void from_body_decode() throws IOException {
+
+        String body = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
         String input = "POST /index.html HTTP/1.1\r\n" +
                 "Host: www.example.com\r\n" +
                 "Content-Type: application/x-www-form-urlencoded\r\n" +
-                "Content-Length: 113\r\n" +
-                "\r\n" + "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
+                "Content-Length: " + body.getBytes().length + "\r\n" +
+                "\r\n" + body;
 
         HttpRequest from = getHttpRequest(input);
 
