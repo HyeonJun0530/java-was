@@ -41,7 +41,7 @@ public class Cookie {
     public static List<Cookie> of(final String headerValue) {
         return Arrays.stream(headerValue.split(SEMICOLON))
                 .map(cookieValue -> {
-                    String[] cookiePair = cookieValue.split("=");
+                    String[] cookiePair = cookieValue.split(EQUAL);
                     Cookie cookie = new Cookie(cookiePair[0].trim(), cookiePair[1].trim(), new HashMap<>());
                     setDefaultAttributes(cookie.attributes);
                     return cookie;
@@ -50,7 +50,7 @@ public class Cookie {
 
     public static byte[] getCookiesBytes(final List<Cookie> cookies) throws UnsupportedEncodingException {
         return cookies.stream()
-                .map(cookie -> HttpHeader.SET_COOKIE.getHeaderName() + COLON + SPACE + cookie.format())
+                .map(cookie -> HttpHeader.SET_COOKIE.getHeaderName() + COLON + SPACE + cookie.formatWithAttributes())
                 .collect(joining(NEW_LINE)).getBytes(DECODING_CHARSET);
     }
 
@@ -74,13 +74,19 @@ public class Cookie {
         return value;
     }
 
-    public String format() {
-        return name + EQUAL + value;
+    public String formatWithAttributes() {
+        return format() + SEMICOLON + SPACE + attributes.entrySet().stream()
+                .map(entry -> entry.getKey() + EQUAL + entry.getValue())
+                .collect(joining(SEMICOLON + SPACE));
     }
 
     @Override
     public String toString() {
-        return format();
+        return formatWithAttributes();
+    }
+
+    private String format() {
+        return name + EQUAL + value;
     }
 
     private static void setDefaultAttributes(final Map<String, String> attributes) {
