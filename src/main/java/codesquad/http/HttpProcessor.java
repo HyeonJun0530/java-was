@@ -1,5 +1,7 @@
 package codesquad.http;
 
+import codesquad.config.FilterChainConfig;
+import codesquad.http.filter.FilterChain;
 import codesquad.http.handler.HttpRequestHandler;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
@@ -34,6 +36,16 @@ public class HttpProcessor implements Runnable {
 
                 HttpRequest request = HttpRequest.from(reader);
                 log.debug("Request: {}", request);
+
+                FilterChain filterChain = FilterChainConfig.filterChain();
+                HttpResponse response = HttpResponse.empty();
+                filterChain.doFilter(request, response);
+
+                if (response.hasMessage()) {
+                    log.debug("Response: {}", response);
+                    write(response, client);
+                    return;
+                }
 
                 HttpResponse httpResponse = HttpRequestHandler.handle(request);
                 log.debug("Response: {}", httpResponse);

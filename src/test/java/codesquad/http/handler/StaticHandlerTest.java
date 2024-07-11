@@ -19,7 +19,7 @@ class StaticHandlerTest {
     @Test
     @DisplayName("정적 파일 요청이 성공적으로 처리되는 경우")
     void handle_success() throws IOException {
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET / HTTP/1.1"))), null, null);
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /favicon.ico HTTP/1.1"))), null, null);
         HttpResponse httpResponse = StaticHandler.handle(httpRequest);
 
         assertAll(() -> assertThat(httpResponse.hasBody()).isTrue(),

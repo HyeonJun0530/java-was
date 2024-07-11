@@ -50,7 +50,9 @@ public enum HttpHeader {
     VARY("Vary"),
     VIA("Via"),
     WARNING("Warning"),
-    WWW_AUTHENTICATE("WWW-Authenticate");
+    WWW_AUTHENTICATE("WWW-Authenticate"),
+    SET_COOKIE("Set-Cookie"),
+    COOKIE("Cookie");
 
     private final String headerName;
 

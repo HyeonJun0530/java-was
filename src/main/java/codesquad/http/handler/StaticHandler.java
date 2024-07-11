@@ -16,9 +16,7 @@ public class StaticHandler {
     private static final Logger log = LoggerFactory.getLogger(StaticHandler.class);
 
     private static final Map<String, String> pathMap = Map.of("/registration", "/registration/index.html",
-            "/login", "/login/index.html",
-            "/main", "/main/index.html",
-            "/", "/index.html");
+            "/login", "/login/index.html");
 
 
     private StaticHandler() {
@@ -41,12 +39,10 @@ public class StaticHandler {
         } catch (IllegalArgumentException e) {
             log.error("Static file not found", e);
             return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.NOT_FOUND);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
-    private static byte[] getStaticFiles(final String path) throws IOException {
+    public static byte[] getStaticFiles(final String path) {
         ClassLoader classLoader = StaticHandler.class.getClassLoader();
         String resourcePath = "static" + path;
 
@@ -56,6 +52,8 @@ public class StaticHandler {
             }
 
             return resourceAsStream.readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

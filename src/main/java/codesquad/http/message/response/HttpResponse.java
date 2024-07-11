@@ -1,21 +1,39 @@
 package codesquad.http.message.response;
 
+import codesquad.http.message.Cookie;
 import codesquad.http.message.HttpHeaders;
 import codesquad.http.message.constant.ContentType;
+import codesquad.http.message.constant.HttpHeader;
 import codesquad.http.message.constant.HttpStatus;
+import codesquad.http.message.request.HttpRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static codesquad.utils.StringUtils.NEW_LINE;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+import static codesquad.utils.StringUtils.*;
 
 public class HttpResponse {
 
-    private final ResponseLine responseLine;
-    private final HttpHeaders header;
-    private final ResponseBody body;
+    private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
 
-    private HttpResponse(final ResponseLine responseLine, final HttpHeaders header, final ResponseBody body) {
+    private ResponseLine responseLine;
+    private HttpHeaders headers;
+    private ResponseBody body;
+    private List<Cookie> cookies;
+
+    private HttpResponse(final ResponseLine responseLine, final HttpHeaders headers, final ResponseBody body) {
         this.responseLine = responseLine;
-        this.header = header;
+        this.headers = headers;
         this.body = body;
+    }
+
+    public static HttpResponse empty() {
+        return new HttpResponse(null, null, null);
     }
 
     public static <T> HttpResponse of(final ContentType contentType, final String httpVersion, final HttpStatus httpStatus, final T body) {
@@ -31,6 +49,26 @@ public class HttpResponse {
         return new HttpResponse(ResponseLine.of(httpVersion, httpStatus), HttpHeaders.newInstance(), null);
     }
 
+    public void sendRedirect(final HttpRequest httpRequest, final String path) {
+        this.responseLine = ResponseLine.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.FOUND);
+        this.headers = HttpHeaders.of(path);
+        this.body = null;
+    }
+
+    public void setCookie(final Cookie cookie) {
+        if (cookies == null) {
+            cookies = new ArrayList<>();
+            cookies.add(cookie);
+            return;
+        }
+
+        cookies.add(cookie);
+    }
+
+    public boolean hasMessage() {
+        return responseLine != null && headers != null;
+    }
+
     public boolean hasBody() {
         return body != null;
     }
@@ -40,7 +78,19 @@ public class HttpResponse {
     }
 
     public byte[] getHeaderBytes() {
-        return header.getBytes();
+        if (cookies == null) {
+            return headers.getBytes();
+        }
+
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            outputStream.write(headers.getBytes());
+            outputStream.write(NEW_LINE.getBytes(StandardCharsets.UTF_8));
+            outputStream.write(Cookie.getCookiesBytes(this.cookies));
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            log.debug("Error writing header bytes = {}", e);
+            return new byte[0];
+        }
     }
 
     public byte[] getBodyBytes() {
@@ -49,13 +99,24 @@ public class HttpResponse {
 
     @Override
     public String toString() {
-        if (hasBody()) {
-            return responseLine.toString() + NEW_LINE +
-                    header.toString() + NEW_LINE + NEW_LINE +
-                    body.toString();
+        StringBuilder httpResponse = new StringBuilder();
+
+        httpResponse.append(responseLine.toString()).append(NEW_LINE);
+        httpResponse.append(headers.toString()).append(NEW_LINE);
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                httpResponse.append(HttpHeader.SET_COOKIE.getHeaderName())
+                        .append(COLON).append(SPACE)
+                        .append(cookie.toString()).append(NEW_LINE);
+            }
         }
 
-        return responseLine.toString() + NEW_LINE +
-                header.toString() + NEW_LINE + NEW_LINE;
+        if (hasBody()) {
+            httpResponse.append(NEW_LINE).append(body.toString());
+        }
+
+        return httpResponse.toString();
     }
+
 }

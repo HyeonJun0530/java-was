@@ -31,7 +31,7 @@ class HttpRequestHandlerTest {
     @Test
     @DisplayName("HttpRequestHandlerTest 테스트 - static 파일 요청이 성공적으로 처리되는 경우")
     void static_handle_success() throws IOException {
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET / HTTP/1.1"))), null, null);
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /favicon.ico HTTP/1.1"))), null, null);
         HttpResponse httpResponse = StaticHandler.handle(httpRequest);
 
         assertAll(() -> assertThat(httpResponse.hasBody()).isTrue(),
@@ -48,6 +48,29 @@ class HttpRequestHandlerTest {
         assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
                 () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.NOT_FOUND.getReasonPhrase()),
                 () -> assertThat(httpResponse.toString()).contains(String.valueOf(HttpStatus.NOT_FOUND.value()))
+        );
+    }
+
+    @Test
+    @DisplayName("HttpRequestHandlerTest 테스트 - api 핸들러에 api가 없어서 static 핸들러로 처리되는 경우")
+    void handle_static() throws IOException {
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /favicon.ico HTTP/1.1"))), null, null);
+        HttpResponse httpResponse = HttpRequestHandler.handle(httpRequest);
+
+        assertAll(() -> assertThat(httpResponse.hasBody()).isTrue(),
+                () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.OK.getReasonPhrase())
+        );
+    }
+
+    @Test
+    @DisplayName("HttpRequestHandlerTest 테스트 - api 핸들러에 api가 있어서 api 핸들러로 처리되는 경우")
+    void handle_api() throws IOException {
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
+                RequestBody.from(new BufferedReader(new StringReader("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")), 113));
+        HttpResponse httpResponse = HttpRequestHandler.handle(httpRequest);
+
+        assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
+                () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.FOUND.getReasonPhrase())
         );
     }
 

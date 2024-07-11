@@ -9,8 +9,7 @@ public class HttpRequestHandler {
     }
 
     public static HttpResponse handle(final HttpRequest httpRequest) {
-        String path = httpRequest.getRequestStartLine().getPath();
-        if (ApiHandler.isApiRequest(path)) {
+        if (ApiHandler.isApiRequest(httpRequest)) {
             return ApiHandler.handle(httpRequest);
         }
 

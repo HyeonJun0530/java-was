@@ -12,6 +12,7 @@ import java.io.StringReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HttpRequestTest {
 
@@ -103,6 +104,36 @@ class HttpRequestTest {
                 () -> assertThat(from.getRequestStartLine().getQueryString().get("password")).isEqualTo("password"),
                 () -> assertThat(from.getRequestStartLine().getQueryString().get("name")).isEqualTo("박재성"),
                 () -> assertThat(from.getRequestStartLine().getQueryString().get("email")).isEqualTo("javajigi@slipp.net"));
+    }
+
+    @Test
+    @DisplayName("HttpRequest 객체에서 쿠키를 가져올 수 있다.")
+    void getCookies() throws IOException {
+        String input = "GET /index.html HTTP/1.1\r\n" +
+                "Host: www.example.com\r\n" +
+                "Content-Type: text/html\r\n" +
+                "Content-Length: 0\r\n" +
+                "Cookie: SID=1234; remember=true\r\n";
+
+        HttpRequest from = getHttpRequest(input);
+
+        assertAll(() -> assertThat(from.getCookies().get(0).getName()).isEqualTo("JSESSIONID"),
+                () -> assertThat(from.getCookies().get(0).getValue()).isEqualTo("1234"),
+                () -> assertThat(from.getCookies().get(1).getName()).isEqualTo("remember"),
+                () -> assertThat(from.getCookies().get(1).getValue()).isEqualTo("true"));
+    }
+
+    @Test
+    @DisplayName("HttpRequest 쿠키가 없으면 빈 배열을 반환한다.")
+    void getCookies_null() throws IOException {
+        String input = "GET /index.html HTTP/1.1\r\n" +
+                "Host: www.example.com\r\n" +
+                "Content-Type: text/html\r\n" +
+                "Content-Length: 0\r\n";
+
+        HttpRequest from = getHttpRequest(input);
+
+        assertTrue(from.getCookies().isEmpty());
     }
 
 }

@@ -2,6 +2,8 @@ package codesquad.http.message.response;
 
 import codesquad.http.message.constant.HttpStatus;
 
+import java.nio.charset.StandardCharsets;
+
 import static codesquad.utils.StringUtils.SPACE;
 
 public class ResponseLine {
@@ -19,7 +21,7 @@ public class ResponseLine {
     }
 
     public byte[] getBytes() {
-        return (httpVersion + SPACE + httpStatus.toString()).getBytes();
+        return (httpVersion + SPACE + httpStatus.toString()).getBytes(StandardCharsets.UTF_8);
     }
 
     public String getHttpVersion() {

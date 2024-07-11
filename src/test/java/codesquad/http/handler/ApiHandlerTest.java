@@ -1,10 +1,12 @@
 package codesquad.http.handler;
 
+import codesquad.app.infrastructure.UserDataBase;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.request.RequestBody;
 import codesquad.http.message.request.RequestStartLine;
 import codesquad.http.message.response.HttpResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +18,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ApiHandlerTest {
+
+    @BeforeEach
+    void setUp() {
+        UserDataBase.save(new codesquad.app.domain.User.Builder()
+                .name("박재성")
+                .email("javajigi@slipp.net")
+                .userId("javajigi")
+                .password("password")
+                .build());
+    }
 
 
     @Test
@@ -51,10 +63,36 @@ class ApiHandlerTest {
     }
 
     @Test
+    @DisplayName("api 핸들러 - 같은 url에 대해서 GET, POST 모두 처리 가능한 경우")
+    void api() throws IOException {
+        String getMessage = "GET /login HTTP/1.1\r\n" +
+                "Host: localhost:8080\r\n" +
+                "Connection: keep-alive\r\n";
+
+        String postMessage = "POST /login HTTP/1.1\r\n" +
+                "Host: localhost:8080\r\n" +
+                "Connection: keep-alive\r\n" +
+                "Content-Length: 33\r\n" +
+                "Content-Type: application/x-www-form-urlencoded\r\n" +
+                "\r\n" +
+                "userId=javajigi&password=password";
+
+        HttpRequest get = HttpRequest.from(new BufferedReader(new StringReader(getMessage)));
+        HttpRequest post = HttpRequest.from(new BufferedReader(new StringReader(postMessage)));
+
+        assertThat(ApiHandler.handle(get).toString()).contains(HttpStatus.OK.getReasonPhrase());
+        assertThat(ApiHandler.handle(post).toString()).contains(HttpStatus.FOUND.getReasonPhrase());
+    }
+
+    @Test
     @DisplayName("api 핸들러에서 처리 유무를 반환")
-    void is_api_request() {
-        assertAll(() -> assertThat(ApiHandler.isApiRequest("/create")).isTrue(),
-                () -> assertThat(ApiHandler.isApiRequest("/notfound")).isFalse());
+    void is_api_request() throws IOException {
+        HttpRequest success = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
+                RequestBody.from(new BufferedReader(new StringReader("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")), 113));
+        HttpRequest fail = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /global.css HTTP/1.1"))), null, null);
+
+        assertAll(() -> assertThat(ApiHandler.isApiRequest(success)).isTrue(),
+                () -> assertThat(ApiHandler.isApiRequest(fail)).isFalse());
     }
 }
 

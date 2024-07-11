@@ -9,11 +9,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-import static codesquad.utils.StringUtils.COLON;
-import static codesquad.utils.StringUtils.NEW_LINE;
+import static codesquad.utils.StringUtils.*;
 import static java.util.stream.Collectors.joining;
 
 
@@ -61,6 +59,12 @@ public class HttpHeaders {
     private static void addResponseDefaultHeaders(final Map<String, String> headers) {
         headers.put(HttpHeader.SERVER.getHeaderName(), DEFAULT_SERVER_NAME);
         headers.put(HttpHeader.DATE.getHeaderName(), HttpMessageUtils.getCurrentTime());
+
+        String type = headers.get(HttpHeader.CONTENT_TYPE.getHeaderName());
+        if (type != null) {
+            headers.put(HttpHeader.CONTENT_TYPE.getHeaderName(),
+                    ContentType.getContentType(type).getType() + "; charset=" + StandardCharsets.UTF_8);
+        }
     }
 
     private static Map<String, String> parseHeaders(final BufferedReader reader) throws IOException {
@@ -75,23 +79,34 @@ public class HttpHeaders {
         return headers;
     }
 
-    private static String formatHeaders(final Map<String, String> headers) {
-        return headers.entrySet().stream()
-                .map(entry -> entry.getKey() + COLON + entry.getValue())
-                .collect(joining(NEW_LINE));
+    public List<Cookie> getCookies() {
+        String cookie = headers.get(HttpHeader.COOKIE.getHeaderName());
+
+        if (cookie == null) {
+            return Collections.unmodifiableList(new ArrayList<>());
+        }
+
+        return Cookie.of(cookie);
     }
+
 
     public String getHeader(final String key) {
         return headers.get(key);
     }
 
     public byte[] getBytes() {
-        return formatHeaders(headers).getBytes();
+        return formatHeaders(headers).getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
     public String toString() {
         return formatHeaders(headers);
+    }
+
+    private String formatHeaders(final Map<String, String> headers) {
+        return headers.entrySet().stream()
+                .map(entry -> entry.getKey() + COLON + SPACE + entry.getValue())
+                .collect(joining(NEW_LINE));
     }
 
 }
