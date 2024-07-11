@@ -117,7 +117,7 @@ class HttpRequestTest {
 
         HttpRequest from = getHttpRequest(input);
 
-        assertAll(() -> assertThat(from.getCookies().get(0).getName()).isEqualTo("JSESSIONID"),
+        assertAll(() -> assertThat(from.getCookies().get(0).getName()).isEqualTo("SID"),
                 () -> assertThat(from.getCookies().get(0).getValue()).isEqualTo("1234"),
                 () -> assertThat(from.getCookies().get(1).getName()).isEqualTo("remember"),
                 () -> assertThat(from.getCookies().get(1).getValue()).isEqualTo("true"));

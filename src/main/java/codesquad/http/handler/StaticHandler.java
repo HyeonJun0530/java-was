@@ -9,26 +9,17 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
+import java.util.List;
 
-public class StaticHandler {
+public class StaticHandler implements HttpRequestHandler {
 
     private static final Logger log = LoggerFactory.getLogger(StaticHandler.class);
+    public static final List<String> staticExtension = List.of(".css", ".js", ".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg");
 
-    private static final Map<String, String> pathMap = Map.of("/registration", "/registration/index.html",
-            "/login", "/login/index.html");
-
-
-    private StaticHandler() {
-    }
-
-    public static HttpResponse handle(final HttpRequest httpRequest) {
+    @Override
+    public Object handle(final HttpRequest httpRequest) {
         try {
             String path = httpRequest.getRequestStartLine().getPath();
-
-            if (pathMap.containsKey(path)) {
-                path = pathMap.get(path);
-            }
 
             byte[] staticFiles = getStaticFiles(path);
 
@@ -40,6 +31,11 @@ public class StaticHandler {
             log.error("Static file not found", e);
             return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.NOT_FOUND);
         }
+    }
+
+    @Override
+    public boolean isSupport(final HttpRequest request) {
+        return staticExtension.stream().anyMatch(request.getRequestStartLine().getPath()::endsWith);
     }
 
     public static byte[] getStaticFiles(final String path) {

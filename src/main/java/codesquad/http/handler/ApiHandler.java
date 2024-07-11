@@ -16,18 +16,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ApiHandler {
+public class ApiHandler implements HttpRequestHandler {
 
     private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
     private static final List<Class> apiList = List.of(UserApi.class, MainApi.class);
 
-    private ApiHandler() {
-    }
-
-
-    //TODO : 같은 path에서 GET, POST 요청을 처리할 수 있도록 구현해야 합니다.
-    public static HttpResponse handle(final HttpRequest httpRequest) {
-        String path = httpRequest.getRequestStartLine().getPath();
+    @Override
+    public Object handle(final HttpRequest request) {
+        String path = request.getRequestStartLine().getPath();
         try {
             List<Method> apiMethods = apiList.stream()
                     .flatMap(apiClass -> Stream.of(apiClass.getMethods()))
@@ -36,24 +32,32 @@ public class ApiHandler {
                     .toList();
 
             if (apiMethods.isEmpty()) {
-                return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.NOT_FOUND);
+                return HttpResponse.of(request.getRequestStartLine().getProtocol(), HttpStatus.NOT_FOUND);
             }
 
             Optional<Method> findMethod = apiMethods.stream()
                     .filter(method -> method.getAnnotation(ApiMapping.class).method()
-                            .equals(httpRequest.getRequestStartLine().getMethod()))
+                            .equals(request.getRequestStartLine().getMethod()))
                     .findFirst();
 
             if (findMethod.isEmpty()) {
-                return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.METHOD_NOT_ALLOWED);
+                return HttpResponse.of(request.getRequestStartLine().getProtocol(), HttpStatus.METHOD_NOT_ALLOWED);
             }
 
-            return (HttpResponse) findMethod.get().invoke(getNewInstance(findMethod.get().getDeclaringClass()), httpRequest);
+            return findMethod.get().invoke(getNewInstance(findMethod.get().getDeclaringClass()), request);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
             log.error("API handler error", e);
-            return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return HttpResponse.of(request.getRequestStartLine().getProtocol(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Override
+    public boolean isSupport(final HttpRequest request) {
+        return apiList.stream()
+                .flatMap(apiClass -> Stream.of(apiClass.getMethods()))
+                .anyMatch(method -> method.isAnnotationPresent(ApiMapping.class) &&
+                        method.getAnnotation(ApiMapping.class).path().equals(request.getRequestStartLine().getPath()));
     }
 
     @SuppressWarnings("unchecked")
@@ -61,13 +65,6 @@ public class ApiHandler {
         Constructor<?> constructor = apiClass.getDeclaredConstructor();
         constructor.setAccessible(true);
         return constructor.newInstance();
-    }
-
-    public static boolean isApiRequest(final HttpRequest httpRequest) {
-        return apiList.stream()
-                .flatMap(apiClass -> Stream.of(apiClass.getMethods()))
-                .anyMatch(method -> method.isAnnotationPresent(ApiMapping.class) &&
-                        method.getAnnotation(ApiMapping.class).path().equals(httpRequest.getRequestStartLine().getPath()));
     }
 
 }

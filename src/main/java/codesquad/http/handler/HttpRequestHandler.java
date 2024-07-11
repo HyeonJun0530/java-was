@@ -1,18 +1,12 @@
 package codesquad.http.handler;
 
 import codesquad.http.message.request.HttpRequest;
-import codesquad.http.message.response.HttpResponse;
 
-public class HttpRequestHandler {
 
-    private HttpRequestHandler() {
-    }
+//TODO: 추상화
+public interface HttpRequestHandler {
 
-    public static HttpResponse handle(final HttpRequest httpRequest) {
-        if (ApiHandler.isApiRequest(httpRequest)) {
-            return ApiHandler.handle(httpRequest);
-        }
+    Object handle(HttpRequest request);
 
-        return StaticHandler.handle(httpRequest);
-    }
+    boolean isSupport(HttpRequest request);
 }
