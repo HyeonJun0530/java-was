@@ -3,10 +3,7 @@ package codesquad.http.message;
 import codesquad.http.message.constant.HttpHeader;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static codesquad.utils.HttpMessageUtils.DECODING_CHARSET;
 import static codesquad.utils.StringUtils.*;
@@ -42,10 +39,15 @@ public class Cookie {
         return Arrays.stream(headerValue.split(SEMICOLON))
                 .map(cookieValue -> {
                     String[] cookiePair = cookieValue.split(EQUAL);
+                    if (cookiePair.length != 2) {
+                        return null;
+                    }
                     Cookie cookie = new Cookie(cookiePair[0].trim(), cookiePair[1].trim(), new HashMap<>());
                     setDefaultAttributes(cookie.attributes);
                     return cookie;
-                }).toList();
+                })
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     public static byte[] getCookiesBytes(final List<Cookie> cookies) throws UnsupportedEncodingException {
