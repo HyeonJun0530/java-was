@@ -7,10 +7,11 @@ import codesquad.utils.HttpMessageUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static codesquad.utils.HttpMessageUtils.DECODING_CHARSET;
 import static codesquad.utils.StringUtils.*;
 import static java.util.stream.Collectors.joining;
 
@@ -63,7 +64,7 @@ public class HttpHeaders {
         String type = headers.get(HttpHeader.CONTENT_TYPE.getHeaderName());
         if (type != null) {
             headers.put(HttpHeader.CONTENT_TYPE.getHeaderName(),
-                    ContentType.getContentType(type).getType() + "; charset=" + StandardCharsets.UTF_8);
+                    ContentType.getContentType(type).getType() + "; charset=" + DECODING_CHARSET);
         }
     }
 
@@ -71,7 +72,7 @@ public class HttpHeaders {
         Map<String, String> headers = new HashMap<>();
         String line;
         while ((line = reader.readLine()) != null && !line.isEmpty()) {
-            URLDecoder.decode(line, StandardCharsets.UTF_8);
+            URLDecoder.decode(line, DECODING_CHARSET);
             String[] headerTokens = line.split(COLON);
             headers.put(headerTokens[0].trim(), headerTokens[1].trim());
         }
@@ -94,8 +95,8 @@ public class HttpHeaders {
         return headers.get(key);
     }
 
-    public byte[] getBytes() {
-        return formatHeaders(headers).getBytes(StandardCharsets.UTF_8);
+    public byte[] getBytes() throws UnsupportedEncodingException {
+        return formatHeaders(headers).getBytes(DECODING_CHARSET);
     }
 
     @Override

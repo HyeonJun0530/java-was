@@ -2,7 +2,7 @@ package codesquad.http.message.request;
 
 public class Protocol {
 
-    private static final String HTTP_PROTOCOL_PATTERN = "^HTTP/1\\.[01]$";
+    public static final String HTTP_PROTOCOL = "HTTP/1.1";
 
     private final String version;
 
@@ -17,7 +17,7 @@ public class Protocol {
     }
 
     private static void validateHttpVersion(final String version) {
-        if (!version.matches(HTTP_PROTOCOL_PATTERN)) {
+        if (!version.equalsIgnoreCase(HTTP_PROTOCOL)) {
             throw new IllegalArgumentException("올바르지 않은 HTTP 버전입니다.");
         }
     }

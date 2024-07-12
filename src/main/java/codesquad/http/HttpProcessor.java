@@ -2,7 +2,6 @@ package codesquad.http;
 
 import codesquad.config.FilterChainConfig;
 import codesquad.http.filter.FilterChain;
-import codesquad.http.handler.HttpRequestHandler;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
 import org.slf4j.Logger;
@@ -13,8 +12,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
+import static codesquad.utils.HttpMessageUtils.DECODING_CHARSET;
 import static codesquad.utils.StringUtils.NEW_LINE;
 
 public class HttpProcessor implements Runnable {
@@ -47,15 +46,13 @@ public class HttpProcessor implements Runnable {
                     return;
                 }
 
-                HttpResponse httpResponse = HttpRequestHandler.handle(request);
+                HttpResponse httpResponse = DispatcherServlet.service(request);
                 log.debug("Response: {}", httpResponse);
 
                 write(httpResponse, client);
             }
         } catch (IOException e) {
             log.error("Error handling client connection = {}", e);
-        } catch (Exception e) {
-            log.error("Error parsing request = {}", e);
         } finally {
             try {
                 connection.close();
@@ -86,7 +83,7 @@ public class HttpProcessor implements Runnable {
     }
 
     private void writeNewLine(final OutputStream out) throws IOException {
-        out.write(NEW_LINE.getBytes(StandardCharsets.UTF_8));
+        out.write(NEW_LINE.getBytes(DECODING_CHARSET));
     }
 
 }

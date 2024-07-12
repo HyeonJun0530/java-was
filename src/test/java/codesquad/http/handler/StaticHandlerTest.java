@@ -13,14 +13,26 @@ import java.io.StringReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 class StaticHandlerTest {
+
+    private StaticHandler staticHandler = new StaticHandler();
+
+    private static HttpResponse getHttpResponse(final Object response) {
+        assertInstanceOf(HttpResponse.class, response);
+
+        HttpResponse httpResponse = (HttpResponse) response;
+        return httpResponse;
+    }
 
     @Test
     @DisplayName("정적 파일 요청이 성공적으로 처리되는 경우")
     void handle_success() throws IOException {
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /favicon.ico HTTP/1.1"))), null, null);
-        HttpResponse httpResponse = StaticHandler.handle(httpRequest);
+        Object response = staticHandler.handle(httpRequest);
+
+        HttpResponse httpResponse = getHttpResponse(response);
 
         assertAll(() -> assertThat(httpResponse.hasBody()).isTrue(),
                 () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.OK.getReasonPhrase())
@@ -31,7 +43,9 @@ class StaticHandlerTest {
     @DisplayName("정적 파일 요청이 실패하는 경우 - NOT_FOUND")
     void handle_fail() throws IOException {
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /no-exit HTTP/1.1"))), null, null);
-        HttpResponse httpResponse = StaticHandler.handle(httpRequest);
+        Object response = staticHandler.handle(httpRequest);
+
+        HttpResponse httpResponse = getHttpResponse(response);
 
         assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
                 () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.NOT_FOUND.getReasonPhrase()),

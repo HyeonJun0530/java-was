@@ -2,30 +2,26 @@ package codesquad.http.message.response;
 
 import codesquad.http.message.constant.HttpStatus;
 
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 
+import static codesquad.utils.HttpMessageUtils.DECODING_CHARSET;
 import static codesquad.utils.StringUtils.SPACE;
 
 public class ResponseLine {
 
-    private final String httpVersion;
+    private static final String HTTP_PROTOCOL = "HTTP/1.1";
     private final HttpStatus httpStatus;
 
-    private ResponseLine(final String httpVersion, final HttpStatus httpStatus) {
-        this.httpVersion = httpVersion;
+    private ResponseLine(final HttpStatus httpStatus) {
         this.httpStatus = httpStatus;
     }
 
-    public static ResponseLine of(final String httpVersion, final HttpStatus httpStatus) {
-        return new ResponseLine(httpVersion, httpStatus);
+    public static ResponseLine of(final HttpStatus httpStatus) {
+        return new ResponseLine(httpStatus);
     }
 
-    public byte[] getBytes() {
-        return (httpVersion + SPACE + httpStatus.toString()).getBytes(StandardCharsets.UTF_8);
-    }
-
-    public String getHttpVersion() {
-        return httpVersion;
+    public byte[] getBytes() throws UnsupportedEncodingException {
+        return (HTTP_PROTOCOL + SPACE + httpStatus.toString()).getBytes(DECODING_CHARSET);
     }
 
     public HttpStatus getHttpStatus() {
@@ -34,6 +30,6 @@ public class ResponseLine {
 
     @Override
     public String toString() {
-        return this.httpVersion + SPACE + this.httpStatus.toString();
+        return HTTP_PROTOCOL + SPACE + this.httpStatus.toString();
     }
 }

@@ -2,12 +2,13 @@ package codesquad.http.message;
 
 import codesquad.http.message.constant.HttpHeader;
 
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static codesquad.utils.HttpMessageUtils.DECODING_CHARSET;
 import static codesquad.utils.StringUtils.*;
 import static java.util.stream.Collectors.joining;
 
@@ -40,17 +41,17 @@ public class Cookie {
     public static List<Cookie> of(final String headerValue) {
         return Arrays.stream(headerValue.split(SEMICOLON))
                 .map(cookieValue -> {
-                    String[] cookiePair = cookieValue.split("=");
+                    String[] cookiePair = cookieValue.split(EQUAL);
                     Cookie cookie = new Cookie(cookiePair[0].trim(), cookiePair[1].trim(), new HashMap<>());
                     setDefaultAttributes(cookie.attributes);
                     return cookie;
                 }).toList();
     }
 
-    public static byte[] getCookiesBytes(final List<Cookie> cookies) {
+    public static byte[] getCookiesBytes(final List<Cookie> cookies) throws UnsupportedEncodingException {
         return cookies.stream()
-                .map(cookie -> HttpHeader.SET_COOKIE.getHeaderName() + COLON + SPACE + cookie.format())
-                .collect(joining(NEW_LINE)).getBytes(StandardCharsets.UTF_8);
+                .map(cookie -> HttpHeader.SET_COOKIE.getHeaderName() + COLON + SPACE + cookie.formatWithAttributes())
+                .collect(joining(NEW_LINE)).getBytes(DECODING_CHARSET);
     }
 
     public void setMaxAge(long maxAge) {
@@ -73,13 +74,19 @@ public class Cookie {
         return value;
     }
 
-    public String format() {
-        return name + EQUAL + value;
+    public String formatWithAttributes() {
+        return format() + SEMICOLON + SPACE + attributes.entrySet().stream()
+                .map(entry -> entry.getKey() + EQUAL + entry.getValue())
+                .collect(joining(SEMICOLON + SPACE));
     }
 
     @Override
     public String toString() {
-        return format();
+        return formatWithAttributes();
+    }
+
+    private String format() {
+        return name + EQUAL + value;
     }
 
     private static void setDefaultAttributes(final Map<String, String> attributes) {

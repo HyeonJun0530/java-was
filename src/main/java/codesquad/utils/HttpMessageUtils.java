@@ -8,6 +8,8 @@ import java.util.Locale;
 
 public class HttpMessageUtils {
 
+    public static final String DECODING_CHARSET = "UTF-8";
+
     private HttpMessageUtils() {
     }
 

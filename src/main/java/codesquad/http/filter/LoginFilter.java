@@ -7,10 +7,11 @@ import codesquad.http.message.response.HttpResponse;
 
 import java.util.List;
 
+import static codesquad.http.handler.StaticHandler.staticExtension;
+
 public class LoginFilter implements Filter {
 
     private static final List<String> permitAll = List.of("/", "/login", "/create", "/registration");
-    private static final List<String> staticExtension = List.of(".css", ".js", ".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg");
     private final int order;
 
     public LoginFilter(final int order) {
@@ -32,7 +33,7 @@ public class LoginFilter implements Filter {
         if (validSession) {
             httpFilterChain.doFilter(request, response);
         } else {
-            response.sendRedirect(request, "/login");
+            response.sendRedirect("/login");
         }
     }
 

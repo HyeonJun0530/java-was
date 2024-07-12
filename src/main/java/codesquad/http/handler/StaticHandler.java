@@ -7,54 +7,34 @@ import codesquad.http.message.response.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
+import java.util.List;
 
-public class StaticHandler {
+import static codesquad.utils.FileUtil.getStaticFile;
+
+public class StaticHandler implements HttpRequestHandler {
 
     private static final Logger log = LoggerFactory.getLogger(StaticHandler.class);
+    public static final List<String> staticExtension = List.of(".css", ".js", ".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg");
 
-    private static final Map<String, String> pathMap = Map.of("/registration", "/registration/index.html",
-            "/login", "/login/index.html");
-
-
-    private StaticHandler() {
-    }
-
-    public static HttpResponse handle(final HttpRequest httpRequest) {
+    @Override
+    public Object handle(final HttpRequest httpRequest) {
         try {
             String path = httpRequest.getRequestStartLine().getPath();
 
-            if (pathMap.containsKey(path)) {
-                path = pathMap.get(path);
-            }
-
-            byte[] staticFiles = getStaticFiles(path);
+            byte[] staticFiles = getStaticFile(path);
 
             return HttpResponse.of(ContentType.from(path),
-                    httpRequest.getRequestStartLine().getProtocol(),
                     HttpStatus.OK,
                     staticFiles);
         } catch (IllegalArgumentException e) {
             log.error("Static file not found", e);
-            return HttpResponse.of(httpRequest.getRequestStartLine().getProtocol(), HttpStatus.NOT_FOUND);
+            return HttpResponse.notFound();
         }
     }
 
-    public static byte[] getStaticFiles(final String path) {
-        ClassLoader classLoader = StaticHandler.class.getClassLoader();
-        String resourcePath = "static" + path;
-
-        try (InputStream resourceAsStream = classLoader.getResourceAsStream(resourcePath)) {
-            if (resourceAsStream == null) {
-                throw new IllegalArgumentException("Static file not found");
-            }
-
-            return resourceAsStream.readAllBytes();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    public boolean isSupport(final HttpRequest request) {
+        return staticExtension.stream().anyMatch(request.getRequestStartLine().getPath()::endsWith);
     }
 
 }

@@ -1,5 +1,7 @@
 package codesquad;
 
+import codesquad.app.domain.User;
+import codesquad.app.infrastructure.UserDataBase;
 import codesquad.config.ExecutorServiceConfiguration;
 import codesquad.http.HttpProcessor;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ public class Main {
         logger.info("Server is starting...");
 
         try (ServerSocket serverSocket = new ServerSocket(DEFAULT_PORT)) {
+            init();
             logger.info("Listening for connection on port 8080 ....");
 
             ExecutorService executorService = ExecutorServiceConfiguration.getExecutorService();
@@ -31,6 +34,19 @@ public class Main {
                 executorService.submit(new HttpProcessor(clientSocket)); // 클라이언트 요청을 병렬로 처리합니다.
             }
         } // 8080 포트에서 서버를 엽니다.
+    }
+
+    public static void init() {
+        for (int i = 0; i < 10; i++) {
+            User user = new User.Builder()
+                    .userId("dummy" + i)
+                    .name("dummyName" + i)
+                    .password("dummyPassword" + i)
+                    .email("dummyEmail" + i + "@test.com")
+                    .build();
+
+            UserDataBase.save(user);
+        }
     }
 }
 
