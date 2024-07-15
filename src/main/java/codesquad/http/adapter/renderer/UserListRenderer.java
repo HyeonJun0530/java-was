@@ -11,9 +11,7 @@ public class UserListRenderer implements ViewRenderer {
 
     @Override
     public String render(final ModelAndView modelAndView) {
-        byte[] staticFile = FileUtil.getTemplateFile(modelAndView.getViewName());
-
-        String html = new String(staticFile);
+        String html = getTemplateFile(modelAndView);
 
         try {
             List<User> users = (List<User>) modelAndView.getObject("users");
@@ -41,6 +39,13 @@ public class UserListRenderer implements ViewRenderer {
     @Override
     public ContentType getContentType() {
         return ContentType.TEXT_HTML;
+    }
+
+    @Override
+    public String getTemplateFile(final ModelAndView modelAndView) {
+        byte[] staticFile = FileUtil.getTemplateFile(modelAndView.getViewName());
+
+        return new String(staticFile);
     }
 
     public String replace(final String html, final List<User> users) {

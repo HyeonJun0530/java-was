@@ -9,4 +9,6 @@ public interface ViewRenderer {
     boolean isSupport(ModelAndView modelAndView);
 
     ContentType getContentType();
+
+    String getTemplateFile(ModelAndView modelAndView);
 }
