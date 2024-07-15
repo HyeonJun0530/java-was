@@ -9,6 +9,7 @@ import codesquad.http.message.constant.HttpMethod;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
+import codesquad.http.model.ModelAndView;
 import codesquad.utils.FileUtil;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class ArticleApi {
 
     @ApiMapping(path = "/article", method = HttpMethod.GET)
-    public Object getArticle(final HttpRequest request) {
+    public Object getCreateArticlePage(final HttpRequest request) {
         if (!SessionManager.isValidSession(request.getSessionId())) {
             return HttpResponse.redirect(HttpStatus.FOUND, "/login");
         }
@@ -45,5 +46,17 @@ public class ArticleApi {
         Article save = InMemoryArticleDatabase.save(article);
 
         return HttpResponse.redirect(HttpStatus.FOUND, "/article" + save.getSequence());
+    }
+
+    @ApiMapping(path = "/{sequence}", method = HttpMethod.GET)
+    public Object getArticle(final HttpRequest request) {
+        ModelAndView mav = new ModelAndView();
+
+        mav.setViewName("/article/index.html");
+
+        String pathVariable = request.getRequestStartLine().getPath().split("/")[2];
+        mav.addObject("article", InMemoryArticleDatabase.findBySequence(Long.parseLong(pathVariable)));
+
+        return mav;
     }
 }
