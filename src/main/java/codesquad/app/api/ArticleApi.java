@@ -11,11 +11,16 @@ import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
 import codesquad.http.model.ModelAndView;
 import codesquad.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 public class ArticleApi {
+
+    private static final Logger log = LoggerFactory.getLogger(ArticleApi.class);
 
     @ApiMapping(path = "/article", method = HttpMethod.GET)
     public Object getCreateArticlePage(final HttpRequest request) {
@@ -45,7 +50,10 @@ public class ArticleApi {
 
         Article save = InMemoryArticleDatabase.save(article);
 
-        return HttpResponse.redirect(HttpStatus.FOUND, "/article" + save.getSequence());
+        log.debug("save article = {}", save);
+
+
+        return HttpResponse.redirect(HttpStatus.FOUND, "/" + save.getSequence());
     }
 
     @ApiMapping(path = "/{sequence}", method = HttpMethod.GET)
@@ -54,8 +62,16 @@ public class ArticleApi {
 
         mav.setViewName("/article/index.html");
 
-        String pathVariable = request.getRequestStartLine().getPath().split("/")[2];
-        mav.addObject("article", InMemoryArticleDatabase.findBySequence(Long.parseLong(pathVariable)));
+        String pathVariable = request.getRequestStartLine().getPath().split("/")[1];
+        Optional<Article> findLastArticle = InMemoryArticleDatabase.findBySequence(Long.parseLong(pathVariable));
+
+        if (findLastArticle.isEmpty()) {
+            return HttpResponse.notFound();
+        }
+
+        mav.addObject("article", findLastArticle.get());
+
+        log.debug("get article = {}", InMemoryArticleDatabase.findBySequence(Long.parseLong(pathVariable)).get());
 
         return mav;
     }
