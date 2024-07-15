@@ -32,7 +32,7 @@ public class ArticleRenderer implements ViewRenderer {
 
     @Override
     public ContentType getContentType() {
-        return null;
+        return ContentType.TEXT_HTML;
     }
 
     @Override
@@ -43,12 +43,12 @@ public class ArticleRenderer implements ViewRenderer {
     }
 
     private String replace(final String html, final Article article) {
-        StringBuilder render = new StringBuilder();
+        String result = html;
 
-        render.append(html.replace("${article.title}", article.getTitle()));
-        render.append(html.replace("${article.user.name}", article.getWriter().getName()));
-        render.append(html.replace("${article.content}", article.getContent()));
+        result = result.replace("${article.title}", article.getTitle());
+        result = result.replace("${article.user.name}", article.getWriter().getName());
+        result = result.replace("${article.content}", article.getContent());
 
-        return render.toString();
+        return result;
     }
 }

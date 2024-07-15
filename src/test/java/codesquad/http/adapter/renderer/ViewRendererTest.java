@@ -1,5 +1,6 @@
 package codesquad.http.adapter.renderer;
 
+import codesquad.app.domain.Article;
 import codesquad.app.domain.User;
 import codesquad.http.model.ModelAndView;
 import org.junit.jupiter.api.DisplayName;
@@ -48,6 +49,41 @@ class ViewRendererTest {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/user/userList.html");
         mav.addObject("users", List.of(new User.Builder().build()));
+
+        assertTrue(viewRenderer.isSupport(mav));
+    }
+
+    @Test
+    @DisplayName("ArticleRenderer를 통해 동적으로 랜더링 한다.")
+    void renderArticle() {
+        User user = new User.Builder()
+                .userId("test")
+                .password("test")
+                .name("test")
+                .email("test@test.com")
+                .build();
+        ViewRenderer viewRenderer = new ArticleRenderer();
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/article/index.html");
+        mav.addObject("article", new Article(1L, "title", "content", user, null, null));
+
+        String article = viewRenderer.render(mav);
+
+        System.out.println(article);
+
+        assertAll(() -> assertTrue(article.contains("title")),
+                () -> assertTrue(article.contains("test")),
+                () -> assertTrue(article.contains("content"))
+        );
+    }
+
+    @Test
+    @DisplayName("ArticleRenderer를 지원하는지 확인한다.")
+    void isSupportArticle() {
+        ViewRenderer viewRenderer = new ArticleRenderer();
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/article/index.html");
+        mav.addObject("article", new Article(1L, "title", "content", new User.Builder().build(), null, null));
 
         assertTrue(viewRenderer.isSupport(mav));
     }
