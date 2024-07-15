@@ -1,5 +1,6 @@
 package codesquad.http.handler;
 
+import codesquad.app.api.ArticleApi;
 import codesquad.app.api.MainApi;
 import codesquad.app.api.UserApi;
 import codesquad.app.api.annotation.ApiMapping;
@@ -14,12 +15,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ApiHandler implements HttpRequestHandler {
 
     private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
-    private static final List<Class> apiList = List.of(UserApi.class, MainApi.class);
+    private static final List<Class> apiList = List.of(UserApi.class, MainApi.class, ArticleApi.class);
 
     @Override
     public Object handle(final HttpRequest request) {
@@ -52,12 +54,37 @@ public class ApiHandler implements HttpRequestHandler {
         }
     }
 
+    private static boolean matchPath(final Method method, final String requestPath) {
+        if (!method.isAnnotationPresent(ApiMapping.class)) {
+            return false;
+        }
+        String apiPath = method.getAnnotation(ApiMapping.class).path();
+        String[] apiPathSegments = apiPath.split("/");
+        String[] requestPathSegments = requestPath.split("/");
+
+        if (apiPathSegments.length != requestPathSegments.length) {
+            return false;
+        }
+
+        return IntStream.range(0, apiPathSegments.length)
+                .allMatch(i -> {
+                    if (apiPathSegments[i].startsWith("{") && apiPathSegments[i].endsWith("}")) {
+                        try {
+                            Long.parseLong(requestPathSegments[i]);
+                            return true;
+                        } catch (NumberFormatException e) {
+                            return false;
+                        }
+                    }
+                    return apiPathSegments[i].equals(requestPathSegments[i]);
+                });
+    }
+
     @Override
     public boolean isSupport(final HttpRequest request) {
         return apiList.stream()
                 .flatMap(apiClass -> Stream.of(apiClass.getMethods()))
-                .anyMatch(method -> method.isAnnotationPresent(ApiMapping.class) &&
-                        method.getAnnotation(ApiMapping.class).path().equals(request.getRequestStartLine().getPath()));
+                .anyMatch(method -> matchPath(method, request.getRequestStartLine().getPath()));
     }
 
     @SuppressWarnings("unchecked")
