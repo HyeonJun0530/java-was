@@ -4,6 +4,7 @@ import codesquad.app.domain.User;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserDatabase implements Database {
@@ -20,8 +21,8 @@ public class UserDatabase implements Database {
         return user;
     }
 
-    public static User findByUserId(String userId) {
-        return users.get(userId);
+    public static Optional<User> findByUserId(String userId) {
+        return Optional.ofNullable(users.get(userId));
     }
 
     public static List<User> findAll() {

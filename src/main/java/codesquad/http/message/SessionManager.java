@@ -19,7 +19,8 @@ public class SessionManager {
     //TODO: 재로그인시 기존 세션 제거
     public static String createSession(final String userId, final HttpResponse response) {
         UUID sessionId = UUID.randomUUID();
-        User user = UserDatabase.findByUserId(userId);
+        User user = UserDatabase.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
         sessions.put(sessionId.toString(), user);
 
         response.setCookie(new Cookie("SID", sessionId.toString()));

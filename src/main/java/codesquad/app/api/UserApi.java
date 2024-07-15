@@ -78,7 +78,8 @@ public class UserApi {
         String userId = body.get("userId");
         String password = body.get("password");
 
-        User user = UserDatabase.findByUserId(userId);
+        User user = UserDatabase.findByUserId(userId)
+                .orElse(null);
 
         if (user == null || !user.getPassword().equals(password)) {
             HttpResponse response = HttpResponse.redirect(HttpStatus.FOUND, "/login");
