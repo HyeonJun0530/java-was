@@ -1,5 +1,6 @@
 package codesquad.http.adapter;
 
+import codesquad.http.adapter.renderer.ArticleRenderer;
 import codesquad.http.adapter.renderer.UserListRenderer;
 import codesquad.http.adapter.renderer.ViewRenderer;
 import codesquad.http.message.constant.HttpStatus;
@@ -13,7 +14,7 @@ import static codesquad.utils.HttpMessageUtils.DECODING_CHARSET;
 
 public class TemplateAdapter implements HttpResponseAdapter {
 
-    private static final List<ViewRenderer> viewRenderers = List.of(new UserListRenderer());
+    private static final List<ViewRenderer> viewRenderers = List.of(new UserListRenderer(), new ArticleRenderer());
 
     @Override
     public HttpResponse adapt(final Object response) throws UnsupportedEncodingException {
