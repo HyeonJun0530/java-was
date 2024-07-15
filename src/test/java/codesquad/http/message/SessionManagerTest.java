@@ -43,13 +43,13 @@ class SessionManagerTest {
 
     @Test
     @DisplayName("세션을 통해 유저 아이디를 가져온다.")
-    void getUserId() {
+    void getUser() {
         User user = save();
 
         HttpResponse httpResponse = HttpResponse.of(HttpStatus.OK);
         String session = SessionManager.createSession(user.getUserId(), httpResponse);
 
-        Optional<User> userId = SessionManager.getUserId(session);
+        Optional<User> userId = SessionManager.getUser(session);
 
         assertAll(
                 () -> assertTrue(userId.isPresent()),
@@ -66,7 +66,7 @@ class SessionManagerTest {
 
         SessionManager.removeSession(session);
 
-        assertTrue(SessionManager.getUserId(session).isEmpty());
+        assertTrue(SessionManager.getUser(session).isEmpty());
     }
 
     @Test

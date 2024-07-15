@@ -27,7 +27,7 @@ public class SessionManager {
         return sessionId.toString();
     }
 
-    public static Optional<User> getUserId(final String sessionId) {
+    public static Optional<User> getUser(final String sessionId) {
         return Optional.ofNullable(sessions.get(sessionId));
     }
 
