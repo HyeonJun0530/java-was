@@ -73,7 +73,7 @@ public class HttpHeaders {
         String line;
         while ((line = reader.readLine()) != null && !line.isEmpty()) {
             URLDecoder.decode(line, DECODING_CHARSET);
-            String[] headerTokens = line.split(COLON);
+            String[] headerTokens = line.split(COLON, 2);
             headers.put(headerTokens[0].trim(), headerTokens[1].trim());
         }
 
