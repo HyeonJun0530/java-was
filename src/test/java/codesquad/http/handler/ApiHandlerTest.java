@@ -6,6 +6,7 @@ import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.request.RequestBody;
 import codesquad.http.message.request.RequestStartLine;
 import codesquad.http.message.response.HttpResponse;
+import codesquad.http.model.ModelAndView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -118,6 +119,27 @@ class ApiHandlerTest {
 
         assertAll(() -> assertThat(apiHandler.isSupport(success)).isTrue(),
                 () -> assertThat(apiHandler.isSupport(fail)).isFalse());
+    }
+
+    @Test
+    @DisplayName("api 핸들러에서 처리 유무를 반환 - pathVariable이 있는 경우")
+    void is_api_request_with_path_variable() throws IOException {
+        String body = "title=title&content=hello";
+        HttpRequest success = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /1 HTTP/1.1"))), null,
+                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
+
+        assertAll(() -> assertThat(apiHandler.isSupport(success)).isTrue());
+    }
+
+    @Test
+    @DisplayName("api 핸들러에서 처리 유무를 반환 - pathVariable이 있는 경우")
+    void api_request_with_path_variable() throws IOException {
+        String body = "title=title&content=hello";
+        HttpRequest success = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /1 HTTP/1.1"))), null,
+                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
+
+        assertAll(() -> assertThat(apiHandler.handle(success)).isNotNull(),
+                () -> assertThat(apiHandler.handle(success)).isInstanceOf(ModelAndView.class));
     }
 }
 

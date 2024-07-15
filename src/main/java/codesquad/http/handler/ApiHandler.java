@@ -29,8 +29,7 @@ public class ApiHandler implements HttpRequestHandler {
         try {
             List<Method> apiMethods = apiList.stream()
                     .flatMap(apiClass -> Stream.of(apiClass.getMethods()))
-                    .filter(method -> method.isAnnotationPresent(ApiMapping.class))
-                    .filter(method -> method.getAnnotation(ApiMapping.class).path().equals(path))
+                    .filter(method -> matchPath(method, path))
                     .toList();
 
             if (apiMethods.isEmpty()) {
@@ -52,6 +51,13 @@ public class ApiHandler implements HttpRequestHandler {
             log.error("API handler error", e);
             return HttpResponse.internalServerError();
         }
+    }
+
+    @Override
+    public boolean isSupport(final HttpRequest request) {
+        return apiList.stream()
+                .flatMap(apiClass -> Stream.of(apiClass.getMethods()))
+                .anyMatch(method -> matchPath(method, request.getRequestStartLine().getPath()));
     }
 
     private static boolean matchPath(final Method method, final String requestPath) {
@@ -78,13 +84,6 @@ public class ApiHandler implements HttpRequestHandler {
                     }
                     return apiPathSegments[i].equals(requestPathSegments[i]);
                 });
-    }
-
-    @Override
-    public boolean isSupport(final HttpRequest request) {
-        return apiList.stream()
-                .flatMap(apiClass -> Stream.of(apiClass.getMethods()))
-                .anyMatch(method -> matchPath(method, request.getRequestStartLine().getPath()));
     }
 
     @SuppressWarnings("unchecked")
