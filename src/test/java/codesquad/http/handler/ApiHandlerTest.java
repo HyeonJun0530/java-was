@@ -1,6 +1,9 @@
 package codesquad.http.handler;
 
+import codesquad.app.domain.Article;
+import codesquad.app.infrastructure.InMemoryArticleDatabase;
 import codesquad.app.infrastructure.UserDatabase;
+import codesquad.http.message.SessionManager;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.request.RequestBody;
@@ -134,12 +137,22 @@ class ApiHandlerTest {
     @Test
     @DisplayName("api 핸들러에서 처리 유무를 반환 - pathVariable이 있는 경우")
     void api_request_with_path_variable() throws IOException {
-        String body = "title=title&content=hello";
+        String session = SessionManager.createSession("javajigi", HttpResponse.ok());
+
+        Article article = InMemoryArticleDatabase.save(new Article.Builder()
+                .sequence(1L)
+                .title("title")
+                .content("content")
+                .writer(UserDatabase.findByUserId("javajigi").get())
+                .build());
+
         HttpRequest success = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /1 HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
+                null);
 
         assertAll(() -> assertThat(apiHandler.handle(success)).isNotNull(),
                 () -> assertThat(apiHandler.handle(success)).isInstanceOf(ModelAndView.class));
+
+        InMemoryArticleDatabase.remove(1L);
     }
 }
 

@@ -26,4 +26,8 @@ public class InMemoryArticleDatabase {
         return Optional.ofNullable(articles.get(sequence.get()));
     }
 
+    public static void remove(final Long sequence) {
+        articles.remove(sequence);
+    }
+
 }
