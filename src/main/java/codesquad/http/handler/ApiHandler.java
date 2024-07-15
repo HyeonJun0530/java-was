@@ -1,6 +1,7 @@
 package codesquad.http.handler;
 
 import codesquad.app.api.ArticleApi;
+import codesquad.app.api.CommentApi;
 import codesquad.app.api.MainApi;
 import codesquad.app.api.UserApi;
 import codesquad.app.api.annotation.ApiMapping;
@@ -21,7 +22,7 @@ import java.util.stream.Stream;
 public class ApiHandler implements HttpRequestHandler {
 
     private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
-    private static final List<Class> apiList = List.of(UserApi.class, MainApi.class, ArticleApi.class);
+    private static final List<Class> apiList = List.of(UserApi.class, MainApi.class, ArticleApi.class, CommentApi.class);
 
     @Override
     public Object handle(final HttpRequest request) {
@@ -46,6 +47,8 @@ public class ApiHandler implements HttpRequestHandler {
             }
 
             return findMethod.get().invoke(getNewInstance(findMethod.get().getDeclaringClass()), request);
+        } catch (NumberFormatException e) {
+            return HttpResponse.badRequest();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
             log.error("API handler error", e);
