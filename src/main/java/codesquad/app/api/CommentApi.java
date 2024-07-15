@@ -5,7 +5,6 @@ import codesquad.app.domain.Article;
 import codesquad.app.domain.Comment;
 import codesquad.app.infrastructure.InMemoryArticleDatabase;
 import codesquad.app.infrastructure.InMemoryCommentDatabase;
-import codesquad.http.message.SessionManager;
 import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.constant.HttpHeader;
 import codesquad.http.message.constant.HttpMethod;
@@ -41,10 +40,6 @@ public class CommentApi {
 
     @ApiMapping(path = "/comment", method = HttpMethod.GET)
     public HttpResponse getComment(final HttpRequest request) {
-        if (!SessionManager.isValidSession(request.getSessionId())) {
-            return HttpResponse.redirect(HttpStatus.FOUND, "/login");
-        }
-
         return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, getStaticFile("/comment/index.html"));
     }
 

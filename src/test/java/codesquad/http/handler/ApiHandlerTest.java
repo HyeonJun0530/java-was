@@ -9,7 +9,6 @@ import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.request.RequestBody;
 import codesquad.http.message.request.RequestStartLine;
 import codesquad.http.message.response.HttpResponse;
-import codesquad.http.model.ModelAndView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,6 +39,7 @@ class ApiHandlerTest {
     @AfterEach
     void tearDown() {
         UserDatabase.remove("javajigi");
+        InMemoryArticleDatabase.remove(1L);
     }
 
     private static HttpResponse convert(final Object response) {
@@ -146,13 +146,20 @@ class ApiHandlerTest {
                 .writer(UserDatabase.findByUserId("javajigi").get())
                 .build());
 
-        HttpRequest success = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /1 HTTP/1.1"))), null,
-                null);
+        String message = "POST /comment HTTP/1.1\r\n" +
+                "Host: localhost:8080\r\n" +
+                "Connection: keep-alive\r\n" +
+                "Content-Length: 31\r\n" +
+                "Content-Type: application/x-www-form-urlencoded\r\n" +
+                "Referer: http://localhost:8080/1\r\n" +
+                "Cookie: SID=" + session + "\r\n" +
+                "\r\n" +
+                "writer=writer&contents=contents";
+
+        HttpRequest success = HttpRequest.from(new BufferedReader(new StringReader(message)));
 
         assertAll(() -> assertThat(apiHandler.handle(success)).isNotNull(),
-                () -> assertThat(apiHandler.handle(success)).isInstanceOf(ModelAndView.class));
-
-        InMemoryArticleDatabase.remove(1L);
+                () -> assertThat(apiHandler.handle(success)).isInstanceOf(HttpResponse.class));
     }
 }
 

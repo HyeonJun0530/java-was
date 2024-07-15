@@ -24,19 +24,11 @@ public class ArticleApi {
 
     @ApiMapping(path = "/article", method = HttpMethod.GET)
     public Object getCreateArticlePage(final HttpRequest request) {
-        if (!SessionManager.isValidSession(request.getSessionId())) {
-            return HttpResponse.redirect(HttpStatus.FOUND, "/login");
-        }
-
         return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.OK, FileUtil.getStaticFile("/article/index.html"));
     }
 
     @ApiMapping(path = "/article", method = HttpMethod.POST)
     public Object createArticle(final HttpRequest request) {
-        if (!SessionManager.isValidSession(request.getSessionId())) {
-            return HttpResponse.redirect(HttpStatus.FOUND, "/login");
-        }
-
         Map<String, String> parameter = request.getRequestBody().parseFormUrlEncoded();
 
         Article article = new Article.Builder()
