@@ -58,7 +58,7 @@ class MainApiTest {
     @DisplayName("/main 경로로 요청이 들어오면 index.html을 반환한다. - 로그인 X")
     void main() throws IOException {
 
-        HttpResponse noLogin = mainApi.main(noLoginRequest());
+        HttpResponse noLogin = (HttpResponse) mainApi.main(noLoginRequest());
 
         assertAll(() -> assertTrue(noLogin.hasBody()),
                 () -> assertTrue(noLogin.toString().contains(ContentType.TEXT_HTML.getType())),
@@ -70,7 +70,7 @@ class MainApiTest {
     @DisplayName("/main 경로로 요청이 들어오면 index.html을 반환한다. - 로그인 상태")
     void main_login() throws IOException {
 
-        HttpResponse login = mainApi.main(loginRequest());
+        HttpResponse login = (HttpResponse) mainApi.main(loginRequest());
 
         assertAll(() -> assertTrue(login.hasBody()),
                 () -> assertTrue(login.toString().contains(ContentType.TEXT_HTML.getType())),
@@ -82,7 +82,7 @@ class MainApiTest {
     @Test
     @DisplayName("/ 경로로 요청이 들어오면 index.html을 반환한다. - 로그인 X")
     void root() throws IOException {
-        HttpResponse noLogin = mainApi.root(noLoginRequest());
+        HttpResponse noLogin = (HttpResponse) mainApi.root(noLoginRequest());
 
         assertAll(() -> assertTrue(noLogin.hasBody()),
                 () -> assertTrue(noLogin.toString().contains(ContentType.TEXT_HTML.getType())),
@@ -96,7 +96,7 @@ class MainApiTest {
         MainApi mainApi = new MainApi();
 
         HttpRequest httpRequest = loginRequest();
-        HttpResponse login = mainApi.root(httpRequest);
+        HttpResponse login = (HttpResponse) mainApi.root(httpRequest);
 
         assertAll(() -> assertTrue(login.hasBody()),
                 () -> assertTrue(login.toString().contains(ContentType.TEXT_HTML.getType())),
