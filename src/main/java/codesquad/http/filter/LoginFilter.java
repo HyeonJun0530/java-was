@@ -6,12 +6,13 @@ import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static codesquad.http.handler.StaticHandler.staticExtension;
 
 public class LoginFilter implements Filter {
 
-    private static final List<String> permitAll = List.of("/", "/login", "/create", "/registration");
+    private static final List<String> permitAll = List.of("/", "/login", "/create", "/registration", "/main");
     private final int order;
 
     public LoginFilter(final int order) {
@@ -39,7 +40,8 @@ public class LoginFilter implements Filter {
 
     @Override
     public boolean isMatched(final String path) {
-        return permitAll.contains(path) || staticExtension.stream().anyMatch(path::endsWith);
+        return permitAll.contains(path) || staticExtension.stream().anyMatch(path::endsWith)
+                || Pattern.matches("/[0-9]+", path);
     }
 
     @Override
