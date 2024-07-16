@@ -64,8 +64,10 @@ class ViewRendererTest {
                 .build();
         ViewRenderer viewRenderer = new ArticleRenderer();
         ModelAndView mav = new ModelAndView();
+        mav.addObject("session", "invalid");
         mav.setViewName("/article/index.html");
         mav.addObject("article", new Article(1L, "title", "content", user, null, null));
+        mav.addObject("comments", List.of());
 
         String article = viewRenderer.render(mav);
 
@@ -83,6 +85,7 @@ class ViewRendererTest {
         ViewRenderer viewRenderer = new ArticleRenderer();
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/article/index.html");
+        mav.addObject("comments", List.of());
         mav.addObject("article", new Article(1L, "title", "content", new User.Builder().build(), null, null));
 
         assertTrue(viewRenderer.isSupport(mav));

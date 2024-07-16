@@ -3,6 +3,7 @@ package codesquad.app.api;
 import codesquad.app.domain.Article;
 import codesquad.app.infrastructure.InMemoryArticleDatabase;
 import codesquad.app.infrastructure.UserDatabase;
+import codesquad.http.message.SessionManager;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
 import org.junit.jupiter.api.*;
@@ -41,14 +42,15 @@ class CommentApiTest {
     @Test
     @DisplayName("CommentApiTest 테스트 - 댓글 생성")
     void createComment() throws IOException {
-        HttpRequest httpRequest = HttpRequest.from(new BufferedReader(new StringReader("POST /comment HTTP/1.1\n" +
+        String session = SessionManager.createSession("javajigi", HttpResponse.ok());
+        HttpRequest httpRequest = HttpRequest.from(new BufferedReader(new StringReader("POST /1/comment HTTP/1.1\n" +
                 "Connection: keep-alive\n" +
                 "Content-Length: 31\n" +
                 "Content-Type: application/x-www-form-urlencoded\n" +
                 "Referer: http://localhost:8080/1\n" +
+                "Cookie: SID=" + session + "\n" +
                 "\n" +
-                "writer=writer&contents=contents")));
-
+                "comment=contents")));
         HttpResponse comment = commentApi.createComment(httpRequest);
 
         Assertions.assertAll(
