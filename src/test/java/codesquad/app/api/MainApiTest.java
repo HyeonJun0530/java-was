@@ -1,11 +1,14 @@
 package codesquad.app.api;
 
+import codesquad.app.domain.Article;
 import codesquad.app.domain.User;
+import codesquad.app.infrastructure.InMemoryArticleDatabase;
 import codesquad.app.infrastructure.UserDatabase;
 import codesquad.http.message.SessionManager;
 import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
+import codesquad.http.model.ModelAndView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.time.LocalDateTime;
 
 import static codesquad.utils.StringUtils.NEW_LINE;
 import static org.junit.jupiter.api.Assertions.*;
@@ -103,6 +107,23 @@ class MainApiTest {
                 () -> assertTrue(login.toString().contains("글쓰기")),
                 () -> assertTrue(login.toString().contains("로그아웃"))
         );
+    }
+
+    @Test
+    @DisplayName("Article이 있는 상태에서 /main 경로로 요청이 들어오면 최근 Article을 반환한다")
+    void getMainPageWithArticle() throws IOException {
+        InMemoryArticleDatabase.save(new Article(InMemoryArticleDatabase.sequence.getAndIncrement(), "test", "contest", user,
+                LocalDateTime.now(), LocalDateTime.now()));
+
+        HttpRequest httpRequest = loginRequest();
+        Object mav = mainApi.main(httpRequest);
+
+        assertAll(() -> assertTrue(mav instanceof ModelAndView),
+                () -> assertTrue(((ModelAndView) mav).containsAttribute("article")),
+                () -> assertTrue(((ModelAndView) mav).getObject("article") instanceof Article)
+        );
+
+        InMemoryArticleDatabase.remove(InMemoryArticleDatabase.sequence.getAndIncrement());
     }
 
     private HttpRequest loginRequest() throws IOException {
