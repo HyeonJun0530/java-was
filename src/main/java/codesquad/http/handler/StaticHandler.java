@@ -1,11 +1,10 @@
 package codesquad.http.handler;
 
+import codesquad.http.exception.NotFoundException;
 import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -13,7 +12,6 @@ import static codesquad.utils.FileUtil.getStaticFile;
 
 public class StaticHandler implements HttpRequestHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(StaticHandler.class);
     public static final List<String> staticExtension = List.of(".css", ".js", ".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg");
 
     @Override
@@ -27,8 +25,7 @@ public class StaticHandler implements HttpRequestHandler {
                     HttpStatus.OK,
                     staticFiles);
         } catch (IllegalArgumentException e) {
-            log.error("Static file not found", e);
-            return HttpResponse.notFound();
+            throw new NotFoundException(e.getMessage());
         }
     }
 

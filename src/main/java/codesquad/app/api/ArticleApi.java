@@ -5,6 +5,7 @@ import codesquad.app.domain.Article;
 import codesquad.app.domain.Comment;
 import codesquad.app.infrastructure.InMemoryArticleDatabase;
 import codesquad.app.infrastructure.InMemoryCommentDatabase;
+import codesquad.http.exception.NotFoundException;
 import codesquad.http.message.SessionManager;
 import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.constant.HttpMethod;
@@ -61,7 +62,7 @@ public class ArticleApi {
         Optional<Article> findLastArticle = InMemoryArticleDatabase.findBySequence(Long.parseLong(pathVariable));
 
         if (findLastArticle.isEmpty()) {
-            return HttpResponse.notFound();
+            throw new NotFoundException("Article not found");
         }
 
         List<Comment> comments = InMemoryCommentDatabase.findByArticleSequence(findLastArticle.get().getSequence());

@@ -1,6 +1,7 @@
 package codesquad.app.infrastructure;
 
 import codesquad.app.domain.User;
+import codesquad.http.exception.BadRequestException;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ public class UserDatabase implements Database {
 
     public static User save(User user) {
         if (users.containsKey(user.getUserId())) {
-            throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
+            throw new BadRequestException("이미 존재하는 사용자입니다.");
         }
 
         users.put(user.getUserId(), user);

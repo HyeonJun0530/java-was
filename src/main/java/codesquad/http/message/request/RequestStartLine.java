@@ -1,5 +1,6 @@
 package codesquad.http.message.request;
 
+import codesquad.http.exception.BadRequestException;
 import codesquad.http.message.constant.HttpMethod;
 
 import java.io.BufferedReader;
@@ -56,7 +57,7 @@ public class RequestStartLine {
         String[] startLineTokens = URLDecoder.decode(reader.readLine(), "UTF-8").split(SPACE);
 
         if (startLineTokens.length != 3) {
-            throw new IllegalArgumentException("Invalid Request Start Line");
+            throw new BadRequestException("Invalid Request Start Line");
         }
 
         return startLineTokens;

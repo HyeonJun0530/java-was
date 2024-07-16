@@ -1,6 +1,7 @@
 package codesquad.http.adapter.renderer;
 
 import codesquad.app.domain.User;
+import codesquad.http.exception.InternalServerException;
 import codesquad.http.message.constant.ContentType;
 import codesquad.http.model.ModelAndView;
 import codesquad.utils.FileUtil;
@@ -17,7 +18,7 @@ public class UserListRenderer implements ViewRenderer {
             List<User> users = (List<User>) modelAndView.getObject("users");
             return replace(html, users);
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("The 'users' attribute is not of type List<User>");
+            throw new InternalServerException(e.getMessage());
         }
     }
 

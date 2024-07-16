@@ -5,11 +5,11 @@ import codesquad.app.api.CommentApi;
 import codesquad.app.api.MainApi;
 import codesquad.app.api.UserApi;
 import codesquad.app.api.annotation.ApiMapping;
-import codesquad.http.message.constant.HttpStatus;
+import codesquad.http.exception.BadRequestException;
+import codesquad.http.exception.InternalServerException;
+import codesquad.http.exception.MethodNotAllowedException;
+import codesquad.http.exception.NotFoundException;
 import codesquad.http.message.request.HttpRequest;
-import codesquad.http.message.response.HttpResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 
 public class ApiHandler implements HttpRequestHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
     private static final List<Class> apiList = List.of(UserApi.class, MainApi.class, ArticleApi.class, CommentApi.class);
 
     @Override
@@ -34,7 +33,7 @@ public class ApiHandler implements HttpRequestHandler {
                     .toList();
 
             if (apiMethods.isEmpty()) {
-                return HttpResponse.notFound();
+                throw new NotFoundException("API not found");
             }
 
             Optional<Method> findMethod = apiMethods.stream()
@@ -43,16 +42,15 @@ public class ApiHandler implements HttpRequestHandler {
                     .findFirst();
 
             if (findMethod.isEmpty()) {
-                return HttpResponse.of(HttpStatus.METHOD_NOT_ALLOWED);
+                throw new MethodNotAllowedException("Method not allowed");
             }
 
             return findMethod.get().invoke(getNewInstance(findMethod.get().getDeclaringClass()), request);
         } catch (NumberFormatException e) {
-            return HttpResponse.badRequest();
+            throw new BadRequestException(e.getMessage());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
-            log.error("API handler error", e);
-            return HttpResponse.internalServerError();
+            throw new InternalServerException(e.getMessage());
         }
     }
 

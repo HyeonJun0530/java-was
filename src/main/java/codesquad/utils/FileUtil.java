@@ -1,5 +1,7 @@
 package codesquad.utils;
 
+import codesquad.http.exception.InternalServerException;
+import codesquad.http.exception.NotFoundException;
 import codesquad.http.handler.StaticHandler;
 
 import java.io.IOException;
@@ -13,12 +15,12 @@ public class FileUtil {
 
         try (InputStream resourceAsStream = classLoader.getResourceAsStream(resourcePath)) {
             if (resourceAsStream == null) {
-                throw new IllegalArgumentException("Static file not found");
+                throw new NotFoundException("Static file not found");
             }
 
             return resourceAsStream.readAllBytes();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new InternalServerException(e.getMessage());
         }
     }
 
@@ -28,12 +30,12 @@ public class FileUtil {
 
         try (InputStream resourceAsStream = classLoader.getResourceAsStream(resourcePath)) {
             if (resourceAsStream == null) {
-                throw new IllegalArgumentException("Template file not found");
+                throw new NotFoundException("Template file not found");
             }
 
             return resourceAsStream.readAllBytes();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new InternalServerException(e.getMessage());
         }
     }
 
