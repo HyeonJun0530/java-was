@@ -1,8 +1,12 @@
 package codesquad.http.handler;
 
+import codesquad.app.api.ArticleApi;
+import codesquad.app.api.CommentApi;
+import codesquad.app.api.MainApi;
+import codesquad.app.api.UserApi;
 import codesquad.app.domain.Article;
 import codesquad.app.domain.User;
-import codesquad.config.ApplicationContext;
+import codesquad.app.infrastructure.*;
 import codesquad.http.exception.MethodNotAllowedException;
 import codesquad.http.exception.NotFoundException;
 import codesquad.http.message.SessionManager;
@@ -19,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -27,25 +32,40 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 class ApiHandlerTest {
 
-    ApiHandler apiHandler = new ApiHandler();
+    ApiHandler apiHandler;
     User user;
+    UserDatabase userDatabase;
+    ArticleDatabase articleDatabase;
 
     @BeforeEach
     void setUp() {
+        userDatabase = new InMemoryUserDatabase();
+        InMemoryCommentDatabase commentDatabase = new InMemoryCommentDatabase();
+        articleDatabase = new InMemoryArticleDatabase();
+
+        UserApi userApi = new UserApi(userDatabase);
+        MainApi mainApi = new MainApi(articleDatabase, commentDatabase);
+        ArticleApi articleApi = new ArticleApi(articleDatabase, commentDatabase);
+        CommentApi commentApi = new CommentApi(articleDatabase, commentDatabase);
+
+        apiHandler = new ApiHandler(Map.of(UserApi.class, userApi,
+                MainApi.class, mainApi,
+                ArticleApi.class, articleApi,
+                CommentApi.class, commentApi));
+
         user = new User.Builder()
                 .name("박재성")
                 .email("javajigi@slipp.net")
                 .userId("javajigi")
                 .password("password")
                 .build();
-        ApplicationContext.getInstance().getUserDatabase()
-                .save(user);
+        userDatabase.save(user);
     }
 
     @AfterEach
     void tearDown() {
-        ApplicationContext.getInstance().getUserDatabase().remove("javajigi");
-        ApplicationContext.getInstance().getArticleDatabase().remove(1L);
+        userDatabase.remove("javajigi");
+        articleDatabase.remove(1L);
     }
 
     private static HttpResponse convert(final Object response) {
@@ -57,7 +77,7 @@ class ApiHandlerTest {
     @Test
     @DisplayName("api 핸들러에 api가 있어서 성공적으로 처리되는 경우")
     public void api_handle_success() throws IOException {
-        ApplicationContext.getInstance().getUserDatabase().remove("javajigi");
+        userDatabase.remove("javajigi");
         String body = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
                 RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
@@ -136,11 +156,11 @@ class ApiHandlerTest {
     void api_request_with_path_variable() throws IOException {
         String session = SessionManager.createSession(user, HttpResponse.ok());
 
-        Article article = ApplicationContext.getInstance().getArticleDatabase().save(new Article.Builder()
+        Article article = articleDatabase.save(new Article.Builder()
                 .sequence(1L)
                 .title("title")
                 .content("content")
-                .writer(ApplicationContext.getInstance().getUserDatabase().findByUserId("javajigi").get())
+                .writer(userDatabase.findByUserId("javajigi").get())
                 .build());
 
         String message = "POST /1/comment HTTP/1.1\r\n" +
