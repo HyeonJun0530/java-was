@@ -2,8 +2,8 @@ package codesquad.app.api;
 
 import codesquad.app.api.annotation.ApiMapping;
 import codesquad.app.domain.Article;
-import codesquad.app.infrastructure.InMemoryArticleDatabase;
-import codesquad.app.infrastructure.InMemoryCommentDatabase;
+import codesquad.app.infrastructure.ArticleDatabase;
+import codesquad.app.infrastructure.CommentDatabase;
 import codesquad.http.message.SessionManager;
 import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.constant.HttpMethod;
@@ -22,6 +22,14 @@ public class MainApi {
 
     private static final Logger log = LoggerFactory.getLogger(MainApi.class);
 
+    private final ArticleDatabase articleDatabase;
+    private final CommentDatabase commentDatabase;
+
+    public MainApi(final ArticleDatabase articleDatabase, final CommentDatabase commentDatabase) {
+        this.articleDatabase = articleDatabase;
+        this.commentDatabase = commentDatabase;
+    }
+
     @ApiMapping(method = HttpMethod.GET, path = "/")
     public Object root(HttpRequest request) {
         return getMainPageWithArticle(request);
@@ -36,7 +44,7 @@ public class MainApi {
         ModelAndView mav = new ModelAndView();
 
         mav.setViewName("/article/index.html");
-        Optional<Article> lastArticle = InMemoryArticleDatabase.findByLastSequence();
+        Optional<Article> lastArticle = articleDatabase.findByLastSequence();
 
         if (lastArticle.isEmpty()) {
             log.debug("lastArticle is empty");
@@ -48,7 +56,7 @@ public class MainApi {
         mav.addObject("session", request.getSessionId());
         log.debug("session: {}", request.getSessionId());
         mav.addObject("article", lastArticle.get());
-        mav.addObject("comments", InMemoryCommentDatabase.findByArticleSequence(lastArticle.get().getSequence()));
+        mav.addObject("comments", commentDatabase.findByArticleSequence(lastArticle.get().getSequence()));
 
         return mav;
     }

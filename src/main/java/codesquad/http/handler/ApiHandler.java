@@ -5,29 +5,35 @@ import codesquad.app.api.CommentApi;
 import codesquad.app.api.MainApi;
 import codesquad.app.api.UserApi;
 import codesquad.app.api.annotation.ApiMapping;
+import codesquad.config.ApplicationContext;
 import codesquad.http.exception.BadRequestException;
 import codesquad.http.exception.InternalServerException;
 import codesquad.http.exception.MethodNotAllowedException;
 import codesquad.http.exception.NotFoundException;
 import codesquad.http.message.request.HttpRequest;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ApiHandler implements HttpRequestHandler {
 
-    private static final List<Class> apiList = List.of(UserApi.class, MainApi.class, ArticleApi.class, CommentApi.class);
+    private static final Map<Class, Object> apiContainer = Map.of(
+            UserApi.class, ApplicationContext.getInstance().getUserApi(),
+            MainApi.class, ApplicationContext.getInstance().getMainApi(),
+            ArticleApi.class, ApplicationContext.getInstance().getArticleApi(),
+            CommentApi.class, ApplicationContext.getInstance().getCommentApi()
+    );
 
     @Override
     public Object handle(final HttpRequest request) {
         String path = request.getRequestStartLine().getPath();
         try {
-            List<Method> apiMethods = apiList.stream()
+            List<Method> apiMethods = apiContainer.keySet().stream()
                     .flatMap(apiClass -> Stream.of(apiClass.getMethods()))
                     .filter(method -> matchPath(method, path))
                     .toList();
@@ -45,18 +51,17 @@ public class ApiHandler implements HttpRequestHandler {
                 throw new MethodNotAllowedException("Method not allowed");
             }
 
-            return findMethod.get().invoke(getNewInstance(findMethod.get().getDeclaringClass()), request);
+            return findMethod.get().invoke(apiContainer.get(findMethod.get().getDeclaringClass()), request);
         } catch (NumberFormatException e) {
             throw new BadRequestException(e.getMessage());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             throw new InternalServerException(e.getMessage());
         }
     }
 
     @Override
     public boolean isSupport(final HttpRequest request) {
-        return apiList.stream()
+        return apiContainer.keySet().stream()
                 .flatMap(apiClass -> Stream.of(apiClass.getMethods()))
                 .anyMatch(method -> matchPath(method, request.getRequestStartLine().getPath()));
     }
@@ -85,13 +90,6 @@ public class ApiHandler implements HttpRequestHandler {
                     }
                     return apiPathSegments[i].equals(requestPathSegments[i]);
                 });
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Object getNewInstance(final Class apiClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        Constructor<?> constructor = apiClass.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        return constructor.newInstance();
     }
 
 }
