@@ -36,6 +36,18 @@ public class Article {
         return writer;
     }
 
+    @Override
+    public String toString() {
+        return "Article{" +
+                "sequence=" + sequence +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", writer=" + writer +
+                ", createdTime=" + createdTime +
+                ", modifiedTime=" + modifiedTime +
+                '}';
+    }
+
     public static class Builder {
         private Long sequence;
         private String title;

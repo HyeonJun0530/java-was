@@ -14,7 +14,7 @@ public class DataSourceConfig {
 
     public DataSourceConfig() {
         JdbcConnectionPool connectionPool = JdbcConnectionPool.create(URL, USER_NAME, PASSWORD);
-        ;
+
         connectionPool.setMaxConnections(10);
 
         this.dataSource = connectionPool;

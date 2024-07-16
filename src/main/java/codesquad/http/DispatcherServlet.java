@@ -24,7 +24,7 @@ public class DispatcherServlet {
         this.adapters = adapters;
     }
 
-    public HttpResponse service(HttpRequest request) {
+    public HttpResponse service(final HttpRequest request) {
         try {
             Object response = handlers.stream()
                     .filter(handler -> handler.isSupport(request))
