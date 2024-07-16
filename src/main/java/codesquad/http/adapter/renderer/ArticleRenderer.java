@@ -10,6 +10,7 @@ import codesquad.utils.FileUtil;
 import java.util.List;
 
 public class ArticleRenderer implements ViewRenderer {
+
     @Override
     public String render(final ModelAndView modelAndView) {
         Article article = (Article) modelAndView.getObject("article");

@@ -1,11 +1,6 @@
 package codesquad.http.handler;
 
-import codesquad.app.api.ArticleApi;
-import codesquad.app.api.CommentApi;
-import codesquad.app.api.MainApi;
-import codesquad.app.api.UserApi;
 import codesquad.app.api.annotation.ApiMapping;
-import codesquad.config.ApplicationContext;
 import codesquad.http.exception.BadRequestException;
 import codesquad.http.exception.InternalServerException;
 import codesquad.http.exception.MethodNotAllowedException;
@@ -22,12 +17,11 @@ import java.util.stream.Stream;
 
 public class ApiHandler implements HttpRequestHandler {
 
-    private static final Map<Class, Object> apiContainer = Map.of(
-            UserApi.class, ApplicationContext.getInstance().getUserApi(),
-            MainApi.class, ApplicationContext.getInstance().getMainApi(),
-            ArticleApi.class, ApplicationContext.getInstance().getArticleApi(),
-            CommentApi.class, ApplicationContext.getInstance().getCommentApi()
-    );
+    private final Map<Class, Object> apiContainer;
+
+    public ApiHandler(final Map<Class, Object> apiContainer) {
+        this.apiContainer = apiContainer;
+    }
 
     @Override
     public Object handle(final HttpRequest request) {

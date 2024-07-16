@@ -1,11 +1,8 @@
 package codesquad.http;
 
 import codesquad.http.adapter.HttpResponseAdapter;
-import codesquad.http.adapter.TemplateAdapter;
 import codesquad.http.exception.HttpException;
-import codesquad.http.handler.ApiHandler;
 import codesquad.http.handler.HttpRequestHandler;
-import codesquad.http.handler.StaticHandler;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
 import org.slf4j.Logger;
@@ -18,16 +15,16 @@ public class DispatcherServlet {
 
     private static final Logger log = LoggerFactory.getLogger(DispatcherServlet.class);
 
-    private static final List<HttpRequestHandler> handlers = List.of(
-            new ApiHandler(),
-            new StaticHandler()
-    );
+    private final List<HttpRequestHandler> handlers;
 
-    private static final List<HttpResponseAdapter> adapters = List.of(
-            new TemplateAdapter()
-    );
+    private final List<HttpResponseAdapter> adapters;
 
-    public static HttpResponse service(HttpRequest request) {
+    public DispatcherServlet(final List<HttpRequestHandler> handlers, final List<HttpResponseAdapter> adapters) {
+        this.handlers = handlers;
+        this.adapters = adapters;
+    }
+
+    public HttpResponse service(HttpRequest request) {
         try {
             Object response = handlers.stream()
                     .filter(handler -> handler.isSupport(request))

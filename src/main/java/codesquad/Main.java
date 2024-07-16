@@ -15,12 +15,6 @@ public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    /**
-     * TODD: Exception 구체화
-     *
-     * @param args
-     * @throws IOException
-     */
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(8080); // 8080 포트에서 서버를 엽니다.
         logger.info("Listening for connection on port 8080 ....");
@@ -31,7 +25,9 @@ public class Main {
 
         while (true) { // 무한 루프를 돌며 클라이언트의 연결을 기다립니다.
             Socket clientSocket = serverSocket.accept(); // 클라이언트 연결을 수락합니다.
-            executorService.submit(new HttpProcessor(clientSocket)); // 클라이언트 요청을 병렬로 처리합니다.
+            executorService.submit(new HttpProcessor(clientSocket,
+                    ApplicationContext.getInstance().getFilterChain(),
+                    ApplicationContext.getInstance().getDispatcherServlet())); // 클라이언트 요청을 병렬로 처리합니다.
         }
     }
 }

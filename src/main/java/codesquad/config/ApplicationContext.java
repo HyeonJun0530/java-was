@@ -5,32 +5,34 @@ import codesquad.app.api.CommentApi;
 import codesquad.app.api.MainApi;
 import codesquad.app.api.UserApi;
 import codesquad.app.infrastructure.*;
+import codesquad.http.DispatcherServlet;
+import codesquad.http.adapter.TemplateAdapter;
+import codesquad.http.adapter.renderer.ArticleRenderer;
+import codesquad.http.adapter.renderer.UserListRenderer;
+import codesquad.http.adapter.renderer.ViewRenderer;
+import codesquad.http.filter.FilterChain;
+import codesquad.http.handler.ApiHandler;
+import codesquad.http.handler.StaticHandler;
+
+import javax.sql.DataSource;
+import java.util.List;
+import java.util.Map;
 
 public class ApplicationContext {
 
     private static ApplicationContext ApplicationContextHolder;
-    private final UserApi userApi;
-    private final MainApi mainApi;
-    private final ArticleApi articleApi;
-    private final CommentApi commentApi;
-    private final CommentDatabase commentDatabase;
-    private final UserDatabase userDatabase;
-    private final ArticleDatabase articleDatabase;
 
-    private ApplicationContext(final UserApi userApi, final MainApi mainApi,
-                               final ArticleApi articleApi, final CommentApi commentApi,
-                               final CommentDatabase commentDatabase, final UserDatabase userDatabase,
-                               final ArticleDatabase articleDatabase) {
-        this.userApi = userApi;
-        this.mainApi = mainApi;
-        this.articleApi = articleApi;
-        this.commentApi = commentApi;
-        this.commentDatabase = commentDatabase;
-        this.userDatabase = userDatabase;
-        this.articleDatabase = articleDatabase;
+    private final FilterChain filterChain;
+    private final DispatcherServlet dispatcherServlet;
+
+    private ApplicationContext(final DispatcherServlet dispatcherServlet, final FilterChain filterChain) {
+        this.filterChain = filterChain;
+        this.dispatcherServlet = dispatcherServlet;
     }
 
     public static void initialize() {
+        DataSource dataSource = new DataSourceConfig().getDataSource();
+
         // Database 초기화
         UserDatabase userDatabase = new InMemoryUserDatabase();
         ArticleDatabase articleDatabase = new InMemoryArticleDatabase();
@@ -42,10 +44,32 @@ public class ApplicationContext {
         ArticleApi articleApi = new ArticleApi(articleDatabase, commentDatabase);
         CommentApi commentApi = new CommentApi(articleDatabase, commentDatabase);
 
-        ApplicationContextHolder = new ApplicationContext(userApi, mainApi,
-                articleApi, commentApi,
-                commentDatabase, userDatabase,
-                articleDatabase);
+        ApiHandler apiHandler = new ApiHandler(Map.of(UserApi.class, userApi,
+                MainApi.class, mainApi,
+                ArticleApi.class, articleApi,
+                CommentApi.class, commentApi));
+
+        StaticHandler staticHandler = new StaticHandler();
+
+        TemplateAdapter templateAdapter = getTemplateAdapter();
+
+        DispatcherServlet dispatcherServlet = new DispatcherServlet(
+                List.of(apiHandler, staticHandler),
+                List.of(templateAdapter)
+        );
+
+
+        ApplicationContextHolder = new ApplicationContext(dispatcherServlet, new FilterChainConfig().getFilterChain());
+    }
+
+    private static TemplateAdapter getTemplateAdapter() {
+        return new TemplateAdapter(
+                registryRenderer()
+        );
+    }
+
+    private static List<ViewRenderer> registryRenderer() {
+        return List.of(new UserListRenderer(), new ArticleRenderer());
     }
 
     public static ApplicationContext getInstance() {
@@ -56,31 +80,12 @@ public class ApplicationContext {
         return ApplicationContextHolder;
     }
 
-    public UserApi getUserApi() {
-        return userApi;
+    public DispatcherServlet getDispatcherServlet() {
+        return dispatcherServlet;
     }
 
-    public MainApi getMainApi() {
-        return mainApi;
+    public FilterChain getFilterChain() {
+        return filterChain;
     }
 
-    public ArticleApi getArticleApi() {
-        return articleApi;
-    }
-
-    public CommentApi getCommentApi() {
-        return commentApi;
-    }
-
-    public CommentDatabase getCommentDatabase() {
-        return commentDatabase;
-    }
-
-    public UserDatabase getUserDatabase() {
-        return userDatabase;
-    }
-
-    public ArticleDatabase getArticleDatabase() {
-        return articleDatabase;
-    }
 }
