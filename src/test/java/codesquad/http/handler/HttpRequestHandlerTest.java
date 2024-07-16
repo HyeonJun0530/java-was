@@ -1,6 +1,7 @@
 package codesquad.http.handler;
 
 import codesquad.app.infrastructure.UserDatabase;
+import codesquad.http.exception.NotFoundException;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.request.RequestBody;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HttpRequestHandlerTest {
@@ -46,14 +48,9 @@ class HttpRequestHandlerTest {
     @DisplayName("HttpRequestHandlerTest 테스트 - 어디에서도 처리 할 수 없는 경우 - NOT_FOUND")
     void handle_fail() throws IOException {
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /no-exit HTTP/1.1"))), null, null);
-        Object response = handlerList.get(1).handle(httpRequest);
 
-        HttpResponse httpResponse = getHttpResponse(response);
-
-        assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
-                () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.NOT_FOUND.getReasonPhrase()),
-                () -> assertThat(httpResponse.toString()).contains(String.valueOf(HttpStatus.NOT_FOUND.value()))
-        );
+        assertThatThrownBy(() -> handlerList.get(1).handle(httpRequest))
+                .isInstanceOf(NotFoundException.class);
     }
 
     @Test

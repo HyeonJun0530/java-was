@@ -2,6 +2,7 @@ package codesquad.app.api;
 
 import codesquad.app.domain.User;
 import codesquad.app.infrastructure.UserDatabase;
+import codesquad.http.exception.BadRequestException;
 import codesquad.http.message.SessionManager;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.request.RequestBody;
@@ -69,7 +70,7 @@ class UserApiTest {
                 RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
 
         assertThatThrownBy(() -> userApi.create(httpRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @Test

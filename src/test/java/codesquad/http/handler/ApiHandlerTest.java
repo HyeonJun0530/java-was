@@ -3,6 +3,8 @@ package codesquad.http.handler;
 import codesquad.app.domain.Article;
 import codesquad.app.infrastructure.InMemoryArticleDatabase;
 import codesquad.app.infrastructure.UserDatabase;
+import codesquad.http.exception.MethodNotAllowedException;
+import codesquad.http.exception.NotFoundException;
 import codesquad.http.message.SessionManager;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
@@ -67,25 +70,16 @@ class ApiHandlerTest {
     @DisplayName("api 핸들러에 api가 없어서 실패하는 경우 - NOT_FOUND")
     void api_handle_fail() throws IOException {
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /notfound HTTP/1.1"))), null, null);
-        Object response = apiHandler.handle(httpRequest);
-
-        HttpResponse httpResponse = convert(response);
-
-        assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
-                () -> assertThat(response.toString()).containsIgnoringCase(HttpStatus.NOT_FOUND.getReasonPhrase()),
-                () -> assertThat(response.toString()).contains(String.valueOf(HttpStatus.NOT_FOUND.value())));
+        assertThatThrownBy(() -> apiHandler.handle(httpRequest))
+                .isInstanceOf(NotFoundException.class);
     }
 
     @Test
     @DisplayName("api 핸들러 path는 맞는데 메서드가 다른 경우 - METHOD_NOT_ALLOWED")
     void api_handle_not_allowed() throws IOException {
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /create HTTP/1.1"))), null, null);
-        Object response = apiHandler.handle(httpRequest);
-
-        HttpResponse httpResponse = convert(response);
-
-        assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
-                () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase()));
+        assertThatThrownBy(() -> apiHandler.handle(httpRequest))
+                .isInstanceOf(MethodNotAllowedException.class);
     }
 
     @Test
@@ -146,7 +140,7 @@ class ApiHandlerTest {
                 .writer(UserDatabase.findByUserId("javajigi").get())
                 .build());
 
-        String message = "POST /comment HTTP/1.1\r\n" +
+        String message = "POST /1/comment HTTP/1.1\r\n" +
                 "Host: localhost:8080\r\n" +
                 "Connection: keep-alive\r\n" +
                 "Content-Length: 31\r\n" +

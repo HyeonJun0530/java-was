@@ -1,5 +1,6 @@
 package codesquad.http.handler;
 
+import codesquad.http.exception.NotFoundException;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.request.RequestStartLine;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
@@ -43,14 +45,8 @@ class StaticHandlerTest {
     @DisplayName("정적 파일 요청이 실패하는 경우 - NOT_FOUND")
     void handle_fail() throws IOException {
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /no-exit HTTP/1.1"))), null, null);
-        Object response = staticHandler.handle(httpRequest);
-
-        HttpResponse httpResponse = getHttpResponse(response);
-
-        assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
-                () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.NOT_FOUND.getReasonPhrase()),
-                () -> assertThat(httpResponse.toString()).contains(String.valueOf(HttpStatus.NOT_FOUND.value()))
-        );
+        assertThatThrownBy(() -> staticHandler.handle(httpRequest))
+                .isInstanceOf(NotFoundException.class);
     }
 
 }

@@ -1,6 +1,7 @@
 package codesquad.http.adapter;
 
 import codesquad.app.domain.User;
+import codesquad.http.exception.NotFoundException;
 import codesquad.http.model.ModelAndView;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -75,7 +76,7 @@ class HttpResponseAdapterTest {
         HttpResponseAdapter templateAdapter = new TemplateAdapter();
 
         assertThatThrownBy(() -> templateAdapter.adapt(mav))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(NotFoundException.class);
     }
 
 
