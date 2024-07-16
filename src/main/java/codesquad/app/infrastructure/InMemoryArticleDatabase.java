@@ -23,7 +23,7 @@ public class InMemoryArticleDatabase {
     }
 
     public static Optional<Article> findByLastSequence() {
-        return Optional.ofNullable(articles.get(sequence.get()));
+        return Optional.ofNullable(articles.get(sequence.get() - 1));
     }
 
     public static void remove(final Long sequence) {

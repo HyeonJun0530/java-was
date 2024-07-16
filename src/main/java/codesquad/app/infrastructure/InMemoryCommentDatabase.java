@@ -2,8 +2,8 @@ package codesquad.app.infrastructure;
 
 import codesquad.app.domain.Comment;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -18,12 +18,10 @@ public class InMemoryCommentDatabase {
         return comment;
     }
 
-    public static Optional<Comment> findBySequence(final Long sequence) {
-        return Optional.ofNullable(comments.get(sequence));
-    }
-
-    public static Optional<Comment> findByLastSequence() {
-        return Optional.ofNullable(comments.get(sequence.get()));
+    public static List<Comment> findByArticleSequence(final Long sequence) {
+        return comments.values().stream()
+                .filter(comment -> comment.getArticle().getSequence().equals(sequence))
+                .toList();
     }
 
     public static void remove(final Long sequence) {

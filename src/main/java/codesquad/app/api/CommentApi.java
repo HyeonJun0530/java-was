@@ -3,39 +3,49 @@ package codesquad.app.api;
 import codesquad.app.api.annotation.ApiMapping;
 import codesquad.app.domain.Article;
 import codesquad.app.domain.Comment;
+import codesquad.app.domain.User;
 import codesquad.app.infrastructure.InMemoryArticleDatabase;
 import codesquad.app.infrastructure.InMemoryCommentDatabase;
+import codesquad.http.message.SessionManager;
 import codesquad.http.message.constant.ContentType;
-import codesquad.http.message.constant.HttpHeader;
 import codesquad.http.message.constant.HttpMethod;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
+import org.slf4j.Logger;
 
 import static codesquad.utils.FileUtil.getStaticFile;
 
 public class CommentApi {
 
-    @ApiMapping(path = "/comment", method = HttpMethod.POST)
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(CommentApi.class);
+
+    @ApiMapping(path = "/{articleId}/comment", method = HttpMethod.POST)
     public HttpResponse createComment(final HttpRequest request) {
-        String refer = request.getHttpHeaders().getHeader(HttpHeader.REFERER.getHeaderName());
-        String[] splitRefer = refer.split("/");
+        String path = request.getRequestStartLine().getPath();
+        log.debug("path: {}", path);
 
-        Long sequence = Long.parseLong(splitRefer[splitRefer.length - 1]);
+        User user = SessionManager.getUser(request.getSessionId())
+                .orElseThrow(() -> new IllegalArgumentException("로그인이 필요합니다."));
 
-        Article article = InMemoryArticleDatabase.findBySequence(sequence)
+        String[] splitPath = path.split("/");
+        long articleId = Long.parseLong(splitPath[1]);
+
+        Article article = InMemoryArticleDatabase.findBySequence(articleId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 글이 존재하지 않습니다."));
 
         Comment comment = new Comment.Builder()
-                .sequence(InMemoryCommentDatabase.sequence.getAndDecrement())
+                .sequence(InMemoryCommentDatabase.sequence.getAndIncrement())
                 .article(article)
-                .writer(request.getRequestBody().parseFormUrlEncoded().get("writer"))
-                .contents(request.getRequestBody().parseFormUrlEncoded().get("contents"))
+                .writer(user.getName())
+                .contents(request.getRequestBody().parseFormUrlEncoded().get("comment"))
                 .build();
 
-        InMemoryCommentDatabase.save(comment);
+        Comment save = InMemoryCommentDatabase.save(comment);
 
-        return HttpResponse.redirect(HttpStatus.FOUND, refer);
+        log.debug("comment: {}", save);
+
+        return HttpResponse.redirect(HttpStatus.FOUND, "/" + article.getSequence());
     }
 
     @ApiMapping(path = "/comment", method = HttpMethod.GET)

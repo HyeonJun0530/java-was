@@ -2,7 +2,9 @@ package codesquad.app.api;
 
 import codesquad.app.api.annotation.ApiMapping;
 import codesquad.app.domain.Article;
+import codesquad.app.domain.Comment;
 import codesquad.app.infrastructure.InMemoryArticleDatabase;
+import codesquad.app.infrastructure.InMemoryCommentDatabase;
 import codesquad.http.message.SessionManager;
 import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.constant.HttpMethod;
@@ -15,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,7 +35,7 @@ public class ArticleApi {
         Map<String, String> parameter = request.getRequestBody().parseFormUrlEncoded();
 
         Article article = new Article.Builder()
-                .sequence(InMemoryArticleDatabase.sequence.getAndDecrement())
+                .sequence(InMemoryArticleDatabase.sequence.getAndIncrement())
                 .title(parameter.get("title"))
                 .content(parameter.get("content"))
                 .writer(SessionManager.getUser(request.getSessionId()).get())
@@ -61,7 +64,11 @@ public class ArticleApi {
             return HttpResponse.notFound();
         }
 
+        List<Comment> comments = InMemoryCommentDatabase.findByArticleSequence(findLastArticle.get().getSequence());
+
+        mav.addObject("session", request.getSessionId());
         mav.addObject("article", findLastArticle.get());
+        mav.addObject("comments", comments);
 
         log.debug("get article = {}", InMemoryArticleDatabase.findBySequence(Long.parseLong(pathVariable)).get());
 
