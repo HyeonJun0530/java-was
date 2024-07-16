@@ -2,8 +2,7 @@ package codesquad.app.api;
 
 import codesquad.app.domain.Article;
 import codesquad.app.domain.User;
-import codesquad.app.infrastructure.InMemoryArticleDatabase;
-import codesquad.app.infrastructure.UserDatabase;
+import codesquad.app.infrastructure.*;
 import codesquad.http.message.SessionManager;
 import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.request.HttpRequest;
@@ -31,29 +30,43 @@ class MainApiTest {
             "Accept-Encoding: gzip, deflate, br" + NEW_LINE +
             "Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7" + NEW_LINE;
 
-    MainApi mainApi = new MainApi();
+    MainApi mainApi;
+    ArticleDatabase articleDatabase;
+    CommentDatabase commentDatabase;
+    UserDatabase userDatabase;
     User user;
 
     @BeforeEach
     void setUp() {
+        articleDatabase = new InMemoryArticleDatabase();
+        commentDatabase = new InMemoryCommentDatabase();
+        userDatabase = new InMemoryUserDatabase();
+        mainApi = new MainApi(articleDatabase, commentDatabase);
         user = new User.Builder()
-                .userId("test")
-                .password("test")
-                .name("test")
-                .email("test@test.com")
+                .name("박재성")
+                .email("javajigi@slipp.net")
+                .userId("javajigi")
+                .password("password")
                 .build();
-        UserDatabase.save(user);
+        userDatabase.save(user);
+
+        articleDatabase.save(new Article.Builder()
+                .sequence(1L)
+                .title("title")
+                .content("content")
+                .writer(userDatabase.findByUserId("javajigi").get())
+                .build());
     }
 
     @AfterEach
     void tearDown() {
-        UserDatabase.remove("test");
+        userDatabase.remove("test");
     }
 
     @Test
     @DisplayName("MainApi 인스턴스를 생성한다.")
     void createMainApi() {
-        MainApi mainApi = new MainApi();
+        mainApi = new MainApi(articleDatabase, commentDatabase);
 
         assertNotNull(mainApi);
     }
@@ -97,8 +110,6 @@ class MainApiTest {
     @Test
     @DisplayName("/ 경로로 요청이 들어오면 index.html을 반환한다. - 로그인 상태")
     void root_login() throws IOException {
-        MainApi mainApi = new MainApi();
-
         HttpRequest httpRequest = loginRequest();
         HttpResponse login = (HttpResponse) mainApi.root(httpRequest);
 
@@ -112,7 +123,7 @@ class MainApiTest {
     @Test
     @DisplayName("Article이 있는 상태에서 /main 경로로 요청이 들어오면 최근 Article을 반환한다")
     void getMainPageWithArticle() throws IOException {
-        InMemoryArticleDatabase.save(new Article(InMemoryArticleDatabase.sequence.getAndIncrement(), "test", "contest", user,
+        articleDatabase.save(new Article(articleDatabase.getSequence().getAndIncrement(), "test", "contest", user,
                 LocalDateTime.now(), LocalDateTime.now()));
 
         HttpRequest httpRequest = loginRequest();
@@ -123,11 +134,11 @@ class MainApiTest {
                 () -> assertTrue(((ModelAndView) mav).getObject("article") instanceof Article)
         );
 
-        InMemoryArticleDatabase.remove(InMemoryArticleDatabase.sequence.getAndIncrement());
+        articleDatabase.remove(articleDatabase.getSequence().getAndIncrement());
     }
 
     private HttpRequest loginRequest() throws IOException {
-        String session = SessionManager.createSession(user.getUserId(), HttpResponse.ok());
+        String session = SessionManager.createSession(user, HttpResponse.ok());
         String loginMessage = getMessage + "Cookie: SID=" + session + NEW_LINE;
         return HttpRequest.from(new BufferedReader(new StringReader(loginMessage)));
     }

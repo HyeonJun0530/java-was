@@ -1,6 +1,6 @@
 package codesquad.http.handler;
 
-import codesquad.app.infrastructure.UserDatabase;
+import codesquad.config.ApplicationContext;
 import codesquad.http.exception.NotFoundException;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
@@ -84,8 +84,7 @@ class HttpRequestHandlerTest {
 
         assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
                 () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.FOUND.getReasonPhrase()));
-
-        UserDatabase.remove("javajigi");
+        ApplicationContext.getInstance().getUserDatabase().remove("javajigi");
     }
 
     @Test
@@ -104,11 +103,11 @@ class HttpRequestHandlerTest {
 
         HttpResponse httpResponse = getHttpResponse(response);
 
-        UserDatabase.remove("javajigi");
-
         assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
                 () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.FOUND.getReasonPhrase())
         );
+
+        ApplicationContext.getInstance().getUserDatabase().remove("javajigi");
     }
 
 }

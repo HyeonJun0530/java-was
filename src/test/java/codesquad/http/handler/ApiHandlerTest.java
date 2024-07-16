@@ -1,8 +1,8 @@
 package codesquad.http.handler;
 
 import codesquad.app.domain.Article;
-import codesquad.app.infrastructure.InMemoryArticleDatabase;
-import codesquad.app.infrastructure.UserDatabase;
+import codesquad.app.domain.User;
+import codesquad.config.ApplicationContext;
 import codesquad.http.exception.MethodNotAllowedException;
 import codesquad.http.exception.NotFoundException;
 import codesquad.http.message.SessionManager;
@@ -28,21 +28,24 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 class ApiHandlerTest {
 
     ApiHandler apiHandler = new ApiHandler();
+    User user;
 
     @BeforeEach
     void setUp() {
-        UserDatabase.save(new codesquad.app.domain.User.Builder()
+        user = new User.Builder()
                 .name("박재성")
                 .email("javajigi@slipp.net")
                 .userId("javajigi")
                 .password("password")
-                .build());
+                .build();
+        ApplicationContext.getInstance().getUserDatabase()
+                .save(user);
     }
 
     @AfterEach
     void tearDown() {
-        UserDatabase.remove("javajigi");
-        InMemoryArticleDatabase.remove(1L);
+        ApplicationContext.getInstance().getUserDatabase().remove("javajigi");
+        ApplicationContext.getInstance().getArticleDatabase().remove(1L);
     }
 
     private static HttpResponse convert(final Object response) {
@@ -54,7 +57,7 @@ class ApiHandlerTest {
     @Test
     @DisplayName("api 핸들러에 api가 있어서 성공적으로 처리되는 경우")
     public void api_handle_success() throws IOException {
-        UserDatabase.remove("javajigi");
+        ApplicationContext.getInstance().getUserDatabase().remove("javajigi");
         String body = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
                 RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
@@ -131,13 +134,13 @@ class ApiHandlerTest {
     @Test
     @DisplayName("api 핸들러에서 처리 유무를 반환 - pathVariable이 있는 경우")
     void api_request_with_path_variable() throws IOException {
-        String session = SessionManager.createSession("javajigi", HttpResponse.ok());
+        String session = SessionManager.createSession(user, HttpResponse.ok());
 
-        Article article = InMemoryArticleDatabase.save(new Article.Builder()
+        Article article = ApplicationContext.getInstance().getArticleDatabase().save(new Article.Builder()
                 .sequence(1L)
                 .title("title")
                 .content("content")
-                .writer(UserDatabase.findByUserId("javajigi").get())
+                .writer(ApplicationContext.getInstance().getUserDatabase().findByUserId("javajigi").get())
                 .build());
 
         String message = "POST /1/comment HTTP/1.1\r\n" +

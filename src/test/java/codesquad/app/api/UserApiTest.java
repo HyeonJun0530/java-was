@@ -1,6 +1,7 @@
 package codesquad.app.api;
 
 import codesquad.app.domain.User;
+import codesquad.app.infrastructure.InMemoryUserDatabase;
 import codesquad.app.infrastructure.UserDatabase;
 import codesquad.http.exception.BadRequestException;
 import codesquad.http.message.SessionManager;
@@ -25,31 +26,33 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserApiTest {
 
-    UserApi userApi = new UserApi();
-
+    UserDatabase userDatabase;
+    UserApi userApi;
     User user;
 
     @BeforeEach
     void setUp() {
+        userDatabase = new InMemoryUserDatabase();
+        userApi = new UserApi(userDatabase);
         user = new User.Builder()
-                .userId("test")
-                .password("test")
-                .name("test")
-                .email("test@test.com")
+                .name("박재성")
+                .email("javajigi@slipp.net")
+                .userId("javajigi")
+                .password("password")
                 .build();
-        UserDatabase.save(user);
+        userDatabase.save(user);
     }
 
     @AfterEach
     void tearDown() {
-        UserDatabase.remove(user.getUserId());
+        userDatabase.remove(user.getUserId());
     }
 
     @Test
     @DisplayName("유저 생성 테스트")
     void createUser() throws IOException {
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")), 113));
+                RequestBody.from(new BufferedReader(new StringReader("userId=java&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")), 113));
 
         HttpResponse response = userApi.create(httpRequest);
 
@@ -59,13 +62,13 @@ class UserApiTest {
                 () -> assertTrue(response.toString().contains("Location: /"))
         );
 
-        UserDatabase.remove("javajigi");
+        userDatabase.remove("java");
     }
 
     @Test
     @DisplayName("유저 생성 테스트 - 중복 회원 가입은 막는다.")
     void createUser_duplicate() throws IOException {
-        String body = "userId=test&password=test&name=test&email=test@test.com";
+        String body = "userId=javajigi&password=test&name=test&email=test@test.com";
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
                 RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
 
@@ -180,7 +183,7 @@ class UserApiTest {
     @DisplayName("로그아웃 테스트 - 로그인 상태")
     void logout() throws IOException {
         HttpRequest httpRequest = loginRequest();
-        String session = SessionManager.createSession(user.getUserId(), HttpResponse.ok());
+        String session = SessionManager.createSession(user, HttpResponse.ok());
 
         HttpResponse response = userApi.logout(httpRequest);
 
@@ -195,7 +198,7 @@ class UserApiTest {
     @DisplayName("유저 리스트 테스트 - 로그인 상태")
     void userList() throws IOException {
         HttpRequest httpRequest = loginRequest();
-        String session = SessionManager.createSession(user.getUserId(), HttpResponse.ok());
+        String session = SessionManager.createSession(user, HttpResponse.ok());
 
         ModelAndView userList = userApi.getUserList(httpRequest);
 
@@ -212,7 +215,7 @@ class UserApiTest {
                 "Accept: */*" + NEW_LINE +
                 "Accept-Encoding: gzip, deflate, br" + NEW_LINE +
                 "Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7" + NEW_LINE;
-        String session = SessionManager.createSession(user.getUserId(), HttpResponse.ok());
+        String session = SessionManager.createSession(user, HttpResponse.ok());
         String loginMessage = getMessage + "Cookie: SID=" + session + NEW_LINE;
         return HttpRequest.from(new BufferedReader(new StringReader(loginMessage)));
     }

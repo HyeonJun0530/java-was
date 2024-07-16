@@ -1,8 +1,8 @@
 package codesquad.app.api;
 
 import codesquad.app.domain.Article;
-import codesquad.app.infrastructure.InMemoryArticleDatabase;
-import codesquad.app.infrastructure.UserDatabase;
+import codesquad.app.domain.User;
+import codesquad.app.infrastructure.*;
 import codesquad.http.message.SessionManager;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
@@ -14,35 +14,44 @@ import java.io.StringReader;
 
 class CommentApiTest {
 
-    CommentApi commentApi = new CommentApi();
+    CommentApi commentApi;
+    ArticleDatabase articleDatabase;
+    CommentDatabase commentDatabase;
+    UserDatabase userDatabase;
+    User user;
 
     @BeforeEach
     void setUp() {
-        UserDatabase.save(new codesquad.app.domain.User.Builder()
+        articleDatabase = new InMemoryArticleDatabase();
+        commentDatabase = new InMemoryCommentDatabase();
+        userDatabase = new InMemoryUserDatabase();
+        commentApi = new CommentApi(articleDatabase, commentDatabase);
+        user = new User.Builder()
                 .name("박재성")
                 .email("javajigi@slipp.net")
                 .userId("javajigi")
                 .password("password")
-                .build());
+                .build();
+        userDatabase.save(user);
 
-        InMemoryArticleDatabase.save(new Article.Builder()
+        articleDatabase.save(new Article.Builder()
                 .sequence(1L)
                 .title("title")
                 .content("content")
-                .writer(UserDatabase.findByUserId("javajigi").get())
+                .writer(userDatabase.findByUserId("javajigi").get())
                 .build());
     }
 
     @AfterEach
     void tearDown() {
-        UserDatabase.remove("javajigi");
-        InMemoryArticleDatabase.remove(1L);
+        userDatabase.remove("javajigi");
+        articleDatabase.remove(1L);
     }
 
     @Test
     @DisplayName("CommentApiTest 테스트 - 댓글 생성")
     void createComment() throws IOException {
-        String session = SessionManager.createSession("javajigi", HttpResponse.ok());
+        String session = SessionManager.createSession(user, HttpResponse.ok());
         HttpRequest httpRequest = HttpRequest.from(new BufferedReader(new StringReader("POST /1/comment HTTP/1.1\n" +
                 "Connection: keep-alive\n" +
                 "Content-Length: 31\n" +
