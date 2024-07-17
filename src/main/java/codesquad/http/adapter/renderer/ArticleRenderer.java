@@ -11,15 +11,21 @@ import java.util.List;
 
 public class ArticleRenderer implements ViewRenderer {
 
+    private static final String ARTICLE_ATTRIBUTE = "article";
+    private static final String COMMENTS_ATTRIBUTE = "comments";
+    private static final String WRITER_NAME_ATTRIBUTE = "writerName";
+    private static final String SESSION_ATTRIBUTE = "session";
+
     @Override
     public String render(final ModelAndView modelAndView) {
-        Article article = (Article) modelAndView.getObject("article");
-        List<Comment> comments = (List<Comment>) modelAndView.getObject("comments");
-        boolean login = SessionManager.isValidSession((String) modelAndView.getObject("session"));
+        Article article = (Article) modelAndView.getObject(ARTICLE_ATTRIBUTE);
+        List<Comment> comments = (List<Comment>) modelAndView.getObject(COMMENTS_ATTRIBUTE);
+        String writerName = (String) modelAndView.getObject(WRITER_NAME_ATTRIBUTE);
+        boolean login = SessionManager.isValidSession((String) modelAndView.getObject(SESSION_ATTRIBUTE));
 
         String templateFile = getTemplateFile(modelAndView);
 
-        return replace(templateFile, article, comments, login);
+        return replace(templateFile, article, writerName, comments, login);
     }
 
     @Override
@@ -27,15 +33,19 @@ public class ArticleRenderer implements ViewRenderer {
         try {
             FileUtil.getTemplateFile(modelAndView.getViewName());
 
-            if (!modelAndView.containsAttribute("article")) {
+            if (!modelAndView.containsAttribute(ARTICLE_ATTRIBUTE)) {
                 return false;
             }
 
-            if (!modelAndView.containsAttribute("comments")) {
+            if (!modelAndView.containsAttribute(COMMENTS_ATTRIBUTE)) {
                 return false;
             }
 
-            return modelAndView.getObject("article") instanceof Article;
+            if (!modelAndView.containsAttribute(WRITER_NAME_ATTRIBUTE)) {
+                return false;
+            }
+
+            return modelAndView.getObject(ARTICLE_ATTRIBUTE) instanceof Article;
         } catch (IllegalArgumentException e) {
             return false;
         }
@@ -53,7 +63,8 @@ public class ArticleRenderer implements ViewRenderer {
         return new String(templateFile);
     }
 
-    private String replace(final String html, final Article article, final List<Comment> comments, final boolean login) {
+    private String replace(final String html, final Article article, final String writerName,
+                           final List<Comment> comments, final boolean login) {
         String result = html;
 
         if (!login) {
@@ -82,7 +93,7 @@ public class ArticleRenderer implements ViewRenderer {
         }
 
         result = result.replace("${article.title}", article.getTitle());
-        result = result.replace("${article.user.name}", article.getWriter().getName());
+        result = result.replace("${article.user.name}", writerName);
         result = result.replace("${article.content}", article.getContent());
 
         StringBuilder renderedComments = new StringBuilder();
