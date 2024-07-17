@@ -44,8 +44,8 @@ class ApiHandlerTest {
         articleDatabase = new InMemoryArticleDatabase();
 
         UserApi userApi = new UserApi(userDatabase);
-        MainApi mainApi = new MainApi(articleDatabase, commentDatabase);
-        ArticleApi articleApi = new ArticleApi(articleDatabase, commentDatabase);
+        MainApi mainApi = new MainApi(userDatabase, articleDatabase, commentDatabase);
+        ArticleApi articleApi = new ArticleApi(articleDatabase, commentDatabase, userDatabase);
         CommentApi commentApi = new CommentApi(articleDatabase, commentDatabase);
 
         apiHandler = new ApiHandler(Map.of(UserApi.class, userApi,
@@ -160,7 +160,7 @@ class ApiHandlerTest {
                 .sequence(1L)
                 .title("title")
                 .content("content")
-                .writer(userDatabase.findByUserId("javajigi").get())
+                .writerId(userDatabase.findByUserId("javajigi").get().getUserId())
                 .build());
 
         String message = "POST /1/comment HTTP/1.1\r\n" +

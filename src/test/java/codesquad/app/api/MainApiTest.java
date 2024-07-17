@@ -41,7 +41,7 @@ class MainApiTest {
         articleDatabase = new InMemoryArticleDatabase();
         commentDatabase = new InMemoryCommentDatabase();
         userDatabase = new InMemoryUserDatabase();
-        mainApi = new MainApi(articleDatabase, commentDatabase);
+        mainApi = new MainApi(userDatabase, articleDatabase, commentDatabase);
         user = new User.Builder()
                 .name("박재성")
                 .email("javajigi@slipp.net")
@@ -49,13 +49,6 @@ class MainApiTest {
                 .password("password")
                 .build();
         userDatabase.save(user);
-
-        articleDatabase.save(new Article.Builder()
-                .sequence(1L)
-                .title("title")
-                .content("content")
-                .writer(userDatabase.findByUserId("javajigi").get())
-                .build());
     }
 
     @AfterEach
@@ -66,7 +59,7 @@ class MainApiTest {
     @Test
     @DisplayName("MainApi 인스턴스를 생성한다.")
     void createMainApi() {
-        mainApi = new MainApi(articleDatabase, commentDatabase);
+        mainApi = new MainApi(userDatabase, articleDatabase, commentDatabase);
 
         assertNotNull(mainApi);
     }
@@ -123,7 +116,7 @@ class MainApiTest {
     @Test
     @DisplayName("Article이 있는 상태에서 /main 경로로 요청이 들어오면 최근 Article을 반환한다")
     void getMainPageWithArticle() throws IOException {
-        articleDatabase.save(new Article(articleDatabase.getSequence().getAndIncrement(), "test", "contest", user,
+        articleDatabase.save(new Article("test", "contest", user.getUserId(),
                 LocalDateTime.now(), LocalDateTime.now()));
 
         HttpRequest httpRequest = loginRequest();
@@ -133,8 +126,6 @@ class MainApiTest {
                 () -> assertTrue(((ModelAndView) mav).containsAttribute("article")),
                 () -> assertTrue(((ModelAndView) mav).getObject("article") instanceof Article)
         );
-
-        articleDatabase.remove(articleDatabase.getSequence().getAndIncrement());
     }
 
     private HttpRequest loginRequest() throws IOException {

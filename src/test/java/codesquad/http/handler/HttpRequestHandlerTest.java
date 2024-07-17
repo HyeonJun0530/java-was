@@ -41,8 +41,8 @@ class HttpRequestHandlerTest {
         InMemoryArticleDatabase articleDatabase = new InMemoryArticleDatabase();
 
         UserApi userApi = new UserApi(userDatabase);
-        MainApi mainApi = new MainApi(articleDatabase, commentDatabase);
-        ArticleApi articleApi = new ArticleApi(articleDatabase, commentDatabase);
+        MainApi mainApi = new MainApi(userDatabase, articleDatabase, commentDatabase);
+        ArticleApi articleApi = new ArticleApi(articleDatabase, commentDatabase, userDatabase);
         CommentApi commentApi = new CommentApi(articleDatabase, commentDatabase);
 
         ApiHandler apiHandler = new ApiHandler(Map.of(UserApi.class, userApi,
