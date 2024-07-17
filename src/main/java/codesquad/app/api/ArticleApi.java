@@ -3,8 +3,10 @@ package codesquad.app.api;
 import codesquad.app.api.annotation.ApiMapping;
 import codesquad.app.domain.Article;
 import codesquad.app.domain.Comment;
+import codesquad.app.domain.User;
 import codesquad.app.infrastructure.ArticleDatabase;
 import codesquad.app.infrastructure.CommentDatabase;
+import codesquad.app.infrastructure.UserDatabase;
 import codesquad.http.exception.NotFoundException;
 import codesquad.http.message.SessionManager;
 import codesquad.http.message.constant.ContentType;
@@ -28,10 +30,12 @@ public class ArticleApi {
 
     private final ArticleDatabase articleDatabase;
     private final CommentDatabase commentDatabase;
+    private final UserDatabase userDatabase;
 
-    public ArticleApi(final ArticleDatabase articleDatabase, final CommentDatabase commentDatabase) {
+    public ArticleApi(final ArticleDatabase articleDatabase, final CommentDatabase commentDatabase, final UserDatabase userDatabase) {
         this.articleDatabase = articleDatabase;
         this.commentDatabase = commentDatabase;
+        this.userDatabase = userDatabase;
     }
 
     @ApiMapping(path = "/article", method = HttpMethod.GET)
@@ -44,12 +48,11 @@ public class ArticleApi {
         Map<String, String> parameter = request.getRequestBody().parseFormUrlEncoded();
 
         Article article = new Article.Builder()
-                .sequence(articleDatabase.getSequence().getAndIncrement())
                 .title(parameter.get("title"))
                 .content(parameter.get("content"))
-                .writer(SessionManager.getUser(request.getSessionId()).get())
-                .createdTime(LocalDateTime.now())
-                .modifiedTime(LocalDateTime.now())
+                .writerId(SessionManager.getUser(request.getSessionId()).get().getUserId())
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
                 .build();
 
         Article save = articleDatabase.save(article);
@@ -73,10 +76,16 @@ public class ArticleApi {
             throw new NotFoundException("Article not found");
         }
 
-        List<Comment> comments = commentDatabase.findByArticleSequence(findLastArticle.get().getSequence());
+        Article article = findLastArticle.get();
+
+        User user = userDatabase.findByUserId(article.getWriterId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        List<Comment> comments = commentDatabase.findByArticleSequence(article.getSequence());
 
         mav.addObject("session", request.getSessionId());
-        mav.addObject("article", findLastArticle.get());
+        mav.addObject("writerName", user.getName());
+        mav.addObject("article", article);
         mav.addObject("comments", comments);
 
         log.debug("get article = {}", articleDatabase.findBySequence(Long.parseLong(pathVariable)).get());

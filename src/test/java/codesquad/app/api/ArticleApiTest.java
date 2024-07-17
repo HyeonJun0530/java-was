@@ -34,7 +34,7 @@ class ArticleApiTest {
     void setUp() {
         UserDatabase userDatabase = new InMemoryUserDatabase();
         articleDatabase = new InMemoryArticleDatabase();
-        articleApi = new ArticleApi(articleDatabase, new InMemoryCommentDatabase());
+        articleApi = new ArticleApi(articleDatabase, new InMemoryCommentDatabase(), userDatabase);
         user = new User("javajigi", "password", "자바지기", "1@1.com");
         userDatabase.save(user);
     }
@@ -58,20 +58,21 @@ class ArticleApiTest {
                 "Content-Length: 31\n" +
                 "Content-Type: application/x-www-form-urlencoded\n" +
                 "Cookie: SID=" + session + "\n" +
+
                 "\n" +
                 "title=제목&content=내용"))));
         Optional<Article> byLastSequence = articleDatabase.findByLastSequence();
 
         assertAll(() -> assertTrue(byLastSequence.isPresent()),
                 () -> assertEquals("제목", byLastSequence.get().getTitle()),
-                () -> assertEquals("자바지기", byLastSequence.get().getWriter().getName())
+                () -> assertEquals("javajigi", byLastSequence.get().getWriterId())
         );
     }
 
     @Test
     @DisplayName("해당 번호의 Article을 가져온다.")
     void getArticle() throws IOException {
-        articleDatabase.save(new Article(1L, "제목", "내용", user, LocalDateTime.now(), LocalDateTime.now()));
+        articleDatabase.save(new Article(1L, "제목", "내용", user.getUserId(), LocalDateTime.now(), LocalDateTime.now()));
         Object article = articleApi.getArticle(HttpRequest.from(new BufferedReader(new StringReader("GET /1 HTTP/1.1"))));
 
         assertAll(() -> assertInstanceOf(ModelAndView.class, article),
@@ -79,7 +80,7 @@ class ArticleApiTest {
                 () -> assertThat(((ModelAndView) article).getObject("article")).isInstanceOf(Article.class),
                 () -> assertTrue(((ModelAndView) article).getObject("article").toString().contains("제목")),
                 () -> assertTrue(((ModelAndView) article).getObject("article").toString().contains("내용")),
-                () -> assertTrue(((ModelAndView) article).getObject("article").toString().contains("자바지기")),
+                () -> assertTrue(((ModelAndView) article).getObject("article").toString().contains("javajigi")),
                 () -> assertThat(((ModelAndView) article).getObject("comments")).isInstanceOf(List.class)
         );
     }

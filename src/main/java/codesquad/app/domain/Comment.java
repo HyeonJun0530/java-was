@@ -2,16 +2,24 @@ package codesquad.app.domain;
 
 public class Comment {
 
-    private final Long sequence;
-    private final Article article;
-    private final String writer;
-    private final String contents;
+    private Long sequence;
+    private Long articleSequence;
+    private String writer;
+    private String contents;
 
-    public Comment(final Long sequence, final Article article, String writer, String contents) {
+    public Comment(final Long sequence, final Long articleSequence, String writer, String contents) {
         this.sequence = sequence;
-        this.article = article;
+        this.articleSequence = articleSequence;
         this.writer = writer;
         this.contents = contents;
+    }
+
+    public Comment(final Long articleSequence, String writer, String contents) {
+        this(null, articleSequence, writer, contents);
+    }
+
+    public void setSequence(final Long sequence) {
+        this.sequence = sequence;
     }
 
     public String getWriter() {
@@ -22,8 +30,8 @@ public class Comment {
         return contents;
     }
 
-    public Article getArticle() {
-        return article;
+    public Long getArticleSequence() {
+        return articleSequence;
     }
 
     public Long getSequence() {
@@ -33,14 +41,16 @@ public class Comment {
     @Override
     public String toString() {
         return "Comment{" +
-                "writer='" + writer + '\'' +
+                "sequence=" + sequence +
+                ", articleSequence='" + articleSequence + '\'' +
+                ", writer='" + writer + '\'' +
                 ", contents='" + contents + '\'' +
                 '}';
     }
 
     public static class Builder {
         private Long sequence;
-        private Article article;
+        private Long articleSequence;
         private String writer;
         private String contents;
 
@@ -49,8 +59,8 @@ public class Comment {
             return this;
         }
 
-        public Builder article(Article article) {
-            this.article = article;
+        public Builder articleSequence(Long articleSequence) {
+            this.articleSequence = articleSequence;
             return this;
         }
 
@@ -65,7 +75,7 @@ public class Comment {
         }
 
         public Comment build() {
-            return new Comment(sequence, article, writer, contents);
+            return new Comment(sequence, articleSequence, writer, contents);
         }
     }
 }

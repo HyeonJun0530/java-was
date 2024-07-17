@@ -4,20 +4,31 @@ import java.time.LocalDateTime;
 
 public class Article {
 
-    private final Long sequence;
-    private final String title;
-    private final String content;
-    private final User writer;
-    private final LocalDateTime createdTime;
-    private final LocalDateTime modifiedTime;
+    private Long sequence;
+    private String title;
+    private String content;
+    private String writerId;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 
-    public Article(final Long sequence, final String title, final String content, final User writer, final LocalDateTime createdTime, final LocalDateTime modifiedTime) {
+    public Article(final Long sequence, final String title,
+                   final String content, final String writerId,
+                   final LocalDateTime createdAt, final LocalDateTime modifiedAt) {
         this.sequence = sequence;
         this.title = title;
         this.content = content;
-        this.writer = writer;
-        this.createdTime = createdTime;
-        this.modifiedTime = modifiedTime;
+        this.writerId = writerId;
+        this.createdAt = createdAt;
+        this.modifiedAt = modifiedAt;
+    }
+
+    public Article(final String title, final String content, final String writerId,
+                   final LocalDateTime createdAt, final LocalDateTime modifiedAt) {
+        this(null, title, content, writerId, createdAt, modifiedAt);
+    }
+
+    public void setSequence(Long sequence) {
+        this.sequence = sequence;
     }
 
     public Long getSequence() {
@@ -32,8 +43,16 @@ public class Article {
         return content;
     }
 
-    public User getWriter() {
-        return writer;
+    public String getWriterId() {
+        return writerId;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getModifiedAt() {
+        return modifiedAt;
     }
 
     @Override
@@ -42,9 +61,9 @@ public class Article {
                 "sequence=" + sequence +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
-                ", writer=" + writer +
-                ", createdTime=" + createdTime +
-                ", modifiedTime=" + modifiedTime +
+                ", writer=" + writerId +
+                ", createdTime=" + createdAt +
+                ", modifiedTime=" + modifiedAt +
                 '}';
     }
 
@@ -52,17 +71,17 @@ public class Article {
         private Long sequence;
         private String title;
         private String content;
-        private User writer;
-        private LocalDateTime createdTime;
-        private LocalDateTime modifiedTime;
+        private String writerId;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
 
         public Builder() {
             this.sequence = sequence;
             this.title = title;
             this.content = content;
-            this.writer = writer;
-            this.createdTime = createdTime;
-            this.modifiedTime = modifiedTime;
+            this.writerId = writerId;
+            this.createdAt = createdAt;
+            this.modifiedAt = modifiedAt;
         }
 
         public Builder sequence(final Long sequence) {
@@ -80,23 +99,23 @@ public class Article {
             return this;
         }
 
-        public Builder writer(final User writer) {
-            this.writer = writer;
+        public Builder writerId(final String writerId) {
+            this.writerId = writerId;
             return this;
         }
 
-        public Builder createdTime(final LocalDateTime createdTime) {
-            this.createdTime = createdTime;
+        public Builder createdAt(final LocalDateTime createdAt) {
+            this.createdAt = createdAt;
             return this;
         }
 
-        public Builder modifiedTime(final LocalDateTime modifiedTime) {
-            this.modifiedTime = modifiedTime;
+        public Builder modifiedAt(final LocalDateTime modifiedAt) {
+            this.modifiedAt = modifiedAt;
             return this;
         }
 
         public Article build() {
-            return new Article(sequence, title, content, writer, createdTime, modifiedTime);
+            return new Article(title, content, writerId, createdAt, modifiedAt);
         }
     }
 }

@@ -43,8 +43,7 @@ public class CommentApi {
                 .orElseThrow(() -> new IllegalArgumentException("해당 글이 존재하지 않습니다."));
 
         Comment comment = new Comment.Builder()
-                .sequence(commentDatabase.getSequence().getAndIncrement())
-                .article(article)
+                .articleSequence(article.getSequence())
                 .writer(user.getName())
                 .contents(request.getRequestBody().parseFormUrlEncoded().get("comment"))
                 .build();

@@ -38,7 +38,7 @@ class CommentApiTest {
                 .sequence(1L)
                 .title("title")
                 .content("content")
-                .writer(userDatabase.findByUserId("javajigi").get())
+                .writerId(userDatabase.findByUserId("javajigi").get().getUserId())
                 .build());
     }
 
