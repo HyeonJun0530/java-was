@@ -1,10 +1,7 @@
 package codesquad.http.handler;
 
 import codesquad.app.api.annotation.ApiMapping;
-import codesquad.http.exception.BadRequestException;
-import codesquad.http.exception.InternalServerException;
-import codesquad.http.exception.MethodNotAllowedException;
-import codesquad.http.exception.NotFoundException;
+import codesquad.http.exception.*;
 import codesquad.http.message.request.HttpRequest;
 
 import java.lang.reflect.InvocationTargetException;
@@ -48,8 +45,15 @@ public class ApiHandler implements HttpRequestHandler {
             return findMethod.get().invoke(apiContainer.get(findMethod.get().getDeclaringClass()), request);
         } catch (NumberFormatException e) {
             throw new BadRequestException(e.getMessage());
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
             throw new InternalServerException(e.getMessage());
+        } catch (InvocationTargetException e) {
+            Throwable targetException = e.getTargetException();
+            if (targetException instanceof HttpException) {
+                throw (HttpException) targetException;
+            }
+
+            throw new InternalServerException(targetException.getMessage());
         }
     }
 
