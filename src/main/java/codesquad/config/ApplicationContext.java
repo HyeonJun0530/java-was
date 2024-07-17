@@ -34,14 +34,14 @@ public class ApplicationContext {
         DataSource dataSource = new DataSourceConfig().getDataSource();
 
         // Database 초기화
-        UserDatabase userDatabase = new InMemoryUserDatabase();
-        ArticleDatabase articleDatabase = new InMemoryArticleDatabase();
-        CommentDatabase commentDatabase = new InMemoryCommentDatabase();
+        UserDatabase userDatabase = new JdbcUserDatabase(dataSource);
+        ArticleDatabase articleDatabase = new JdbcArticleDatabase(dataSource);
+        CommentDatabase commentDatabase = new JdbcCommentDatabase(dataSource);
 
 
         UserApi userApi = new UserApi(userDatabase);
-        MainApi mainApi = new MainApi(articleDatabase, commentDatabase);
-        ArticleApi articleApi = new ArticleApi(articleDatabase, commentDatabase);
+        MainApi mainApi = new MainApi(userDatabase, articleDatabase, commentDatabase);
+        ArticleApi articleApi = new ArticleApi(articleDatabase, commentDatabase, userDatabase);
         CommentApi commentApi = new CommentApi(articleDatabase, commentDatabase);
 
         ApiHandler apiHandler = new ApiHandler(Map.of(UserApi.class, userApi,
