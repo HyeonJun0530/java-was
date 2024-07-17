@@ -7,7 +7,6 @@ import codesquad.http.message.SessionManager;
 import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
-import codesquad.http.model.ModelAndView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +40,7 @@ class MainApiTest {
         articleDatabase = new InMemoryArticleDatabase();
         commentDatabase = new InMemoryCommentDatabase();
         userDatabase = new InMemoryUserDatabase();
-        mainApi = new MainApi(userDatabase, articleDatabase, commentDatabase);
+        mainApi = new MainApi(articleDatabase);
         user = new User.Builder()
                 .name("박재성")
                 .email("javajigi@slipp.net")
@@ -59,7 +58,7 @@ class MainApiTest {
     @Test
     @DisplayName("MainApi 인스턴스를 생성한다.")
     void createMainApi() {
-        mainApi = new MainApi(userDatabase, articleDatabase, commentDatabase);
+        mainApi = new MainApi(articleDatabase);
 
         assertNotNull(mainApi);
     }
@@ -122,9 +121,8 @@ class MainApiTest {
         HttpRequest httpRequest = loginRequest();
         Object mav = mainApi.main(httpRequest);
 
-        assertAll(() -> assertTrue(mav instanceof ModelAndView),
-                () -> assertTrue(((ModelAndView) mav).containsAttribute("article")),
-                () -> assertTrue(((ModelAndView) mav).getObject("article") instanceof Article)
+        assertAll(() -> assertTrue(mav instanceof HttpResponse),
+                () -> assertTrue(((HttpResponse) mav).toString().contains("302"))
         );
     }
 

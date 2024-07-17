@@ -44,7 +44,7 @@ class ApiHandlerTest {
         articleDatabase = new InMemoryArticleDatabase();
 
         UserApi userApi = new UserApi(userDatabase);
-        MainApi mainApi = new MainApi(userDatabase, articleDatabase, commentDatabase);
+        MainApi mainApi = new MainApi(articleDatabase);
         ArticleApi articleApi = new ArticleApi(articleDatabase, commentDatabase, userDatabase);
         CommentApi commentApi = new CommentApi(articleDatabase, commentDatabase);
 
