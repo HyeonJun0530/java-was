@@ -56,12 +56,6 @@ public class ArticleRenderer implements ViewRenderer {
         return ContentType.TEXT_HTML;
     }
 
-    @Override
-    public String getTemplateFile(final ModelAndView modelAndView) {
-        byte[] templateFile = FileUtil.getTemplateFile(modelAndView.getViewName());
-
-        return new String(templateFile);
-    }
 
     private String replace(final String html, final Article article, final String writerName,
                            final List<Comment> comments, final boolean login) {
