@@ -9,11 +9,14 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class InMemoryCommentDatabase implements CommentDatabase {
 
-    private final AtomicLong sequence = new AtomicLong(0);
+    private final AtomicLong sequence = new AtomicLong(1);
     private final Map<Long, Comment> comments = new ConcurrentHashMap<>();
 
     @Override
     public Comment save(final Comment comment) {
+        if (comment.getSequence() == null) {
+            comment.setSequence(sequence.getAndIncrement());
+        }
         comments.put(comment.getSequence(), comment);
 
         return comment;
@@ -22,7 +25,7 @@ public class InMemoryCommentDatabase implements CommentDatabase {
     @Override
     public List<Comment> findByArticleSequence(final Long sequence) {
         return comments.values().stream()
-                .filter(comment -> comment.getArticle().getSequence().equals(sequence))
+                .filter(comment -> comment.getArticleSequence().equals(sequence))
                 .toList();
     }
 
@@ -31,8 +34,4 @@ public class InMemoryCommentDatabase implements CommentDatabase {
         comments.remove(sequence);
     }
 
-    @Override
-    public AtomicLong getSequence() {
-        return sequence;
-    }
 }

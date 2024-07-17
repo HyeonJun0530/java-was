@@ -9,11 +9,15 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class InMemoryArticleDatabase implements ArticleDatabase {
 
-    private final AtomicLong sequence = new AtomicLong(0);
+    private final AtomicLong sequence = new AtomicLong(1);
     private final Map<Long, Article> articles = new ConcurrentHashMap<>();
 
     @Override
     public Article save(final Article article) {
+        if (article.getSequence() == null) {
+            article.setSequence(sequence.getAndIncrement());
+        }
+
         articles.put(article.getSequence(), article);
 
         return article;
@@ -32,11 +36,6 @@ public class InMemoryArticleDatabase implements ArticleDatabase {
     @Override
     public void remove(final Long sequence) {
         articles.remove(sequence);
-    }
-
-    @Override
-    public AtomicLong getSequence() {
-        return sequence;
     }
 
 }
