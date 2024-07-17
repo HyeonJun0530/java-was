@@ -83,10 +83,13 @@ public class ArticleApi {
 
         List<Comment> comments = commentDatabase.findByArticleSequence(article.getSequence());
 
+        boolean isNext = articleDatabase.findBySequence(Long.parseLong(pathVariable) + 1).isPresent();
+
         mav.addObject("session", request.getSessionId());
         mav.addObject("writerName", user.getName());
         mav.addObject("article", article);
         mav.addObject("comments", comments);
+        mav.addObject("isNext", isNext);
 
         log.debug("get article = {}", articleDatabase.findBySequence(Long.parseLong(pathVariable)).get());
 

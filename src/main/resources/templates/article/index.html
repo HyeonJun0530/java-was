@@ -54,8 +54,37 @@
         </ul>
         <nav class="nav">
             <ul class="nav__menu">
+                <script>
+                    var isNextAvailable = ${isNext};
+                </script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const currentArticleId = parseInt(window.location.pathname.split('/').pop(), 10);
+                        const prevArticleId = currentArticleId - 1;
+                        const nextArticleId = currentArticleId + 1;
+
+                        const prevLink = document.querySelector('.nav__menu__item__btn[href=""][data-direction="prev"]');
+                        const nextLink = document.querySelector('.nav__menu__item__btn[href=""][data-direction="next"]');
+
+                        if (!isNaN(currentArticleId)) {
+                            if (prevArticleId >= 1) { // Assuming article IDs start at 1
+                                prevLink.href = '/' + prevArticleId;
+                            } else {
+                                prevLink.style.pointerEvents = 'none';
+                                prevLink.style.opacity = '0.5';
+                            }
+
+                            if (isNextAvailable) {
+                                nextLink.href = '/' + nextArticleId;
+                            } else {
+                                nextLink.style.pointerEvents = 'none';
+                                nextLink.style.opacity = '0.5';
+                            }
+                        }
+                    });
+                </script>
                 <li class="nav__menu__item">
-                    <a class="nav__menu__item__btn" href="">
+                    <a class="nav__menu__item__btn" data-direction="prev" href="">
                         <img
                                 class="nav__menu__item__img"
                                 src="/img/ci_chevron-left.svg"
@@ -67,7 +96,7 @@
                     <a class="btn btn_ghost btn_size_m" href="/comment">댓글 작성</a>
                 </li>
                 <li class="nav__menu__item">
-                    <a class="nav__menu__item__btn" href="">
+                    <a class="nav__menu__item__btn" data-direction="next" href="">
                         다음 글
                         <img
                                 class="nav__menu__item__img"

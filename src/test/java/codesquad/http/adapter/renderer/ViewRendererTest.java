@@ -69,6 +69,7 @@ class ViewRendererTest {
         mav.addObject("article", new Article(1L, "title", "content", user.getName(), null, null));
         mav.addObject("comments", List.of());
         mav.addObject("writerName", "test");
+        mav.addObject("isNext", true);
 
         String article = viewRenderer.render(mav);
 
@@ -89,6 +90,7 @@ class ViewRendererTest {
         mav.addObject("comments", List.of());
         mav.addObject("article", new Article(1L, "title", "content", "javajigi", null, null));
         mav.addObject("writerName", "자바지기");
+        mav.addObject("isNext", true);
 
         assertTrue(viewRenderer.isSupport(mav));
     }
