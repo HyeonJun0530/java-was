@@ -3,7 +3,6 @@ package codesquad.app.infrastructure;
 import codesquad.app.domain.Comment;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 public interface CommentDatabase extends Database {
 
@@ -13,5 +12,4 @@ public interface CommentDatabase extends Database {
 
     void remove(final Long sequence);
 
-    AtomicLong getSequence();
 }

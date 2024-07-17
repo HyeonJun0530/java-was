@@ -3,7 +3,6 @@ package codesquad.app.infrastructure;
 import codesquad.app.domain.Article;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 public interface ArticleDatabase extends Database {
     Article save(final Article article);
@@ -14,5 +13,4 @@ public interface ArticleDatabase extends Database {
 
     void remove(final Long sequence);
 
-    AtomicLong getSequence();
 }
