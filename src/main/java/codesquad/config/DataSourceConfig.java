@@ -22,7 +22,7 @@ public class DataSourceConfig {
         runServer();
 
         JdbcConnectionPool connectionPool = JdbcConnectionPool.create(URL, USER_NAME, PASSWORD);
-        connectionPool.setMaxConnections(10);
+        connectionPool.setMaxConnections(3);
 
         this.dataSource = connectionPool;
 
@@ -42,29 +42,30 @@ public class DataSourceConfig {
     }
 
     private static void createTable(final DataSource dataSource) {
-        try (Connection con = dataSource.getConnection()) {
-            Statement stmt = con.createStatement();
-            stmt.execute("CREATE TABLE articles (sequence BIGINT PRIMARY KEY AUTO_INCREMENT, " +
-                    "writer VARCHAR(255), " +
-                    "title VARCHAR(255), " +
-                    "contents TEXT, " +
-                    "image_url VARCHAR(255), " +
-                    "create_at TIMESTAMP, " +
-                    "modified_at TIMESTAMP)");
+        new Thread(() -> {
+            try (Connection con = dataSource.getConnection()) {
+                Statement stmt = con.createStatement();
+                stmt.execute("CREATE TABLE articles (sequence BIGINT PRIMARY KEY AUTO_INCREMENT, " +
+                        "writer VARCHAR(255), " +
+                        "title VARCHAR(255), " +
+                        "contents TEXT, " +
+                        "image_url VARCHAR(255), " +
+                        "create_at TIMESTAMP, " +
+                        "modified_at TIMESTAMP)");
 
-            stmt.execute("CREATE TABLE comments (sequence BIGINT PRIMARY KEY AUTO_INCREMENT, " +
-                    "article_sequence BIGINT, " +
-                    "writer VARCHAR(255), " +
-                    "contents TEXT)");
+                stmt.execute("CREATE TABLE comments (sequence BIGINT PRIMARY KEY AUTO_INCREMENT, " +
+                        "article_sequence BIGINT, " +
+                        "writer VARCHAR(255), " +
+                        "contents TEXT)");
 
-            stmt.execute("CREATE TABLE users (user_id VARCHAR(255) PRIMARY KEY, " +
-                    "password VARCHAR(255), " +
-                    "name VARCHAR(255), " +
-                    "email VARCHAR(255))");
-        } catch (SQLException e) {
-            log.error("Create Table Error", e);
-        }
-
+                stmt.execute("CREATE TABLE users (user_id VARCHAR(255) PRIMARY KEY, " +
+                        "password VARCHAR(255), " +
+                        "name VARCHAR(255), " +
+                        "email VARCHAR(255))");
+            } catch (SQLException e) {
+                log.error("Create Table Error", e);
+            }
+        }).start();
     }
 
     public DataSource getDataSource() {

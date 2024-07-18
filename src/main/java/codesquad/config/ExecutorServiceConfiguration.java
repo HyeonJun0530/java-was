@@ -6,8 +6,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class ExecutorServiceConfiguration {
-    private static final int THREAD_POOL_SIZE = 10;
-    private static final int QUEUE_CAPACITY = 50;
+    private static final int THREAD_POOL_SIZE = 5;
+    private static final int QUEUE_CAPACITY = 5;
     private static final ExecutorService executorService = new ThreadPoolExecutor(
             THREAD_POOL_SIZE,
             THREAD_POOL_SIZE,

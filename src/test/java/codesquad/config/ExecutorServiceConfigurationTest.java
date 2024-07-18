@@ -19,10 +19,10 @@ class ExecutorServiceConfigurationTest {
 
         assertInstanceOf(ThreadPoolExecutor.class, executorService);
         Assertions.assertThat(((ThreadPoolExecutor) executorService).getCorePoolSize())
-                .isEqualTo(10);
+                .isEqualTo(5);
         Assertions.assertThat(((ThreadPoolExecutor) executorService).getMaximumPoolSize())
-                .isEqualTo(10);
+                .isEqualTo(5);
         Assertions.assertThat(((ThreadPoolExecutor) executorService).getQueue().remainingCapacity())
-                .isEqualTo(50);
+                .isEqualTo(5);
     }
 }

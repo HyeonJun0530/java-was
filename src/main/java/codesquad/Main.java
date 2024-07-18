@@ -15,7 +15,6 @@ public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    //TODO: 멀티파트 파싱 -> 파일 업로드 및 HttpRequest 수정, 사진 추가
     public static void main(String[] args) throws IOException {
         try (ServerSocket serverSocket = new ServerSocket(8080)) { // 8080 포트에서 서버를 엽니다.
             logger.info("Listening for connection on port 8080 ....");
