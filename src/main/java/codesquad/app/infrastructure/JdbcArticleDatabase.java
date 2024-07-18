@@ -20,7 +20,7 @@ public class JdbcArticleDatabase implements ArticleDatabase {
 
     @Override
     public Article save(final Article article) {
-        String query = "INSERT INTO articles (writer, title, contents, create_at, modified_at) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO articles (writer, title, contents, image_url, create_at, modified_at) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection con = dataSource.getConnection()) {
             PreparedStatement pstmt = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -28,8 +28,9 @@ public class JdbcArticleDatabase implements ArticleDatabase {
             pstmt.setString(1, article.getWriterId());
             pstmt.setString(2, article.getTitle());
             pstmt.setString(3, article.getContent());
-            pstmt.setTimestamp(4, Timestamp.valueOf(article.getCreatedAt()));
-            pstmt.setTimestamp(5, Timestamp.valueOf(article.getModifiedAt()));
+            pstmt.setString(4, article.getImageUrl());
+            pstmt.setTimestamp(5, Timestamp.valueOf(article.getCreatedAt()));
+            pstmt.setTimestamp(6, Timestamp.valueOf(article.getModifiedAt()));
 
             pstmt.executeUpdate();
 
@@ -62,6 +63,7 @@ public class JdbcArticleDatabase implements ArticleDatabase {
                         resultSet.getString("title"),
                         resultSet.getString("contents"),
                         resultSet.getString("writer"),
+                        resultSet.getString("image_url"),
                         resultSet.getTimestamp("create_at").toLocalDateTime(),
                         resultSet.getTimestamp("modified_at").toLocalDateTime()
                 ));
@@ -87,6 +89,7 @@ public class JdbcArticleDatabase implements ArticleDatabase {
                         resultSet.getString("title"),
                         resultSet.getString("contents"),
                         resultSet.getString("writer"),
+                        resultSet.getString("image_url"),
                         resultSet.getTimestamp("create_at").toLocalDateTime(),
                         resultSet.getTimestamp("modified_at").toLocalDateTime()
                 ));

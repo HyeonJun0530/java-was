@@ -8,23 +8,25 @@ public class Article {
     private String title;
     private String content;
     private String writerId;
+    private String imageUrl;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
     public Article(final Long sequence, final String title,
-                   final String content, final String writerId,
+                   final String content, final String writerId, final String imageUrl,
                    final LocalDateTime createdAt, final LocalDateTime modifiedAt) {
         this.sequence = sequence;
         this.title = title;
         this.content = content;
         this.writerId = writerId;
+        this.imageUrl = imageUrl;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
     }
 
     public Article(final String title, final String content, final String writerId,
-                   final LocalDateTime createdAt, final LocalDateTime modifiedAt) {
-        this(null, title, content, writerId, createdAt, modifiedAt);
+                   final String imageUrl, final LocalDateTime createdAt, final LocalDateTime modifiedAt) {
+        this(null, title, content, writerId, imageUrl, createdAt, modifiedAt);
     }
 
     public void setSequence(Long sequence) {
@@ -47,6 +49,10 @@ public class Article {
         return writerId;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -61,9 +67,10 @@ public class Article {
                 "sequence=" + sequence +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
-                ", writer=" + writerId +
-                ", createdTime=" + createdAt +
-                ", modifiedTime=" + modifiedAt +
+                ", writerId='" + writerId + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", createdAt=" + createdAt +
+                ", modifiedAt=" + modifiedAt +
                 '}';
     }
 
@@ -72,6 +79,7 @@ public class Article {
         private String title;
         private String content;
         private String writerId;
+        private String imageUrl;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
 
@@ -80,6 +88,7 @@ public class Article {
             this.title = title;
             this.content = content;
             this.writerId = writerId;
+            this.imageUrl = imageUrl;
             this.createdAt = createdAt;
             this.modifiedAt = modifiedAt;
         }
@@ -104,6 +113,11 @@ public class Article {
             return this;
         }
 
+        public Builder imageUrl(final String imageUrl) {
+            this.imageUrl = imageUrl;
+            return this;
+        }
+
         public Builder createdAt(final LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
@@ -115,7 +129,7 @@ public class Article {
         }
 
         public Article build() {
-            return new Article(title, content, writerId, createdAt, modifiedAt);
+            return new Article(title, content, writerId, imageUrl, createdAt, modifiedAt);
         }
     }
 }

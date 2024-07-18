@@ -48,6 +48,7 @@ public class DataSourceConfig {
                     "writer VARCHAR(255), " +
                     "title VARCHAR(255), " +
                     "contents TEXT, " +
+                    "image_url VARCHAR(255), " +
                     "create_at TIMESTAMP, " +
                     "modified_at TIMESTAMP)");
 

@@ -7,26 +7,31 @@ import codesquad.app.domain.User;
 import codesquad.app.infrastructure.ArticleDatabase;
 import codesquad.app.infrastructure.CommentDatabase;
 import codesquad.app.infrastructure.UserDatabase;
+import codesquad.http.exception.BadRequestException;
 import codesquad.http.exception.NotFoundException;
 import codesquad.http.message.SessionManager;
 import codesquad.http.message.constant.ContentType;
 import codesquad.http.message.constant.HttpMethod;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
+import codesquad.http.message.request.MultipartRequestBody;
 import codesquad.http.message.response.HttpResponse;
 import codesquad.http.model.ModelAndView;
 import codesquad.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+
+import static codesquad.utils.FileUtil.saveImage;
 
 public class ArticleApi {
 
     private static final Logger log = LoggerFactory.getLogger(ArticleApi.class);
+    private static final String imagesPath = System.getProperty("user.images.path", System.getProperty("user.home") + File.separator + "appImages" + File.separator + "images/");
 
     private final ArticleDatabase articleDatabase;
     private final CommentDatabase commentDatabase;
@@ -44,13 +49,37 @@ public class ArticleApi {
     }
 
     @ApiMapping(path = "/article", method = HttpMethod.POST)
-    public Object createArticle(final HttpRequest request) {
-        Map<String, String> parameter = request.getRequestBody().parseFormUrlEncoded();
+    public Object createArticleWithImage(final HttpRequest request) {
+        MultipartRequestBody requestBody = (MultipartRequestBody) request.getRequestBody();
+        List<MultipartRequestBody.Part> parts = requestBody.parseMultipart(request.getHttpHeaders());
+        String title = parts.stream()
+                .filter(part -> part.getName().equals("title"))
+                .map(part -> new String(part.getBody()))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException("Title not found"));
+
+        String content = parts.stream()
+                .filter(part -> part.getName().equals("content"))
+                .map(part -> new String(part.getBody()))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException("Content not found"));
+
+        Optional<byte[]> photo = parts.stream()
+                .filter(part -> part.getName().equals("photo"))
+                .map(part -> part.getBody())
+                .findFirst();
+
+        String imageUrl = null;
+        if (photo.isPresent()) {
+            byte[] image = photo.get();
+            imageUrl = saveImage(image);
+        }
 
         Article article = new Article.Builder()
-                .title(parameter.get("title"))
-                .content(parameter.get("content"))
+                .title(title)
+                .content(content)
                 .writerId(SessionManager.getUser(request.getSessionId()).get().getUserId())
+                .imageUrl(imageUrl)
                 .createdAt(LocalDateTime.now())
                 .modifiedAt(LocalDateTime.now())
                 .build();
@@ -95,4 +124,5 @@ public class ArticleApi {
 
         return mav;
     }
+
 }

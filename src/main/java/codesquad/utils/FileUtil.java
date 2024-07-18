@@ -4,8 +4,8 @@ import codesquad.http.exception.InternalServerException;
 import codesquad.http.exception.NotFoundException;
 import codesquad.http.handler.StaticHandler;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.UUID;
 
 public class FileUtil {
 
@@ -15,7 +15,16 @@ public class FileUtil {
 
         try (InputStream resourceAsStream = classLoader.getResourceAsStream(resourcePath)) {
             if (resourceAsStream == null) {
-                throw new NotFoundException("Static file not found");
+                File file = new File(path);
+
+                if (!file.exists()) {
+                    throw new NotFoundException("Static file not found");
+                }
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    return fis.readAllBytes();
+                } catch (IOException e) {
+                    throw new InternalServerException(e.getMessage());
+                }
             }
 
             return resourceAsStream.readAllBytes();
@@ -37,6 +46,26 @@ public class FileUtil {
         } catch (IOException e) {
             throw new InternalServerException(e.getMessage());
         }
+    }
+
+    public static String saveImage(byte[] image) {
+        String basePath = System.getProperty("user.images.path", System.getProperty("user.home") + File.separator + "appImages");
+        String imagesPath = basePath + File.separator + "images/";
+
+        File imagesDir = new File(imagesPath);
+        if (!imagesDir.exists()) {
+            imagesDir.mkdirs();
+        }
+
+        String imageName = UUID.randomUUID().toString() + ".png";
+        File imageFile = new File(imagesDir, imageName);
+        try (FileOutputStream fos = new FileOutputStream(imageFile)) {
+            fos.write(image);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save image", e);
+        }
+
+        return imageName;
     }
 
 }

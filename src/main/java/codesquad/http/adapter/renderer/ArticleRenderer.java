@@ -7,6 +7,7 @@ import codesquad.http.message.constant.ContentType;
 import codesquad.http.model.ModelAndView;
 import codesquad.utils.FileUtil;
 
+import java.io.File;
 import java.util.List;
 
 public class ArticleRenderer implements ViewRenderer {
@@ -90,6 +91,16 @@ public class ArticleRenderer implements ViewRenderer {
                     "                    </button>\n" +
                     "                </form>\n" +
                     "            </li>");
+        }
+
+        String basePath = System.getProperty("user.images.path", System.getProperty("user.home") + File.separator + "appImages");
+        String imagesPath = basePath + File.separator + "images/";
+
+        if (article.getImageUrl() != null) {
+            String imageUrl = article.getImageUrl();
+            result = result.replace("src=${article.image}", "src=\"" + imagesPath + imageUrl + "\"");
+        } else {
+            result = result.replace("src=${article.image}", "");
         }
 
         result = result.replace("${article.title}", article.getTitle());
