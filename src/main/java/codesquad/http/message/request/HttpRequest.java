@@ -1,5 +1,6 @@
 package codesquad.http.message.request;
 
+import codesquad.http.exception.BadRequestException;
 import codesquad.http.message.Cookie;
 import codesquad.http.message.HttpHeaders;
 import codesquad.http.message.constant.HttpHeader;
@@ -32,7 +33,7 @@ public class HttpRequest {
         int contentLength = Integer.parseInt(length);
 
         if (contentLength > 100000000) {
-            throw new IllegalArgumentException("Content-Length is too long");
+            throw new BadRequestException("Content-Length가 너무 큽니다.");
         }
 
         if (contentLength == 0) {

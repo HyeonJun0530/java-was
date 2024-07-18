@@ -1,6 +1,5 @@
 package codesquad.http;
 
-import codesquad.config.FilterChainConfig;
 import codesquad.http.filter.FilterChain;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
@@ -20,9 +19,14 @@ public class HttpProcessor implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(HttpProcessor.class);
     private final Socket connection;
+    private final FilterChain filterChain;
+    private final DispatcherServlet dispatcherServlet;
 
-    public HttpProcessor(final Socket connection) {
+    public HttpProcessor(final Socket connection, final FilterChain filterChain,
+                         final DispatcherServlet dispatcherServlet) {
         this.connection = connection;
+        this.filterChain = filterChain;
+        this.dispatcherServlet = dispatcherServlet;
     }
 
     @Override
@@ -36,7 +40,6 @@ public class HttpProcessor implements Runnable {
                 HttpRequest request = HttpRequest.from(reader);
                 log.debug("Request: {}", request);
 
-                FilterChain filterChain = FilterChainConfig.filterChain();
                 HttpResponse response = HttpResponse.empty();
                 filterChain.doFilter(request, response);
 
@@ -46,7 +49,7 @@ public class HttpProcessor implements Runnable {
                     return;
                 }
 
-                HttpResponse httpResponse = DispatcherServlet.service(request);
+                HttpResponse httpResponse = dispatcherServlet.service(request);
                 log.debug("Response: {}", httpResponse);
 
                 write(httpResponse, client);

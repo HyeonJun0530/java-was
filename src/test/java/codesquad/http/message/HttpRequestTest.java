@@ -1,5 +1,6 @@
 package codesquad.http.message;
 
+import codesquad.http.exception.BadRequestException;
 import codesquad.http.message.constant.HttpMethod;
 import codesquad.http.message.request.HttpRequest;
 import org.assertj.core.api.Assertions;
@@ -48,7 +49,7 @@ class HttpRequestTest {
                 "Content-Length: 0\r\n";
 
         Assertions.assertThatThrownBy(() -> getHttpRequest(input))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @Test

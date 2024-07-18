@@ -1,6 +1,7 @@
 package codesquad.http.adapter.renderer;
 
 import codesquad.app.domain.User;
+import codesquad.http.exception.InternalServerException;
 import codesquad.http.message.constant.ContentType;
 import codesquad.http.model.ModelAndView;
 import codesquad.utils.FileUtil;
@@ -9,17 +10,17 @@ import java.util.List;
 
 public class UserListRenderer implements ViewRenderer {
 
+    private static final String USER_ATTRIBUTE = "users";
+
     @Override
     public String render(final ModelAndView modelAndView) {
-        byte[] staticFile = FileUtil.getTemplateFile(modelAndView.getViewName());
-
-        String html = new String(staticFile);
+        String html = getTemplateFile(modelAndView);
 
         try {
-            List<User> users = (List<User>) modelAndView.getObject("users");
+            List<User> users = (List<User>) modelAndView.getObject(USER_ATTRIBUTE);
             return replace(html, users);
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("The 'users' attribute is not of type List<User>");
+            throw new InternalServerException(e.getMessage());
         }
     }
 
@@ -28,11 +29,11 @@ public class UserListRenderer implements ViewRenderer {
         try {
             FileUtil.getTemplateFile(modelAndView.getViewName());
 
-            if (!modelAndView.containsAttribute("users")) {
+            if (!modelAndView.containsAttribute(USER_ATTRIBUTE)) {
                 return false;
             }
 
-            return modelAndView.getObject("users") instanceof List;
+            return modelAndView.getObject(USER_ATTRIBUTE) instanceof List;
         } catch (IllegalArgumentException e) {
             return false;
         }
@@ -42,6 +43,7 @@ public class UserListRenderer implements ViewRenderer {
     public ContentType getContentType() {
         return ContentType.TEXT_HTML;
     }
+
 
     public String replace(final String html, final List<User> users) {
         StringBuilder render = new StringBuilder();

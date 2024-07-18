@@ -1,6 +1,9 @@
 package codesquad.http.adapter;
 
 import codesquad.app.domain.User;
+import codesquad.http.adapter.renderer.ArticleRenderer;
+import codesquad.http.adapter.renderer.UserListRenderer;
+import codesquad.http.exception.NotFoundException;
 import codesquad.http.model.ModelAndView;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +21,7 @@ class HttpResponseAdapterTest {
     void isSupportTemplateAdapter() {
         Object object = new ModelAndView();
         Object object1 = new String();
-        HttpResponseAdapter templateAdapter = new TemplateAdapter();
+        HttpResponseAdapter templateAdapter = new TemplateAdapter(List.of(new UserListRenderer(), new ArticleRenderer()));
 
         Assertions.assertAll(
                 () -> assertTrue(templateAdapter.isSupport(object)),
@@ -45,7 +48,7 @@ class HttpResponseAdapterTest {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/user/userList.html");
         mav.addObject("users", List.of(user1, user2));
-        HttpResponseAdapter templateAdapter = new TemplateAdapter();
+        HttpResponseAdapter templateAdapter = new TemplateAdapter(List.of(new UserListRenderer()));
 
         assertAll(
                 () -> assertTrue(templateAdapter.adapt(mav).toString().contains("OK")),
@@ -72,10 +75,10 @@ class HttpResponseAdapterTest {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("invalid");
         mav.addObject("users", List.of(user1, user2));
-        HttpResponseAdapter templateAdapter = new TemplateAdapter();
+        HttpResponseAdapter templateAdapter = new TemplateAdapter(List.of(new UserListRenderer()));
 
         assertThatThrownBy(() -> templateAdapter.adapt(mav))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(NotFoundException.class);
     }
 
 

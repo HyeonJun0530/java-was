@@ -1,11 +1,20 @@
 package codesquad.http.handler;
 
+import codesquad.app.api.ArticleApi;
+import codesquad.app.api.CommentApi;
+import codesquad.app.api.MainApi;
+import codesquad.app.api.UserApi;
+import codesquad.app.infrastructure.InMemoryArticleDatabase;
+import codesquad.app.infrastructure.InMemoryCommentDatabase;
+import codesquad.app.infrastructure.InMemoryUserDatabase;
 import codesquad.app.infrastructure.UserDatabase;
+import codesquad.http.exception.NotFoundException;
 import codesquad.http.message.constant.HttpStatus;
 import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.request.RequestBody;
 import codesquad.http.message.request.RequestStartLine;
 import codesquad.http.message.response.HttpResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,14 +22,38 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HttpRequestHandlerTest {
 
-    List<HttpRequestHandler> handlerList = List.of(new ApiHandler(), new StaticHandler());
+    List<HttpRequestHandler> handlerList;
+    UserDatabase userDatabase;
+
+    @BeforeEach
+    void setUp() {
+        userDatabase = new InMemoryUserDatabase();
+        InMemoryCommentDatabase commentDatabase = new InMemoryCommentDatabase();
+        InMemoryArticleDatabase articleDatabase = new InMemoryArticleDatabase();
+
+        UserApi userApi = new UserApi(userDatabase);
+        MainApi mainApi = new MainApi(userDatabase, articleDatabase, commentDatabase);
+        ArticleApi articleApi = new ArticleApi(articleDatabase, commentDatabase, userDatabase);
+        CommentApi commentApi = new CommentApi(articleDatabase, commentDatabase);
+
+        ApiHandler apiHandler = new ApiHandler(Map.of(UserApi.class, userApi,
+                MainApi.class, mainApi,
+                ArticleApi.class, articleApi,
+                CommentApi.class, commentApi));
+
+        StaticHandler staticHandler = new StaticHandler();
+
+        handlerList = List.of(apiHandler, staticHandler);
+    }
 
     private static HttpResponse getHttpResponse(final Object response) {
         assertInstanceOf(HttpResponse.class, response);
@@ -46,14 +79,9 @@ class HttpRequestHandlerTest {
     @DisplayName("HttpRequestHandlerTest 테스트 - 어디에서도 처리 할 수 없는 경우 - NOT_FOUND")
     void handle_fail() throws IOException {
         HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /no-exit HTTP/1.1"))), null, null);
-        Object response = handlerList.get(1).handle(httpRequest);
 
-        HttpResponse httpResponse = getHttpResponse(response);
-
-        assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
-                () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.NOT_FOUND.getReasonPhrase()),
-                () -> assertThat(httpResponse.toString()).contains(String.valueOf(HttpStatus.NOT_FOUND.value()))
-        );
+        assertThatThrownBy(() -> handlerList.get(1).handle(httpRequest))
+                .isInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -87,8 +115,6 @@ class HttpRequestHandlerTest {
 
         assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
                 () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.FOUND.getReasonPhrase()));
-
-        UserDatabase.remove("javajigi");
     }
 
     @Test
@@ -106,8 +132,6 @@ class HttpRequestHandlerTest {
         Object response = supportHandler.get().handle(httpRequest);
 
         HttpResponse httpResponse = getHttpResponse(response);
-
-        UserDatabase.remove("javajigi");
 
         assertAll(() -> assertThat(httpResponse.hasBody()).isFalse(),
                 () -> assertThat(httpResponse.toString()).containsIgnoringCase(HttpStatus.FOUND.getReasonPhrase())

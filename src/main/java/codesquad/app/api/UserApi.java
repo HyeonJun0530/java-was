@@ -23,6 +23,12 @@ public class UserApi {
 
     private static final Logger log = LoggerFactory.getLogger(UserApi.class);
 
+    private final UserDatabase userDatabase;
+
+    public UserApi(final UserDatabase userDatabase) {
+        this.userDatabase = userDatabase;
+    }
+
     @ApiMapping(method = HttpMethod.POST, path = "/create")
     public HttpResponse create(final HttpRequest request) {
         Map<String, String> body = request.getRequestBody().parseFormUrlEncoded();
@@ -38,12 +44,12 @@ public class UserApi {
                 .userId(userId)
                 .build();
 
-        UserDatabase.save(user);
+        userDatabase.save(user);
         log.debug("User: {}", user);
 
         HttpResponse response = HttpResponse.redirect(HttpStatus.FOUND, "/");
 
-        SessionManager.createSession(userId, response);
+        SessionManager.createSession(user, response);
 
         return response;
     }
@@ -78,7 +84,8 @@ public class UserApi {
         String userId = body.get("userId");
         String password = body.get("password");
 
-        User user = UserDatabase.findByUserId(userId);
+        User user = userDatabase.findByUserId(userId)
+                .orElse(null);
 
         if (user == null || !user.getPassword().equals(password)) {
             HttpResponse response = HttpResponse.redirect(HttpStatus.FOUND, "/login");
@@ -87,7 +94,7 @@ public class UserApi {
 
         HttpResponse response = HttpResponse.redirect(HttpStatus.FOUND, "/");
 
-        SessionManager.createSession(userId, response);
+        SessionManager.createSession(user, response);
 
         return response;
     }
@@ -110,7 +117,7 @@ public class UserApi {
     public ModelAndView getUserList(final HttpRequest request) {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/user/userList.html");
-        mav.addObject("users", UserDatabase.findAll());
+        mav.addObject("users", userDatabase.findAll());
 
         return mav;
     }

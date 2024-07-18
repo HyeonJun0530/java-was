@@ -1,38 +1,36 @@
 package codesquad.http.handler;
 
-import codesquad.app.api.MainApi;
-import codesquad.app.api.UserApi;
 import codesquad.app.api.annotation.ApiMapping;
-import codesquad.http.message.constant.HttpStatus;
+import codesquad.http.exception.*;
 import codesquad.http.message.request.HttpRequest;
-import codesquad.http.message.response.HttpResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ApiHandler implements HttpRequestHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
-    private static final List<Class> apiList = List.of(UserApi.class, MainApi.class);
+    private final Map<Class, Object> apiContainer;
+
+    public ApiHandler(final Map<Class, Object> apiContainer) {
+        this.apiContainer = apiContainer;
+    }
 
     @Override
     public Object handle(final HttpRequest request) {
         String path = request.getRequestStartLine().getPath();
         try {
-            List<Method> apiMethods = apiList.stream()
+            List<Method> apiMethods = apiContainer.keySet().stream()
                     .flatMap(apiClass -> Stream.of(apiClass.getMethods()))
-                    .filter(method -> method.isAnnotationPresent(ApiMapping.class))
-                    .filter(method -> method.getAnnotation(ApiMapping.class).path().equals(path))
+                    .filter(method -> matchPath(method, path))
                     .toList();
 
             if (apiMethods.isEmpty()) {
-                return HttpResponse.notFound();
+                throw new NotFoundException("API not found");
             }
 
             Optional<Method> findMethod = apiMethods.stream()
@@ -41,30 +39,55 @@ public class ApiHandler implements HttpRequestHandler {
                     .findFirst();
 
             if (findMethod.isEmpty()) {
-                return HttpResponse.of(HttpStatus.METHOD_NOT_ALLOWED);
+                throw new MethodNotAllowedException("Method not allowed");
             }
 
-            return findMethod.get().invoke(getNewInstance(findMethod.get().getDeclaringClass()), request);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException e) {
-            log.error("API handler error", e);
-            return HttpResponse.internalServerError();
+            return findMethod.get().invoke(apiContainer.get(findMethod.get().getDeclaringClass()), request);
+        } catch (NumberFormatException e) {
+            throw new BadRequestException(e.getMessage());
+        } catch (IllegalAccessException e) {
+            throw new InternalServerException(e.getMessage());
+        } catch (InvocationTargetException e) {
+            Throwable targetException = e.getTargetException();
+            if (targetException instanceof HttpException) {
+                throw (HttpException) targetException;
+            }
+
+            throw new InternalServerException(targetException.getMessage());
         }
     }
 
     @Override
     public boolean isSupport(final HttpRequest request) {
-        return apiList.stream()
+        return apiContainer.keySet().stream()
                 .flatMap(apiClass -> Stream.of(apiClass.getMethods()))
-                .anyMatch(method -> method.isAnnotationPresent(ApiMapping.class) &&
-                        method.getAnnotation(ApiMapping.class).path().equals(request.getRequestStartLine().getPath()));
+                .anyMatch(method -> matchPath(method, request.getRequestStartLine().getPath()));
     }
 
-    @SuppressWarnings("unchecked")
-    private static Object getNewInstance(final Class apiClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        Constructor<?> constructor = apiClass.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        return constructor.newInstance();
+    private static boolean matchPath(final Method method, final String requestPath) {
+        if (!method.isAnnotationPresent(ApiMapping.class)) {
+            return false;
+        }
+        String apiPath = method.getAnnotation(ApiMapping.class).path();
+        String[] apiPathSegments = apiPath.split("/");
+        String[] requestPathSegments = requestPath.split("/");
+
+        if (apiPathSegments.length != requestPathSegments.length) {
+            return false;
+        }
+
+        return IntStream.range(0, apiPathSegments.length)
+                .allMatch(i -> {
+                    if (apiPathSegments[i].startsWith("{") && apiPathSegments[i].endsWith("}")) {
+                        try {
+                            Long.parseLong(requestPathSegments[i]);
+                            return true;
+                        } catch (NumberFormatException e) {
+                            return false;
+                        }
+                    }
+                    return apiPathSegments[i].equals(requestPathSegments[i]);
+                });
     }
 
 }

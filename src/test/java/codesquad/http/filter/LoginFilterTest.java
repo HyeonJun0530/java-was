@@ -17,6 +17,8 @@ class LoginFilterTest {
 
     HttpRequest successRequest;
     HttpRequest failRequest;
+    HttpRequest pathVariableRequest;
+    HttpRequest pathVariableRequestFail;
     HttpResponse response;
     HttpFilterChain httpFilterChain;
     LoginFilter loginFilter = new LoginFilter(1);
@@ -25,6 +27,8 @@ class LoginFilterTest {
     void setUp() throws IOException {
         successRequest = HttpRequest.from(new BufferedReader(new StringReader("GET /login HTTP/1.1\r\nCookie: SID=1234\r\n\r\n")));
         failRequest = HttpRequest.from(new BufferedReader(new StringReader("GET /user/list HTTP/1.1")));
+        pathVariableRequest = HttpRequest.from(new BufferedReader(new StringReader("GET /11421415 HTTP/1.1")));
+        pathVariableRequestFail = HttpRequest.from(new BufferedReader(new StringReader("GET /11421415/aarsrfsr HTTP/1.1")));
         response = HttpResponse.empty();
         httpFilterChain = new HttpFilterChain();
         httpFilterChain.addFilter(loginFilter);
@@ -50,9 +54,13 @@ class LoginFilterTest {
     void isMatched() {
         boolean matched = loginFilter.isMatched(successRequest.getRequestStartLine().getPath());
         boolean notMatched = loginFilter.isMatched(failRequest.getRequestStartLine().getPath());
+        boolean pathVariableMatch = loginFilter.isMatched(pathVariableRequest.getRequestStartLine().getPath());
+        boolean pathVariableNotMatch = loginFilter.isMatched(pathVariableRequestFail.getRequestStartLine().getPath());
 
         assertAll(() -> assertTrue(matched),
-                () -> assertFalse(notMatched)
+                () -> assertFalse(notMatched),
+                () -> assertTrue(pathVariableMatch),
+                () -> assertFalse(pathVariableNotMatch)
         );
     }
 

@@ -2,15 +2,20 @@ package codesquad.config;
 
 import codesquad.http.filter.FilterChain;
 import codesquad.http.filter.HttpFilterChain;
+import codesquad.http.filter.LoginFilter;
 
 public class FilterChainConfig {
 
-    private static final FilterChain filterChain = new HttpFilterChain();
+    private final FilterChain filterChain;
 
-    private FilterChainConfig() {
+    public FilterChainConfig() {
+        this.filterChain = new HttpFilterChain();
+
+        filterChain.addFilter(new LoginFilter(100));
     }
 
-    public static FilterChain filterChain() {
+    public FilterChain getFilterChain() {
         return filterChain;
     }
+
 }

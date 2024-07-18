@@ -14,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static codesquad.utils.FileUtil.getStaticFile;
 import static codesquad.utils.HttpMessageUtils.DECODING_CHARSET;
 import static codesquad.utils.StringUtils.*;
 
@@ -53,16 +54,8 @@ public class HttpResponse {
         return new HttpResponse(ResponseLine.of(httpStatus), HttpHeaders.of(location), null);
     }
 
-    public static HttpResponse notFound() {
-        return HttpResponse.of(HttpStatus.NOT_FOUND);
-    }
-
     public static HttpResponse internalServerError() {
-        return HttpResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    public static HttpResponse badRequest() {
-        return HttpResponse.of(HttpStatus.BAD_REQUEST);
+        return HttpResponse.of(ContentType.TEXT_HTML, HttpStatus.INTERNAL_SERVER_ERROR, getStaticFile("/error/500Page.html"));
     }
 
     public void sendRedirect(final String path) {

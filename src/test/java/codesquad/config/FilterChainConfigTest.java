@@ -12,7 +12,7 @@ class FilterChainConfigTest {
     @Test
     @DisplayName("FilterChain이 HttpFilterChain 인스턴스를 반환한다.")
     void existFilterChainConfig() {
-        FilterChain filterChain = FilterChainConfig.filterChain();
+        FilterChain filterChain = new FilterChainConfig().getFilterChain();
 
         assertAll(() -> assertNotNull(filterChain),
                 () -> assertInstanceOf(HttpFilterChain.class, filterChain)
