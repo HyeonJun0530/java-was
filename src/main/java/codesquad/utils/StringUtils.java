@@ -17,6 +17,7 @@ public final class StringUtils {
     public static final String HYPHEN = "-";
     public static final String ASTERISK = "*";
     public static final String AND = "&";
+    public static final char CARRIAGE_RETURN = '\r';
 
 
     private StringUtils() {

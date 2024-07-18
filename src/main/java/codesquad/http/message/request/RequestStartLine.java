@@ -2,9 +2,10 @@ package codesquad.http.message.request;
 
 import codesquad.http.exception.BadRequestException;
 import codesquad.http.message.constant.HttpMethod;
+import codesquad.utils.HttpMessageUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class RequestStartLine {
         this.path = path;
     }
 
-    public static RequestStartLine from(final BufferedReader reader) throws IOException {
+    public static RequestStartLine from(final InputStream reader) throws IOException {
         String[] startLineTokens = getStartLineTokens(reader);
 
         HttpMethod method = HttpMethod.from(startLineTokens[0]);
@@ -53,8 +54,10 @@ public class RequestStartLine {
         return method.name() + SPACE + path.toString() + SPACE + protocol.toString();
     }
 
-    private static String[] getStartLineTokens(final BufferedReader reader) throws IOException {
-        String[] startLineTokens = URLDecoder.decode(reader.readLine(), "UTF-8").split(SPACE);
+    private static String[] getStartLineTokens(final InputStream reader) throws IOException {
+        String line = HttpMessageUtils.readLine(reader);
+
+        String[] startLineTokens = URLDecoder.decode(line, "UTF-8").split(SPACE);
 
         if (startLineTokens.length != 3) {
             throw new BadRequestException("Invalid Request Start Line");

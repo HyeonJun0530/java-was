@@ -1,45 +1,48 @@
 package codesquad.http.message.request;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Map;
 
 import static codesquad.utils.HttpMessageUtils.DECODING_CHARSET;
-import static codesquad.utils.StringUtils.EMPTY;
-import static codesquad.utils.StringUtils.EQUAL;
+import static codesquad.utils.StringUtils.*;
 import static java.util.stream.Collectors.toMap;
 
 public class RequestBody {
 
-    private final String body;
+    private final byte[] body;
 
-    private RequestBody(final String body) {
+    protected RequestBody(final byte[] body) {
         this.body = body;
     }
 
-    public static RequestBody from(final BufferedReader reader, final int contentLength) throws IOException {
-        char[] read = new char[contentLength];
+    public static RequestBody from(final InputStream reader, final int contentLength) throws IOException {
+        byte[] read = new byte[contentLength];
         reader.read(read);
 
-        String body = new String(read);
-        String decode = URLDecoder.decode(body, DECODING_CHARSET);
-
-        return new RequestBody(decode);
+        return new RequestBody(read);
     }
 
     public String getBody() {
-        return body;
+        try {
+            String body = new String(this.body);
+
+            return URLDecoder.decode(body, DECODING_CHARSET);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     @Override
     public String toString() {
-        return body;
+        return getBody();
     }
 
     public Map<String, String> parseFormUrlEncoded() {
-        return Arrays.stream(this.body.split("&"))
+        return Arrays.stream(getBody().split(AND))
                 .map(kv -> kv.split(EQUAL))
                 .collect(toMap(kv -> kv[0], kv -> kv.length > 1 ? kv[1] : EMPTY));
     }

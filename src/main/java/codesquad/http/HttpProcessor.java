@@ -6,9 +6,8 @@ import codesquad.http.message.response.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
@@ -34,10 +33,10 @@ public class HttpProcessor implements Runnable {
         try {
             log.debug("Client connected");
 
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            try (InputStream inputStream = connection.getInputStream();
                  OutputStream client = connection.getOutputStream()) {
 
-                HttpRequest request = HttpRequest.from(reader);
+                HttpRequest request = HttpRequest.from(inputStream);
                 log.debug("Request: {}", request);
 
                 HttpResponse response = HttpResponse.empty();
@@ -56,6 +55,8 @@ public class HttpProcessor implements Runnable {
             }
         } catch (IOException e) {
             log.error("Error handling client connection = {}", e);
+        } catch (Exception e) {
+            log.error("Error processing client request", e);
         } finally {
             try {
                 connection.close();

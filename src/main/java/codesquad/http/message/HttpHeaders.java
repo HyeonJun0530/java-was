@@ -5,8 +5,8 @@ import codesquad.http.message.constant.HttpHeader;
 import codesquad.http.message.response.ResponseBody;
 import codesquad.utils.HttpMessageUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
@@ -34,9 +34,8 @@ public class HttpHeaders {
         return new HttpHeaders(headers);
     }
 
-    public static HttpHeaders from(final BufferedReader reader) throws IOException {
+    public static HttpHeaders from(final InputStream reader) throws IOException {
         Map<String, String> headers = parseHeaders(reader);
-        addResponseDefaultHeaders(headers);
         return new HttpHeaders(headers);
     }
 
@@ -68,10 +67,10 @@ public class HttpHeaders {
         }
     }
 
-    private static Map<String, String> parseHeaders(final BufferedReader reader) throws IOException {
+    private static Map<String, String> parseHeaders(final InputStream reader) throws IOException {
         Map<String, String> headers = new HashMap<>();
         String line;
-        while ((line = reader.readLine()) != null && !line.isEmpty()) {
+        while ((line = HttpMessageUtils.readLine(reader)) != null && !line.isEmpty()) {
             URLDecoder.decode(line, DECODING_CHARSET);
             String[] headerTokens = line.split(COLON, 2);
             headers.put(headerTokens[0].trim(), headerTokens[1].trim());

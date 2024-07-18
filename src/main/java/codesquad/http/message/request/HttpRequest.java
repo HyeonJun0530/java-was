@@ -5,8 +5,8 @@ import codesquad.http.message.Cookie;
 import codesquad.http.message.HttpHeaders;
 import codesquad.http.message.constant.HttpHeader;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +26,7 @@ public class HttpRequest {
         this.requestBody = requestBody;
     }
 
-    public static HttpRequest from(final BufferedReader reader) throws IOException {
+    public static HttpRequest from(final InputStream reader) throws IOException {
         RequestStartLine requestStartLine = RequestStartLine.from(reader);
         HttpHeaders httpHeaders = HttpHeaders.from(reader);
         String length = Optional.ofNullable(httpHeaders.getHeader(CONTENT_LENGTH.getHeaderName())).orElse("0");
