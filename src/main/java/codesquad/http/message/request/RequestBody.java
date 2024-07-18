@@ -13,7 +13,7 @@ import static java.util.stream.Collectors.toMap;
 
 public class RequestBody {
 
-    private final byte[] body;
+    protected final byte[] body;
 
     protected RequestBody(final byte[] body) {
         this.body = body;

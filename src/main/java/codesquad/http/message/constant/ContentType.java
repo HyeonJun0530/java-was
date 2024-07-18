@@ -18,7 +18,8 @@ public enum ContentType {
     APPLICATION_XHTML("application/xhtml+xml", ".xhtml"),
     APPLICATION_OCTET_STREAM("application/octet-stream", ".bin"),
     APPLICATION_PDF("application/pdf", ".pdf"),
-    APPLICATION_JAVASCRIPT("application/javascript", ".js");
+    APPLICATION_JAVASCRIPT("application/javascript", ".js"),
+    MULTI_PART_FORM("multipart/form-data", ".form");
 
     private final String type;
     private final String ext;
@@ -42,6 +43,13 @@ public enum ContentType {
                 .filter(contentType -> contentType.type.equalsIgnoreCase(type))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 확장자입니다."));
+    }
+
+    public static boolean isImage(final String contentType) {
+        String lowerCase = contentType.toLowerCase();
+        return lowerCase.equals(IMAGE_JPEG.type) || lowerCase.equals(IMAGE_PNG.type)
+                || lowerCase.equals(IMAGE_GIF.type) || lowerCase.equals(IMAGE_SVG.type)
+                || lowerCase.equals(IMAGE_ICO.type);
     }
 
     public boolean isStatic() {

@@ -21,6 +21,7 @@ public enum HttpHeader {
     CONTENT_MD5("Content-MD5"),
     CONTENT_RANGE("Content-Range"),
     CONTENT_TYPE("Content-Type"),
+    CONTENT_DISPOSITION("Content-Disposition"),
     DATE("Date"),
     ETAG("ETag"),
     EXPECT("Expect"),
