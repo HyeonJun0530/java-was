@@ -6,10 +6,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 
+import static codesquad.utils.StringUtils.NEW_LINE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,10 +25,14 @@ class LoginFilterTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        successRequest = HttpRequest.from(new BufferedReader(new StringReader("GET /login HTTP/1.1\r\nCookie: SID=1234\r\n\r\n")));
-        failRequest = HttpRequest.from(new BufferedReader(new StringReader("GET /user/list HTTP/1.1")));
-        pathVariableRequest = HttpRequest.from(new BufferedReader(new StringReader("GET /11421415 HTTP/1.1")));
-        pathVariableRequestFail = HttpRequest.from(new BufferedReader(new StringReader("GET /11421415/aarsrfsr HTTP/1.1")));
+        String input = "GET /login HTTP/1.1" + NEW_LINE + "Cookie: SID=1234" + NEW_LINE + NEW_LINE;
+        successRequest = HttpRequest.from(new ByteArrayInputStream(input.getBytes()));
+        input = "GET /user/list HTTP/1.1";
+        failRequest = HttpRequest.from(new ByteArrayInputStream(input.getBytes()));
+        input = "GET /11421415 HTTP/1.1";
+        pathVariableRequest = HttpRequest.from(new ByteArrayInputStream(input.getBytes()));
+        input = "GET /11421415/aarsrfsr HTTP/1.1";
+        pathVariableRequestFail = HttpRequest.from(new ByteArrayInputStream(input.getBytes()));
         response = HttpResponse.empty();
         httpFilterChain = new HttpFilterChain();
         httpFilterChain.addFilter(loginFilter);

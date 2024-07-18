@@ -12,9 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.time.LocalDateTime;
 
 import static codesquad.utils.StringUtils.NEW_LINE;
@@ -129,11 +128,11 @@ class MainApiTest {
     private HttpRequest loginRequest() throws IOException {
         String session = SessionManager.createSession(user, HttpResponse.ok());
         String loginMessage = getMessage + "Cookie: SID=" + session + NEW_LINE;
-        return HttpRequest.from(new BufferedReader(new StringReader(loginMessage)));
+        return HttpRequest.from(new ByteArrayInputStream(loginMessage.getBytes()));
     }
 
     private HttpRequest noLoginRequest() throws IOException {
-        return HttpRequest.from(new BufferedReader(new StringReader(getMessage)));
+        return HttpRequest.from(new ByteArrayInputStream(getMessage.getBytes()));
     }
 
 }

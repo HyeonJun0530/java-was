@@ -18,9 +18,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,7 +64,8 @@ class HttpRequestHandlerTest {
     @Test
     @DisplayName("HttpRequestHandlerTest 테스트 - static 파일 요청이 성공적으로 처리되는 경우")
     void static_handle_success() throws IOException {
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /favicon.ico HTTP/1.1"))), null, null);
+        String input = "GET /favicon.ico HTTP/1.1";
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null, null);
         Object response = handlerList.get(1).handle(httpRequest);
 
         HttpResponse httpResponse = getHttpResponse(response);
@@ -78,7 +78,8 @@ class HttpRequestHandlerTest {
     @Test
     @DisplayName("HttpRequestHandlerTest 테스트 - 어디에서도 처리 할 수 없는 경우 - NOT_FOUND")
     void handle_fail() throws IOException {
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /no-exit HTTP/1.1"))), null, null);
+        String input = "GET /no-exit HTTP/1.1";
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null, null);
 
         assertThatThrownBy(() -> handlerList.get(1).handle(httpRequest))
                 .isInstanceOf(NotFoundException.class);
@@ -87,7 +88,8 @@ class HttpRequestHandlerTest {
     @Test
     @DisplayName("HttpRequestHandlerTest 테스트 - api 핸들러에 api가 없어서 static 핸들러로 처리되는 경우")
     void handle_static() throws IOException {
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /favicon.ico HTTP/1.1"))), null, null);
+        String input = "GET /favicon.ico HTTP/1.1";
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null, null);
         Optional<HttpRequestHandler> supportHandler = handlerList.stream()
                 .filter(handler -> handler.isSupport(httpRequest))
                 .findFirst();
@@ -107,8 +109,10 @@ class HttpRequestHandlerTest {
     @DisplayName("HttpRequestHandlerTest 테스트 - api 핸들러에 api가 있어서 성공적으로 HttpResponse 타입으로 처리되는 경우")
     void api_handle_success() throws IOException {
         String body = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
+        String input = "POST /create HTTP/1.1";
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null,
+                RequestBody.from(new ByteArrayInputStream(body.getBytes()), body.getBytes().length));
+
         Object response = handlerList.get(0).handle(httpRequest);
 
         HttpResponse httpResponse = getHttpResponse(response);
@@ -121,8 +125,9 @@ class HttpRequestHandlerTest {
     @DisplayName("HttpRequestHandlerTest 테스트 - api 핸들러에 api가 있어서 api 핸들러로 처리되는 경우")
     void handle_api() throws IOException {
         String body = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
+        String input = "POST /create HTTP/1.1";
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null,
+                RequestBody.from(new ByteArrayInputStream(body.getBytes()), body.getBytes().length));
         Optional<HttpRequestHandler> supportHandler = handlerList.stream()
                 .filter(handler -> handler.isSupport(httpRequest))
                 .findFirst();

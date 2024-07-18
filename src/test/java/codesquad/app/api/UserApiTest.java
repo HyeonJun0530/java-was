@@ -15,9 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 
 import static codesquad.utils.StringUtils.NEW_LINE;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -51,8 +50,10 @@ class UserApiTest {
     @Test
     @DisplayName("유저 생성 테스트")
     void createUser() throws IOException {
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader("userId=java&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")), 113));
+        String body = "userId=java&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
+        String input = "POST /create HTTP/1.1";
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null,
+                RequestBody.from(new ByteArrayInputStream(body.getBytes()), 113));
 
         HttpResponse response = userApi.create(httpRequest);
 
@@ -69,8 +70,9 @@ class UserApiTest {
     @DisplayName("유저 생성 테스트 - 중복 회원 가입은 막는다.")
     void createUser_duplicate() throws IOException {
         String body = "userId=javajigi&password=test&name=test&email=test@test.com";
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
+        String input = "POST /create HTTP/1.1";
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null,
+                RequestBody.from(new ByteArrayInputStream(body.getBytes()), body.getBytes().length));
 
         assertThatThrownBy(() -> userApi.create(httpRequest))
                 .isInstanceOf(BadRequestException.class);
@@ -136,8 +138,9 @@ class UserApiTest {
     @DisplayName("로그인 테스트 - 로그인 성공")
     void login() throws IOException {
         String body = "userId=test&password=test";
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /login HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
+        String input = "POST /login HTTP/1.1";
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null,
+                RequestBody.from(new ByteArrayInputStream(body.getBytes()), body.getBytes().length));
 
         HttpResponse response = userApi.login(httpRequest);
 
@@ -152,8 +155,9 @@ class UserApiTest {
     @DisplayName("로그인 테스트 - 로그인 실패")
     void login_fail() throws IOException {
         String body = "userId=test&password=wrong";
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /login HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
+        String input = "POST /login HTTP/1.1";
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null,
+                RequestBody.from(new ByteArrayInputStream(body.getBytes()), body.getBytes().length));
 
         HttpResponse response = userApi.login(httpRequest);
 
@@ -217,7 +221,7 @@ class UserApiTest {
                 "Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7" + NEW_LINE;
         String session = SessionManager.createSession(user, HttpResponse.ok());
         String loginMessage = getMessage + "Cookie: SID=" + session + NEW_LINE;
-        return HttpRequest.from(new BufferedReader(new StringReader(loginMessage)));
+        return HttpRequest.from(new ByteArrayInputStream(loginMessage.getBytes()));
     }
 
     private HttpRequest noLoginRequest() throws IOException {
@@ -227,7 +231,7 @@ class UserApiTest {
                 "Accept: */*" + NEW_LINE +
                 "Accept-Encoding: gzip, deflate, br" + NEW_LINE +
                 "Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7" + NEW_LINE;
-        return HttpRequest.from(new BufferedReader(new StringReader(getMessage)));
+        return HttpRequest.from(new ByteArrayInputStream(getMessage.getBytes()));
     }
 
 }

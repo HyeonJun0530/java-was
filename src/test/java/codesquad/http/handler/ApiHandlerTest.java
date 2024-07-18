@@ -20,11 +20,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.Map;
 
+import static codesquad.utils.StringUtils.NEW_LINE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -79,8 +79,9 @@ class ApiHandlerTest {
     public void api_handle_success() throws IOException {
         userDatabase.remove("javajigi");
         String body = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
+        String input = "POST /create HTTP/1.1";
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null,
+                RequestBody.from(new ByteArrayInputStream(body.getBytes()), body.getBytes().length));
         Object response = apiHandler.handle(httpRequest);
 
         HttpResponse httpResponse = convert(response);
@@ -92,7 +93,8 @@ class ApiHandlerTest {
     @Test
     @DisplayName("api 핸들러에 api가 없어서 실패하는 경우 - NOT_FOUND")
     void api_handle_fail() throws IOException {
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /notfound HTTP/1.1"))), null, null);
+        String input = "GET /notfound HTTP/1.1";
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null, null);
         assertThatThrownBy(() -> apiHandler.handle(httpRequest))
                 .isInstanceOf(NotFoundException.class);
     }
@@ -100,7 +102,8 @@ class ApiHandlerTest {
     @Test
     @DisplayName("api 핸들러 path는 맞는데 메서드가 다른 경우 - METHOD_NOT_ALLOWED")
     void api_handle_not_allowed() throws IOException {
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /create HTTP/1.1"))), null, null);
+        String input = "GET /create HTTP/1.1";
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null, null);
         assertThatThrownBy(() -> apiHandler.handle(httpRequest))
                 .isInstanceOf(MethodNotAllowedException.class);
     }
@@ -108,22 +111,22 @@ class ApiHandlerTest {
     @Test
     @DisplayName("api 핸들러 - 같은 url에 대해서 GET, POST 모두 처리 가능한 경우")
     void api() throws IOException {
-        String getMessage = "GET /login HTTP/1.1\r\n" +
-                "Host: localhost:8080\r\n" +
-                "Connection: keep-alive\r\n";
+        String getMessage = "GET /login HTTP/1.1" + NEW_LINE +
+                "Host: localhost:8080" + NEW_LINE +
+                "Connection: keep-alive" + NEW_LINE;
 
         int length = "userId=javajigi&password=password".getBytes().length;
 
-        String postMessage = "POST /login HTTP/1.1\r\n" +
-                "Host: localhost:8080\r\n" +
-                "Connection: keep-alive\r\n" +
-                "Content-Length: " + length + "\r\n" +
-                "Content-Type: application/x-www-form-urlencoded\r\n" +
-                "\r\n" +
+        String postMessage = "POST /login HTTP/1.1" + NEW_LINE +
+                "Host: localhost:8080" + NEW_LINE +
+                "Connection: keep-alive" + NEW_LINE +
+                "Content-Length: " + length + NEW_LINE +
+                "Content-Type: application/x-www-form-urlencoded" + NEW_LINE
+                + NEW_LINE +
                 "userId=javajigi&password=password";
 
-        HttpRequest get = HttpRequest.from(new BufferedReader(new StringReader(getMessage)));
-        HttpRequest post = HttpRequest.from(new BufferedReader(new StringReader(postMessage)));
+        HttpRequest get = HttpRequest.from(new ByteArrayInputStream(getMessage.getBytes()));
+        HttpRequest post = HttpRequest.from(new ByteArrayInputStream(postMessage.getBytes()));
 
         assertThat(apiHandler.handle(get).toString()).contains(HttpStatus.OK.getReasonPhrase());
         assertThat(apiHandler.handle(post).toString()).contains(HttpStatus.FOUND.getReasonPhrase());
@@ -133,9 +136,11 @@ class ApiHandlerTest {
     @DisplayName("api 핸들러에서 처리 유무를 반환")
     void is_api_request() throws IOException {
         String body = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
-        HttpRequest success = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("POST /create HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
-        HttpRequest fail = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /global.css HTTP/1.1"))), null, null);
+        String successInput = "POST /create HTTP/1.1";
+        HttpRequest success = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(successInput.getBytes())), null,
+                RequestBody.from(new ByteArrayInputStream(body.getBytes()), body.getBytes().length));
+        String failInput = "GET /global.css HTTP/1.1";
+        HttpRequest fail = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(failInput.getBytes())), null, null);
 
         assertAll(() -> assertThat(apiHandler.isSupport(success)).isTrue(),
                 () -> assertThat(apiHandler.isSupport(fail)).isFalse());
@@ -145,8 +150,9 @@ class ApiHandlerTest {
     @DisplayName("api 핸들러에서 처리 유무를 반환 - pathVariable이 있는 경우")
     void is_api_request_with_path_variable() throws IOException {
         String body = "title=title&content=hello";
-        HttpRequest success = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /1 HTTP/1.1"))), null,
-                RequestBody.from(new BufferedReader(new StringReader(body)), body.getBytes().length));
+        String input = "GET /1 HTTP/1.1";
+        HttpRequest success = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null,
+                RequestBody.from(new ByteArrayInputStream(body.getBytes()), body.getBytes().length));
 
         assertAll(() -> assertThat(apiHandler.isSupport(success)).isTrue());
     }
@@ -163,17 +169,17 @@ class ApiHandlerTest {
                 .writerId(userDatabase.findByUserId("javajigi").get().getUserId())
                 .build());
 
-        String message = "POST /1/comment HTTP/1.1\r\n" +
-                "Host: localhost:8080\r\n" +
-                "Connection: keep-alive\r\n" +
-                "Content-Length: 31\r\n" +
-                "Content-Type: application/x-www-form-urlencoded\r\n" +
-                "Referer: http://localhost:8080/1\r\n" +
-                "Cookie: SID=" + session + "\r\n" +
-                "\r\n" +
+        String message = "POST /1/comment HTTP/1.1" + NEW_LINE +
+                "Host: localhost:8080" + NEW_LINE +
+                "Connection: keep-alive" + NEW_LINE +
+                "Content-Length: 31" + NEW_LINE +
+                "Content-Type: application/x-www-form-urlencoded" + NEW_LINE +
+                "Referer: http://localhost:8080/1" + NEW_LINE +
+                "Cookie: SID=" + session + NEW_LINE
+                + NEW_LINE +
                 "writer=writer&contents=contents";
 
-        HttpRequest success = HttpRequest.from(new BufferedReader(new StringReader(message)));
+        HttpRequest success = HttpRequest.from(new ByteArrayInputStream(message.getBytes()));
 
         assertAll(() -> assertThat(apiHandler.handle(success)).isNotNull(),
                 () -> assertThat(apiHandler.handle(success)).isInstanceOf(HttpResponse.class));

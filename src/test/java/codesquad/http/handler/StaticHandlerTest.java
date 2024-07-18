@@ -8,9 +8,8 @@ import codesquad.http.message.response.HttpResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -31,7 +30,8 @@ class StaticHandlerTest {
     @Test
     @DisplayName("정적 파일 요청이 성공적으로 처리되는 경우")
     void handle_success() throws IOException {
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /favicon.ico HTTP/1.1"))), null, null);
+        String input = "GET /favicon.ico HTTP/1.1";
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null, null);
         Object response = staticHandler.handle(httpRequest);
 
         HttpResponse httpResponse = getHttpResponse(response);
@@ -44,7 +44,8 @@ class StaticHandlerTest {
     @Test
     @DisplayName("정적 파일 요청이 실패하는 경우 - NOT_FOUND")
     void handle_fail() throws IOException {
-        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new BufferedReader(new StringReader("GET /no-exit HTTP/1.1"))), null, null);
+        String input = "GET /no-exit HTTP/1.1";
+        HttpRequest httpRequest = new HttpRequest(RequestStartLine.from(new ByteArrayInputStream(input.getBytes())), null, null);
         assertThatThrownBy(() -> staticHandler.handle(httpRequest))
                 .isInstanceOf(NotFoundException.class);
     }

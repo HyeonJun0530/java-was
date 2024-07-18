@@ -8,9 +8,10 @@ import codesquad.http.message.request.HttpRequest;
 import codesquad.http.message.response.HttpResponse;
 import org.junit.jupiter.api.*;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
+
+import static codesquad.utils.StringUtils.NEW_LINE;
 
 class CommentApiTest {
 
@@ -52,14 +53,15 @@ class CommentApiTest {
     @DisplayName("CommentApiTest 테스트 - 댓글 생성")
     void createComment() throws IOException {
         String session = SessionManager.createSession(user, HttpResponse.ok());
-        HttpRequest httpRequest = HttpRequest.from(new BufferedReader(new StringReader("POST /1/comment HTTP/1.1\n" +
-                "Connection: keep-alive\n" +
-                "Content-Length: 31\n" +
-                "Content-Type: application/x-www-form-urlencoded\n" +
-                "Referer: http://localhost:8080/1\n" +
-                "Cookie: SID=" + session + "\n" +
-                "\n" +
-                "comment=contents")));
+        String input = "POST /1/comment HTTP/1.1" + NEW_LINE +
+                "Connection: keep-alive" + NEW_LINE +
+                "Content-Length: 31" + NEW_LINE +
+                "Content-Type: application/x-www-form-urlencoded" + NEW_LINE +
+                "Referer: http://localhost:8080/1" + NEW_LINE +
+                "Cookie: SID=" + session + NEW_LINE +
+                NEW_LINE +
+                "comment=contents";
+        HttpRequest httpRequest = HttpRequest.from(new ByteArrayInputStream(input.getBytes()));
         HttpResponse comment = commentApi.createComment(httpRequest);
 
         Assertions.assertAll(
@@ -70,11 +72,12 @@ class CommentApiTest {
 
     @Test
     void getComment() throws IOException {
-        HttpRequest httpRequest = HttpRequest.from(new BufferedReader(new StringReader("GET /comment HTTP/1.1\n" +
-                "Connection: keep-alive\n" +
-                "Content-Length: 0\n" +
-                "Content-Type: application/x-www-form-urlencoded\n" +
-                "\n")));
+        String input = "GET /comment HTTP/1.1" + NEW_LINE +
+                "Connection: keep-alive" + NEW_LINE +
+                "Content-Length: 0" + NEW_LINE +
+                "Content-Type: application/x-www-form-urlencoded" + NEW_LINE +
+                NEW_LINE;
+        HttpRequest httpRequest = HttpRequest.from(new ByteArrayInputStream(input.getBytes()));
 
         HttpResponse comment = commentApi.getComment(httpRequest);
 

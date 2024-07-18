@@ -8,10 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,7 +38,7 @@ class HttpHeadersTest {
                 "\r\n";
 
 
-        HttpHeaders httpHeaders = HttpHeaders.from(new BufferedReader(new StringReader(input)));
+        HttpHeaders httpHeaders = HttpHeaders.from(new ByteArrayInputStream(input.getBytes()));
         log.debug(httpHeaders.toString());
 
         assertNotNull(httpHeaders);
@@ -72,7 +71,7 @@ class HttpHeadersTest {
                 "Content-Type: text/html\r\n" +
                 "Content-Length: 0\r\n" +
                 "Cookie: name=hyeon\r\n\r\n";
-        HttpHeaders httpHeaders = HttpHeaders.from(new BufferedReader(new StringReader(input)));
+        HttpHeaders httpHeaders = HttpHeaders.from(new ByteArrayInputStream(input.getBytes()));
         List<Cookie> cookies = httpHeaders.getCookies();
 
         assertAll(() -> assertEquals(1, cookies.size()),

@@ -13,13 +13,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static codesquad.utils.StringUtils.NEW_LINE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,7 +42,8 @@ class ArticleApiTest {
     @Test
     @DisplayName("Article 작성 페이지를 가져온다.")
     void getCreateArticlePage() throws IOException {
-        Object createArticlePage = articleApi.getCreateArticlePage(HttpRequest.from(new BufferedReader(new StringReader("GET /article HTTP/1.1"))));
+        String input = "GET /article HTTP/1.1";
+        Object createArticlePage = articleApi.getCreateArticlePage(HttpRequest.from(new ByteArrayInputStream(input.getBytes())));
 
         assertAll(() -> assertThat(createArticlePage).isInstanceOf(HttpResponse.class),
                 () -> assertTrue(((HttpResponse) createArticlePage).toString().contains("200 OK")),
@@ -54,13 +55,15 @@ class ArticleApiTest {
     @DisplayName("Article을 생성한다.")
     void createArticle() throws IOException {
         String session = SessionManager.createSession(user, HttpResponse.ok());
-        articleApi.createArticle(HttpRequest.from(new BufferedReader(new StringReader("POST /article HTTP/1.1\n" +
-                "Content-Length: 31\n" +
-                "Content-Type: application/x-www-form-urlencoded\n" +
-                "Cookie: SID=" + session + "\n" +
-
-                "\n" +
-                "title=제목&content=내용"))));
+        String input = "POST /article HTTP/1.1" + NEW_LINE +
+                "Cookie: " + "SID=" + session + NEW_LINE +
+                "Content-Length: 23" + NEW_LINE +
+                "Content-Type: application/x-www-form-urlencoded" + NEW_LINE +
+                NEW_LINE +
+                "title=제목&contents=내용";
+        HttpRequest from = HttpRequest.from(new ByteArrayInputStream(input.getBytes()));
+        System.out.println(from);
+        articleApi.createArticle(from);
         Optional<Article> byLastSequence = articleDatabase.findByLastSequence();
 
         assertAll(() -> assertTrue(byLastSequence.isPresent()),
@@ -73,7 +76,8 @@ class ArticleApiTest {
     @DisplayName("해당 번호의 Article을 가져온다.")
     void getArticle() throws IOException {
         articleDatabase.save(new Article(1L, "제목", "내용", user.getUserId(), LocalDateTime.now(), LocalDateTime.now()));
-        Object article = articleApi.getArticle(HttpRequest.from(new BufferedReader(new StringReader("GET /1 HTTP/1.1"))));
+        String input = "GET /1 HTTP/1.1";
+        Object article = articleApi.getArticle(HttpRequest.from(new ByteArrayInputStream(input.getBytes())));
 
         assertAll(() -> assertInstanceOf(ModelAndView.class, article),
                 () -> assertEquals("/article/index.html", ((ModelAndView) article).getViewName()),
@@ -89,7 +93,10 @@ class ArticleApiTest {
     @DisplayName("해당 번호의 Article을 가져온다. - 실패")
     void getArticle_fail() throws IOException {
         assertThatThrownBy(() ->
-                articleApi.getArticle(HttpRequest.from(new BufferedReader(new StringReader("GET /1 HTTP/1.1")))))
+        {
+            String input = "GET /1 HTTP/1.1";
+            articleApi.getArticle(HttpRequest.from(new ByteArrayInputStream(input.getBytes())));
+        })
                 .isInstanceOf(NotFoundException.class);
     }
 
