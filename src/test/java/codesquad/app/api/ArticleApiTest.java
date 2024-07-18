@@ -57,25 +57,38 @@ class ArticleApiTest {
         String session = SessionManager.createSession(user, HttpResponse.ok());
         String input = "POST /article HTTP/1.1" + NEW_LINE +
                 "Cookie: " + "SID=" + session + NEW_LINE +
-                "Content-Length: 23" + NEW_LINE +
-                "Content-Type: application/x-www-form-urlencoded" + NEW_LINE +
+                "Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW" + NEW_LINE +
+                "Content-Length: 200" + NEW_LINE +
                 NEW_LINE +
-                "title=제목&contents=내용";
+                "------WebKitFormBoundary7MA4YWxkTrZu0gW" + NEW_LINE +
+                "Content-Disposition: form-data; name=\"title\"" + NEW_LINE +
+                NEW_LINE +
+                "제목" + NEW_LINE +
+                "------WebKitFormBoundary7MA4YWxkTrZu0gW" + NEW_LINE +
+                "Content-Disposition: form-data; name=\"content\"" + NEW_LINE +
+                NEW_LINE +
+                "내용" + NEW_LINE +
+                "------WebKitFormBoundary7MA4YWxkTrZu0gW" + NEW_LINE +
+                "Content-Disposition: form-data; name=\"image\"; filename=\"image.png\"" + NEW_LINE +
+                "Content-Type: image/png" + NEW_LINE +
+                NEW_LINE +
+                "이미지" + NEW_LINE +
+                "------WebKitFormBoundary7MA4YWxkTrZu0gW--" + NEW_LINE;
         HttpRequest from = HttpRequest.from(new ByteArrayInputStream(input.getBytes()));
         System.out.println(from);
-        articleApi.createArticle(from);
+        articleApi.createArticleWithImage(from);
         Optional<Article> byLastSequence = articleDatabase.findByLastSequence();
 
         assertAll(() -> assertTrue(byLastSequence.isPresent()),
-                () -> assertEquals("제목", byLastSequence.get().getTitle()),
-                () -> assertEquals("javajigi", byLastSequence.get().getWriterId())
+                () -> assertTrue(byLastSequence.get().getTitle().contains("제목")),
+                () -> assertTrue(byLastSequence.get().getWriterId().contains("javajigi"))
         );
     }
 
     @Test
     @DisplayName("해당 번호의 Article을 가져온다.")
     void getArticle() throws IOException {
-        articleDatabase.save(new Article(1L, "제목", "내용", user.getUserId(), LocalDateTime.now(), LocalDateTime.now()));
+        articleDatabase.save(new Article(1L, "제목", "내용", user.getUserId(), "image", LocalDateTime.now(), LocalDateTime.now()));
         String input = "GET /1 HTTP/1.1";
         Object article = articleApi.getArticle(HttpRequest.from(new ByteArrayInputStream(input.getBytes())));
 

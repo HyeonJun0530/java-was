@@ -114,7 +114,7 @@ class MainApiTest {
     @Test
     @DisplayName("Article이 있는 상태에서 /main 경로로 요청이 들어오면 최근 Article을 반환한다")
     void getMainPageWithArticle() throws IOException {
-        articleDatabase.save(new Article("test", "contest", user.getUserId(),
+        articleDatabase.save(new Article("test", "contest", user.getUserId(), "image",
                 LocalDateTime.now(), LocalDateTime.now()));
 
         HttpRequest httpRequest = loginRequest();
