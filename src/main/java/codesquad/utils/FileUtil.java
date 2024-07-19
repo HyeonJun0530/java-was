@@ -54,7 +54,7 @@ public class FileUtil {
 
         File imagesDir = new File(imagesPath);
         if (!imagesDir.exists()) {
-            imagesDir.mkdirs();
+            throw new InternalServerException("Images directory not found");
         }
 
         String imageName = UUID.randomUUID().toString() + fileExt;
