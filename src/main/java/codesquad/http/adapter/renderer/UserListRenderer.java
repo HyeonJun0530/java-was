@@ -8,6 +8,8 @@ import codesquad.utils.FileUtil;
 
 import java.util.List;
 
+import static codesquad.utils.HttpMessageUtils.sanitizeHtml;
+
 public class UserListRenderer implements ViewRenderer {
 
     private static final String USER_ATTRIBUTE = "users";
@@ -51,9 +53,9 @@ public class UserListRenderer implements ViewRenderer {
             User user = users.get(i);
             render.append("<tr>");
             render.append("<td>").append(i + 1).append("</td>");
-            render.append("<td>").append(user.getUserId()).append("</td>");
-            render.append("<td>").append(user.getName()).append("</td>");
-            render.append("<td>").append(user.getEmail()).append("</td>");
+            render.append("<td>").append(sanitizeHtml(user.getUserId())).append("</td>");
+            render.append("<td>").append(sanitizeHtml(user.getName())).append("</td>");
+            render.append("<td>").append(sanitizeHtml(user.getEmail())).append("</td>");
             render.append("</tr>");
         }
 

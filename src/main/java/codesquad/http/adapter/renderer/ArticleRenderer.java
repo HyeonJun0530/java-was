@@ -10,6 +10,8 @@ import codesquad.utils.FileUtil;
 import java.io.File;
 import java.util.List;
 
+import static codesquad.utils.HttpMessageUtils.sanitizeHtml;
+
 public class ArticleRenderer implements ViewRenderer {
 
     private static final String ARTICLE_ATTRIBUTE = "article";
@@ -98,14 +100,14 @@ public class ArticleRenderer implements ViewRenderer {
 
         if (article.getImageUrl() != null) {
             String imageUrl = article.getImageUrl();
-            result = result.replace("src=${article.image}", "src=\"" + imagesPath + imageUrl + "\"");
+            result = result.replace("src=${article.image}", "src=\"" + imagesPath + sanitizeHtml(imageUrl) + "\"");
         } else {
             result = result.replace("src=${article.image}", "");
         }
 
-        result = result.replace("${article.title}", article.getTitle());
-        result = result.replace("${article.user.name}", writerName);
-        result = result.replace("${article.content}", article.getContent());
+        result = result.replace("${article.title}", sanitizeHtml(article.getTitle()));
+        result = result.replace("${article.user.name}", sanitizeHtml(writerName));
+        result = result.replace("${article.content}", sanitizeHtml(article.getContent()));
 
         StringBuilder renderedComments = new StringBuilder();
 
@@ -113,9 +115,9 @@ public class ArticleRenderer implements ViewRenderer {
             renderedComments.append("<li class=\"comment__item\">");
             renderedComments.append("<div class=\"comment__item__user\">");
             renderedComments.append("<img class=\"comment__item__user__img\"/>");
-            renderedComments.append("<p class=\"comment__item__user__nickname\">").append(comment.getWriter()).append("</p>");
+            renderedComments.append("<p class=\"comment__item__user__nickname\">").append(sanitizeHtml(comment.getWriter())).append("</p>");
             renderedComments.append("</div>");
-            renderedComments.append("<p class=\"comment__item__article\">").append(comment.getContents()).append("</p>");
+            renderedComments.append("<p class=\"comment__item__article\">").append(sanitizeHtml(comment.getContents())).append("</p>");
             renderedComments.append("</li>");
         }
 

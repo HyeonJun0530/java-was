@@ -44,4 +44,9 @@ public class HttpMessageUtils {
 
         return gmtDateTime.format(formatter);
     }
+
+    public static String sanitizeHtml(String htmlContent) {
+        return htmlContent.replace("<", "\"").replace(">", "\"");
+    }
+
 }
