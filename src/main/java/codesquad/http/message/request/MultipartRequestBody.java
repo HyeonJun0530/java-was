@@ -26,20 +26,8 @@ public class MultipartRequestBody extends RequestBody {
     public static MultipartRequestBody from(final InputStream reader, final int contentLength, final HttpHeaders httpHeaders) throws IOException {
         BufferedInputStream bufferedInputStream = new BufferedInputStream(reader);
         byte[] read = new byte[contentLength];
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-//        bufferedInputStream.read(read);
-        int length = 0;
-        while (true) {
-            read[length] = (byte) bufferedInputStream.read();
-            length++;
-            if (length > contentLength - 1) {
-                break;
-            }
-        }
+
+        bufferedInputStream.readNBytes(read, 0, contentLength);
 
         return new MultipartRequestBody(read, httpHeaders);
     }
