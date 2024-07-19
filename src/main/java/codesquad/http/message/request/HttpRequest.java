@@ -16,6 +16,8 @@ import static codesquad.utils.StringUtils.NEW_LINE;
 
 public class HttpRequest {
 
+    private static final int limitContentLength = 10000000;
+
     private final RequestStartLine requestStartLine;
     private final HttpHeaders httpHeaders;
     private final RequestBody requestBody;
@@ -33,7 +35,7 @@ public class HttpRequest {
         String length = Optional.ofNullable(httpHeaders.getHeader(CONTENT_LENGTH.getHeaderName())).orElse("0");
         int contentLength = Integer.parseInt(length);
 
-        if (contentLength > 10000000) {
+        if (contentLength > limitContentLength) {
             throw new BadRequestException("Content-Length가 너무 큽니다.");
         }
 
