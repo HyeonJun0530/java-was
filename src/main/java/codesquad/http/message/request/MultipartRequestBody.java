@@ -26,7 +26,20 @@ public class MultipartRequestBody extends RequestBody {
     public static MultipartRequestBody from(final InputStream reader, final int contentLength, final HttpHeaders httpHeaders) throws IOException {
         BufferedInputStream bufferedInputStream = new BufferedInputStream(reader);
         byte[] read = new byte[contentLength];
-        bufferedInputStream.read(read);
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+//        bufferedInputStream.read(read);
+        int length = 0;
+        while (true) {
+            read[length] = (byte) bufferedInputStream.read();
+            length++;
+            if (length > contentLength - 1) {
+                break;
+            }
+        }
 
         return new MultipartRequestBody(read, httpHeaders);
     }
@@ -88,12 +101,14 @@ public class MultipartRequestBody extends RequestBody {
 
     public static class Part {
         private final String name;
+        private final String fileName;
         private final String contentType;
         private final String contentDisposition;
         private final byte[] body;
 
-        public Part(final String name, final String contentType, final String contentDisposition, final byte[] body) {
+        public Part(final String name, final String fileName, final String contentType, final String contentDisposition, final byte[] body) {
             this.name = name;
+            this.fileName = fileName;
             this.contentType = contentType;
             this.contentDisposition = contentDisposition;
             this.body = body;
@@ -113,7 +128,7 @@ public class MultipartRequestBody extends RequestBody {
             String filename = extractValue(headerPart, "filename=\"", "\"");
             String contentType = extractValue(headerPart, "Content-Type: ", NEW_LINE);
 
-            return new Part(name, contentType, headerPart, contentBytes);
+            return new Part(name, filename, contentType, headerPart, contentBytes);
         }
 
         private static int findHeaderEndIndex(byte[] body) {
@@ -155,6 +170,10 @@ public class MultipartRequestBody extends RequestBody {
 
         public String getContentDisposition() {
             return contentDisposition;
+        }
+
+        public String getFileName() {
+            return fileName;
         }
 
         public byte[] getBody() {
