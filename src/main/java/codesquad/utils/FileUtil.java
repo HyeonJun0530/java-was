@@ -48,7 +48,7 @@ public class FileUtil {
         }
     }
 
-    public static String saveImage(byte[] image) {
+    public static String saveImage(byte[] image, String fileExt) {
         String basePath = System.getProperty("user.images.path", System.getProperty("user.home") + File.separator + "appImages");
         String imagesPath = basePath + File.separator + "images/";
 
@@ -57,10 +57,11 @@ public class FileUtil {
             imagesDir.mkdirs();
         }
 
-        String imageName = UUID.randomUUID().toString() + ".png";
+        String imageName = UUID.randomUUID().toString() + fileExt;
         File imageFile = new File(imagesDir, imageName);
-        try (FileOutputStream fos = new FileOutputStream(imageFile)) {
+        try (BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(imageFile))) {
             fos.write(image);
+            fos.flush();
         } catch (IOException e) {
             throw new RuntimeException("Failed to save image", e);
         }

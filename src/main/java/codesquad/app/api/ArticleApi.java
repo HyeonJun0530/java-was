@@ -69,10 +69,24 @@ public class ArticleApi {
                 .map(part -> part.getBody())
                 .findFirst();
 
+        Optional<String> photoNameExtension = parts.stream()
+                .filter(part -> part.getName().equals("photo"))
+                .map(part -> part.getFileName())
+                .findFirst()
+                .map(fileName -> {
+                    int lastIndexOfDot = fileName.lastIndexOf('.');
+                    if (lastIndexOfDot > 0 && lastIndexOfDot < fileName.length() - 1) {
+                        return fileName.substring(lastIndexOfDot);
+                    } else {
+                        return ""; // Or return null, depending on how you want to handle files without an extension.
+                    }
+                });
+
+
         String imageUrl = null;
         if (photo.isPresent()) {
             byte[] image = photo.get();
-            imageUrl = saveImage(image);
+            imageUrl = saveImage(image, photoNameExtension.get());
         }
 
         Article article = new Article.Builder()
