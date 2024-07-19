@@ -22,7 +22,7 @@ public class DataSourceConfig {
         runServer();
 
         JdbcConnectionPool connectionPool = JdbcConnectionPool.create(URL, USER_NAME, PASSWORD);
-        connectionPool.setMaxConnections(3);
+        connectionPool.setMaxConnections(5);
 
         this.dataSource = connectionPool;
 
