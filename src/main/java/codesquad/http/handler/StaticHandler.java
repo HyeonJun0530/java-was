@@ -12,7 +12,7 @@ import static codesquad.utils.FileUtil.getStaticFile;
 
 public class StaticHandler implements HttpRequestHandler {
 
-    public static final List<String> staticExtension = List.of(".css", ".js", ".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg");
+    public static final List<String> staticExtension = List.of(".css", ".js", ".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp");
 
     @Override
     public Object handle(final HttpRequest httpRequest) {

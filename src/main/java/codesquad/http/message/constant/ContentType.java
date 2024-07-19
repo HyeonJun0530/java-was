@@ -13,6 +13,7 @@ public enum ContentType {
     IMAGE_GIF("image/gif", ".gif"),
     IMAGE_SVG("image/svg+xml", ".svg"),
     IMAGE_ICO("image/x-icon", ".ico"),
+    IMAGE_WEBP("image/webp", ".webp"),
     APPLICATION_JSON("application/json", ".json"),
     APPLICATION_FORM("application/x-www-form-urlencoded", ".form"),
     APPLICATION_XML("application/xml", ".xml"),
